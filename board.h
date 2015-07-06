@@ -24,7 +24,7 @@ public: // methods
 
     bool operator== (BoardLocation& bl)
     {
-        return m_x == bl.m_x && m_y && bl.m_y;
+        return m_x == bl.m_x && m_y == bl.m_y;
     }
 
 public: // inlines

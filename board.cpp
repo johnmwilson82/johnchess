@@ -182,6 +182,9 @@ bool Board::move_piece(BoardLocation curr_loc, BoardLocation new_loc)
 {
     Piece* captured_piece = square(new_loc).get_piece();
     Piece* moving_piece = square(curr_loc).get_piece();
+    if(!moving_piece)
+        return false;
+
     if(!moving_piece->move(*this, new_loc))
         return false;
 

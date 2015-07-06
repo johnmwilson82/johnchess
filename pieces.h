@@ -5,7 +5,7 @@
 
 #include <vector>
 #include <string>
-
+#include <iostream>
 
 class Piece;
 
@@ -39,8 +39,11 @@ public:
 
     bool operator== (Move& m)
     {
-        return m_piece == m.m_piece && m_new_loc == m.m_new_loc;
+        //std::cout << (size_t)m_piece << " = " << (size_t)m.m_piece << " : " << m_new_loc.get_x() << " = " << m.m_new_loc.get_x() << " : " << m_new_loc.get_y() << " = " << m.m_new_loc.get_y() << ((m_new_loc == m.m_new_loc) ? " true" : " false") << std::endl;
+        return (m_piece == m.m_piece) && (m_new_loc == m.m_new_loc);
     }
+
+    BoardLocation get_board_loc() { return m_new_loc; }
 
 private:
     BoardLocation m_new_loc;
@@ -78,7 +81,7 @@ public: //public interface
     virtual std::vector<Move> get_all_valid_moves(Board& board) = 0;
     virtual bool check_valid_move(Board& board, Move move) {
         std::vector<Move> valid_moves = get_all_valid_moves(board);
-        for (std::vector<Move>::iterator it = valid_moves.begin(); it != valid_moves.end(); ++it)
+        for (std::vector<Move>::iterator it = valid_moves.begin(); it != valid_moves.end(); it++)
         {
             if(*it == move)
                 return true;
@@ -97,6 +100,7 @@ public: // public methods
         if(!check_valid_move(board, Move(this, new_loc)))
             return false;
         m_loc = new_loc;
+        return true;
     }
 
 protected:

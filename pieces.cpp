@@ -1,4 +1,6 @@
 #include "pieces.h"
+#include <iostream>
+
 Piece::~Piece()
 {
 }
@@ -60,8 +62,10 @@ std::vector<Move> Pawn::get_all_valid_moves(Board& board)
     int dir = m_colour == Piece::WHITE ? 1 : -1;
     std::vector<Move> ret;
     BoardLocation new_loc;
-    BoardLocation curr_loc(m_loc);
-    for(int i = 0; i < 2; i++)
+    BoardLocation curr_loc = m_loc;
+    int j = (m_colour == Piece::WHITE) && (m_loc.get_y() == 1) ||
+            (m_colour == Piece::BLACK) && (m_loc.get_y() == 6) ? 2 : 1;
+    for(int i = 0; i < j; i++)
     {
         new_loc = curr_loc.apply_move(0, dir);
         if (new_loc.get_valid() && board.square(new_loc).is_empty())
@@ -79,6 +83,12 @@ std::vector<Move> Pawn::get_all_valid_moves(Board& board)
     new_loc = m_loc.apply_move(-1, dir);
     if (new_loc.get_valid() && !board.square(new_loc).is_empty() && board.square(new_loc).get_piece()->get_colour() != m_colour)
         ret.push_back(Move(this, new_loc));
+
+    /*std::cout << "piece location = " << m_loc.get_x() << ", " << m_loc.get_y() << std::endl;
+    for (int i = 0; i < ret.size(); i++)
+    {
+    std::cout << "move " << i+1 << ": " << ret[i].get_board_loc().get_x() << ", " << ret[i].get_board_loc().get_y() << std::endl;
+    }*/
 
     return ret;
 }

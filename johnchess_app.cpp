@@ -4,7 +4,12 @@ JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
     m_app_opts(NULL)
 {
     m_app_opts = parse_args(argc, argv);
-    m_xboard_interface = new XBoardInterface(get_input_stream(), get_output_stream()); //opts.out_stream);
+    m_xboard_interface = new XBoardInterface(get_input_stream(), get_output_stream(), "Johnchess v0.1");
+    m_xboard_interface->add_feature("memory=1");
+    m_xboard_interface->add_feature("setboard=0");
+    m_xboard_interface->add_feature("ping=1");
+    m_xboard_interface->add_variant("normal");
+
     show_welcome();
     m_board = new Board(8, 8);
 }
@@ -28,14 +33,49 @@ void JohnchessApp::main_loop()
             m_xboard_interface->reply_invalid(rcvd);
             continue;
         }
-        if (rcvd.is_finish()){
-            break;
-        }
-        if (rcvd.get_type() == XBoardInterface::CommandReceived::MOVE)
+        switch(rcvd.get_type())
         {
-            if(!m_board->move_piece(rcvd.get_move_string()))
-                m_xboard_interface->reply_illegal_move(rcvd);
+            case XBoardInterface::CommandReceived::MOVE:
+                if(!m_board->move_piece(rcvd.get_move_string()))
+                    m_xboard_interface->reply_illegal_move(rcvd);
+                break;
+
+            case XBoardInterface::CommandReceived::INFO_REQ:
+                m_xboard_interface->reply_features();
+                break;
+
+            case XBoardInterface::CommandReceived::INIT:
+                m_xboard_interface->reply_newline();
+                break;
+
+            case XBoardInterface::CommandReceived::PING:
+                m_xboard_interface->reply_ping(rcvd);
+                break;
+
+            case XBoardInterface::CommandReceived::NEW:
+                m_board->set_to_start_position();
+                break;
+
+            case XBoardInterface::CommandReceived::MEMORY:
+                // set max memory
+            case XBoardInterface::CommandReceived::LEVEL:
+                // set level
+            case XBoardInterface::CommandReceived::POST:
+                // set output pondering mode
+            case XBoardInterface::CommandReceived::HARD:
+                // set hard mode
+            case XBoardInterface::CommandReceived::RANDOM:
+                // set random mode
+            case XBoardInterface::CommandReceived::TIME:
+            case XBoardInterface::CommandReceived::OTIM:
+            case XBoardInterface::CommandReceived::NONE:
+                break;
+
+            case XBoardInterface::CommandReceived::QUIT:
+                finished = true;
+                break;
         }
+
     }
 }
 
