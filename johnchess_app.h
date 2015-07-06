@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "xboard_interface.h"
+#include "board.h"
 
 class JohnchessApp {
 private:
@@ -11,7 +12,6 @@ private:
         std::ostream *out_stream;
         app_opts() : in_stream(NULL), out_stream(NULL) {}
     } app_opts_t;
-    XBoardInterface *m_xboard_interface;
 
 public: //ctor + dtor
     JohnchessApp(int argc, const char* argv[]);
@@ -21,6 +21,8 @@ public: //public methods
     void main_loop();
 
 private:
+    XBoardInterface *m_xboard_interface;
+    Board *m_board;
     app_opts_t* parse_args(int argc, const char* argv[]);
     void show_welcome();
     app_opts_t* m_app_opts;

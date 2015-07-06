@@ -6,6 +6,7 @@ JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
     m_app_opts = parse_args(argc, argv);
     m_xboard_interface = new XBoardInterface(get_input_stream(), get_output_stream()); //opts.out_stream);
     show_welcome();
+    m_board = new Board(8, 8);
 }
 
 JohnchessApp::~JohnchessApp()
@@ -14,6 +15,7 @@ JohnchessApp::~JohnchessApp()
         delete m_app_opts;
 
     delete m_xboard_interface;
+    delete m_board;
 }
 
 void JohnchessApp::main_loop()
@@ -28,6 +30,11 @@ void JohnchessApp::main_loop()
         }
         if (rcvd.is_finish()){
             break;
+        }
+        if (rcvd.get_type() == XBoardInterface::CommandReceived::MOVE)
+        {
+            if(!m_board->move_piece(rcvd.get_move_string()))
+                m_xboard_interface->reply_illegal_move(rcvd);
         }
     }
 }
