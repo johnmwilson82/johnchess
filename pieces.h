@@ -44,7 +44,7 @@ public:
     }
 
     BoardLocation get_board_loc() { return m_new_loc; }
-
+    std::string to_string();
 private:
     BoardLocation m_new_loc;
     Piece *m_piece;

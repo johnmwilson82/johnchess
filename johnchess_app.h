@@ -4,6 +4,7 @@
 #include <iostream>
 #include "xboard_interface.h"
 #include "board.h"
+#include "ai.h"
 
 class JohnchessApp {
 private:
@@ -28,6 +29,7 @@ private:
     app_opts_t* m_app_opts;
     std::istream& get_input_stream();
     std::ostream& get_output_stream();
+    AI* m_ai;
 };
 
 #endif //JOHNCHESS_APP_H

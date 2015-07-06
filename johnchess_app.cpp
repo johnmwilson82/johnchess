@@ -1,4 +1,5 @@
 #include "johnchess_app.h"
+#include <stdexcept>
 
 JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
     m_app_opts(NULL)
@@ -12,6 +13,8 @@ JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
 
     show_welcome();
     m_board = new Board(8, 8);
+
+    m_ai = new RandomAI(Piece::BLACK);
 }
 
 JohnchessApp::~JohnchessApp()
@@ -21,6 +24,7 @@ JohnchessApp::~JohnchessApp()
 
     delete m_xboard_interface;
     delete m_board;
+    delete m_ai;
 }
 
 void JohnchessApp::main_loop()
@@ -38,6 +42,13 @@ void JohnchessApp::main_loop()
             case XBoardInterface::CommandReceived::MOVE:
                 if(!m_board->move_piece(rcvd.get_move_string()))
                     m_xboard_interface->reply_illegal_move(rcvd);
+                else
+                {
+                    std::string move_string = m_ai->make_move(m_board).to_string();
+                    if(!m_board->move_piece(move_string))
+                        throw std::runtime_error("AI seems to have generated a nonsense move");
+                    m_xboard_interface->send_move(move_string);
+                }
                 break;
 
             case XBoardInterface::CommandReceived::INFO_REQ:

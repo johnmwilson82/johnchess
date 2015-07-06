@@ -11,15 +11,21 @@ Move::Move(Piece *piece, DynMove dm) :
     m_new_loc = piece->get_loc().apply_move(dm);
 }
 
+std::string Move::to_string()
+{
+    return m_piece->get_loc().to_string() + m_new_loc.to_string();
+}
+
 std::vector<Move> Piece::get_all_slide_moves(std::vector<DynMove> dms, Board& board)
 {
     std::vector<Move> ret;
     for(std::vector<DynMove>::iterator it = dms.begin(); it != dms.end(); ++it)
     {
-        BoardLocation curr_loc(m_loc);
+        BoardLocation curr_loc = m_loc;
         while(true)
         {
             BoardLocation new_loc = curr_loc.apply_move(*it);
+            //std::cout << new_loc.get_x() << ", " << new_loc.get_y() << " : " << m_loc.get_x() << ", " << m_loc.get_y() << std::endl;
             if (new_loc.get_valid())
             {
                 if (board.square(new_loc).is_empty())
@@ -32,6 +38,8 @@ std::vector<Move> Piece::get_all_slide_moves(std::vector<DynMove> dms, Board& bo
                     ret.push_back(Move(this, new_loc));
                     break;
                 }
+                else
+                    break;
             }
             else
                 break;

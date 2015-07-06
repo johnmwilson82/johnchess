@@ -27,6 +27,14 @@ public: // methods
         return m_x == bl.m_x && m_y == bl.m_y;
     }
 
+    std::string to_string()
+    {
+        std::string ret = "a1";
+        ret[0] += m_x;
+        ret[1] += m_y;
+        return ret;
+    }
+
 public: // inlines
 
     inline int get_x() { return m_x; }

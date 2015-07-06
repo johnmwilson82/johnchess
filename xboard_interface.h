@@ -91,6 +91,7 @@ public:
     void reply_invalid(CommandReceived rcvd);
     void reply_illegal_move(CommandReceived rcvd);
     void reply_ping(CommandReceived rcvd);
+    void send_move(std::string move);
     void reply_newline();
     void add_variant(std::string variant_name);
     void add_feature(std::string feature_str);

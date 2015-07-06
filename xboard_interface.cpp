@@ -1,12 +1,14 @@
 #include "xboard_interface.h"
+#include <csignal>
 
 XBoardInterface::XBoardInterface(std::istream& instr, std::ostream& outstr, std::string app_name) :
     m_instr(instr),
     m_outstr(outstr),
     m_app_name(app_name)
 {
-    //instr.setf(std::ios::unitbuf);
-    //outstr.setf(std::ios::unitbuf);
+    instr.setf(std::ios::unitbuf);
+    outstr.setf(std::ios::unitbuf);
+    signal(SIGINT, SIG_IGN);
 }
 
 
@@ -53,6 +55,11 @@ void XBoardInterface::add_option(std::string option_str)
 void XBoardInterface::reply_ping(CommandReceived rcvd)
 {
     write_command("pong", rcvd.get_params()[0]);
+}
+
+void XBoardInterface::send_move(std::string move)
+{
+    write_command("move", move);
 }
 
 void XBoardInterface::reply_features()
