@@ -85,6 +85,10 @@ void JohnchessApp::main_loop()
             case XBoardInterface::CommandReceived::QUIT:
                 finished = true;
                 break;
+
+            case XBoardInterface::CommandReceived::EDIT:
+                m_board->set_from_edit_mode(m_xboard_interface->read_edit_mode());
+                break;
         }
 
     }

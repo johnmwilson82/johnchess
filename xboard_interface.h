@@ -28,6 +28,8 @@ public:
             QUIT,
             TIME,
             OTIM,
+            EDIT,
+            FORCE,
             NONE
         } type_t;
 
@@ -37,7 +39,7 @@ public:
             m_invalid(false),
             m_finish(false),
             m_type(NONE)
-        { 
+        {
             try
             {
                 parse(rcvd);
@@ -52,6 +54,7 @@ public:
         bool is_invalid() { return m_invalid; }
         bool is_finish() { return m_finish; }
         type_t get_type() { return m_type; }
+
         std::string get_move_string()
         {
             if (m_type != MOVE)
@@ -60,11 +63,11 @@ public:
         }
         std::deque<std::string> get_params() { return m_params; }
         std::deque<int> get_intparams()
-        { 
+        {
             std::deque<int> ret;
             for(std::deque<std::string>::iterator it = m_params.begin(); it != m_params.end(); it++)
             {
-                ret.push_back(atoi((*it).c_str())); 
+                ret.push_back(atoi((*it).c_str()));
             }
             return ret;
         }
@@ -97,6 +100,7 @@ public:
     void add_feature(std::string feature_str);
     void add_option(std::string option_str);
     void reply_features();
+    std::vector<std::string> read_edit_mode();
 
 private:
     void write_command(std::string command, std::string content);

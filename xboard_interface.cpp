@@ -94,6 +94,19 @@ void XBoardInterface::reply_features()
     m_outstr << "feature done=1" << std::endl;
 }
 
+std::vector<std::string> XBoardInterface::read_edit_mode()
+{
+    std::vector<std::string> out;
+    std::string rcvd;
+
+    do{
+        std::getline(m_instr, rcvd);
+        out.push_back(rcvd);
+    }while(rcvd.compare("."));
+
+    return out;
+}
+
 bool XBoardInterface::CommandReceived::check_move_string(std::string comm)
 {
     if (comm.size() != 4)
@@ -195,6 +208,16 @@ void XBoardInterface::CommandReceived::parse(std::string rcvd)
         else if(!command.compare("hard"))
         {
             m_type = HARD;
+            break;
+        }
+        else if(!command.compare("force"))
+        {
+            m_type = FORCE;
+            break;
+        }
+        else if(!command.compare("edit"))
+        {
+            m_type = EDIT;
             break;
         }
         else if(check_move_string(command))

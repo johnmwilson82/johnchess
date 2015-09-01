@@ -118,6 +118,7 @@ void Board::delete_all_pieces()
         square((*it)->get_loc()).remove_piece();
         delete *it;
     }
+    m_pieces.clear();
 }
 
 bool Board::add_piece(Piece::Type type, Piece::Colour col, std::string loc)
@@ -161,6 +162,7 @@ bool Board::remove_piece(std::string loc)
 {
     return remove_piece(BoardLocation(loc, this));
 }
+
 bool Board::remove_piece(BoardLocation loc)
 {
     // This doesn't fully delete the pieces, just removes them from play
@@ -169,6 +171,7 @@ bool Board::remove_piece(BoardLocation loc)
 
     Piece* piece = square(loc).get_piece();
     piece->set_on_board(false);
+    return true;
 }
 
 bool Board::move_piece(std::string move_str)
@@ -239,5 +242,65 @@ void Board::set_to_start_position()
 
 void Board::register_captured(Piece* piece)
 {
+
+}
+
+void Board::set_from_edit_mode(std::vector<std::string> in)
+{
+    Piece::Colour col = Piece::WHITE;
+
+    for(std::vector<std::string>::iterator it = in.begin(); it != in.end(); it++)
+    {
+    	// see http://www.gnu.org/software/xboard/engine-intf.html
+        if (!it->compare("#"))
+        {
+            delete_all_pieces();
+            continue;
+        }
+        else if (!it->compare("."))
+        {
+        	return;
+        }
+        else if (!it->compare("c"))
+        {
+        	if (col == Piece::WHITE)
+        		col = Piece::BLACK;
+        	else
+        		col = Piece::WHITE;
+        	continue;
+        }
+
+        // At this point we have a string in the form Tcr,
+        // T = type (P, N, B, R, Q, K),
+        // cr = col + row
+        std::string sq = it->substr(1);
+
+
+        switch ((*it)[0])
+        {
+        case 'P':
+        	add_piece(Piece::PAWN, col, sq);
+        	break;
+        case 'N':
+        	add_piece(Piece::KNIGHT, col, sq);
+        	break;
+        case 'B':
+        	add_piece(Piece::BISHOP, col, sq);
+        	break;
+        case 'R':
+        	add_piece(Piece::ROOK, col, sq);
+        	break;
+        case 'Q':
+        	add_piece(Piece::QUEEN, col, sq);
+        	break;
+        case 'K':
+        	add_piece(Piece::KING, col, sq);
+        	break;
+        default:
+        	throw std::runtime_error(std::string("Invalid edit string: ") + *it);
+        }
+
+    }
+
 
 }

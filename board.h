@@ -118,6 +118,7 @@ public:
     bool move_piece(BoardLocation curr_loc, BoardLocation new_loc);
     int get_dim_x() { return m_dim_x; }
     int get_dim_y() { return m_dim_y; }
+    void set_from_edit_mode(std::vector<std::string> edit_mode_string);
 
 private:
     void delete_all_pieces();
