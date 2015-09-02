@@ -33,7 +33,7 @@ protected:
 
 /*! /brief Random moves AI
  *
- * This AI just picks the first move that it finds which is legal and
+ * This AI just picks a random move that it finds which is legal and
  * plays it!
  */
 class RandomAI : public AI

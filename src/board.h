@@ -151,6 +151,7 @@ public:
     {
         delete_all_pieces();
     }
+    Board(Board& board);
 
     //! Set the board to the starting position
     /*!
@@ -210,13 +211,13 @@ public:
     /*!
      * \return true on success and if there was a piece to remove
      */
-    bool move_piece(std::string move_str);
+    bool move_piece(std::string move_str, bool check_test=true);
 
     //! Move a piece on the board where move is defined by a current and new BoardLocation
     /*!
      * \return true on success and if there was a piece to remove
      */
-    bool move_piece(BoardLocation curr_loc, BoardLocation new_loc);
+    bool move_piece(BoardLocation curr_loc, BoardLocation new_loc, bool check_test=true);
 
     //! Return the number of columns
     int get_dim_x() { return m_dim_x; }
@@ -230,6 +231,21 @@ public:
      *                         (i.e. from 'edit' to '.')
      */
     void set_from_edit_mode(std::vector<std::string> edit_mode_strings);
+
+    //! Return whether this board is in check
+    /*!
+     * \return true if either side is in check, false otherwise
+     */
+    inline bool get_in_check()
+    {
+        return get_in_check(Piece::WHITE) || get_in_check(Piece::BLACK);
+    }
+
+    //! Return whether given colour's king is in check
+    /*!
+     * \return true if parameter colour is in check, false otherwise
+     */
+    bool get_in_check(Piece::Colour col, bool get_valid_move_check_test=false);
 
 private:
     //! Delete all the pieces from the board

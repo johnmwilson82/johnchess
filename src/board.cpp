@@ -94,6 +94,18 @@ Board::Board(int dim_x, int dim_y) :
     set_to_start_position();
 }
 
+Board::Board(Board& orig) :
+    m_dim_x(orig.m_dim_x),
+    m_dim_y(orig.m_dim_y),
+    m_squares(orig.m_dim_x*orig.m_dim_y),
+    m_colour_to_move(orig.m_colour_to_move)
+{
+    for(std::vector<Piece*>::iterator it = orig.m_pieces.begin(); it != orig.m_pieces.end(); it++)
+    {
+        add_piece((*it)->get_type(), (*it)->get_colour(), (*it)->get_loc());
+    }
+}
+
 void Board::delete_all_pieces()
 {
     for(std::vector<Piece*>::iterator it = m_pieces.begin(); it != m_pieces.end(); ++it)
@@ -157,23 +169,23 @@ bool Board::remove_piece(BoardLocation loc)
     return true;
 }
 
-bool Board::move_piece(std::string move_str)
+bool Board::move_piece(std::string move_str, bool check_test)
 {
     std::string curr_loc = move_str.substr(0, 2);
     std::string new_loc = move_str.substr(2);
 
     m_colour_to_move = (m_colour_to_move == Piece::WHITE ? Piece::BLACK : Piece::WHITE);
-    return move_piece(BoardLocation(curr_loc, this), BoardLocation(new_loc, this));
+    return move_piece(BoardLocation(curr_loc, this), BoardLocation(new_loc, this), check_test);
 }
 
-bool Board::move_piece(BoardLocation curr_loc, BoardLocation new_loc)
+bool Board::move_piece(BoardLocation curr_loc, BoardLocation new_loc, bool check_test)
 {
     Piece* captured_piece = square(new_loc).get_piece();
     Piece* moving_piece = square(curr_loc).get_piece();
     if(!moving_piece)
         return false;
 
-    if(!moving_piece->move(*this, new_loc))
+    if(!moving_piece->move(*this, new_loc, check_test))
         return false;
 
     if(captured_piece)
@@ -192,6 +204,11 @@ bool Board::move_piece(BoardLocation curr_loc, BoardLocation new_loc)
 void Board::set_to_start_position()
 {
     delete_all_pieces();
+    // Kings will occupy the first two elements of m_pieces for
+    // quick lookup
+    add_piece(Piece::KING,   Piece::WHITE, "e1");
+    add_piece(Piece::KING,   Piece::BLACK, "e8");
+
     add_piece(Piece::PAWN,   Piece::WHITE, "a2");
     add_piece(Piece::PAWN,   Piece::WHITE, "b2");
     add_piece(Piece::PAWN,   Piece::WHITE, "c2");
@@ -204,7 +221,6 @@ void Board::set_to_start_position()
     add_piece(Piece::KNIGHT, Piece::WHITE, "b1");
     add_piece(Piece::BISHOP, Piece::WHITE, "c1");
     add_piece(Piece::QUEEN,  Piece::WHITE, "d1");
-    add_piece(Piece::KING,   Piece::WHITE, "e1");
     add_piece(Piece::BISHOP, Piece::WHITE, "f1");
     add_piece(Piece::KNIGHT, Piece::WHITE, "g1");
     add_piece(Piece::ROOK,   Piece::WHITE, "h1");
@@ -221,7 +237,6 @@ void Board::set_to_start_position()
     add_piece(Piece::KNIGHT, Piece::BLACK, "b8");
     add_piece(Piece::BISHOP, Piece::BLACK, "c8");
     add_piece(Piece::QUEEN,  Piece::BLACK, "d8");
-    add_piece(Piece::KING,   Piece::BLACK, "e8");
     add_piece(Piece::BISHOP, Piece::BLACK, "f8");
     add_piece(Piece::KNIGHT, Piece::BLACK, "g8");
     add_piece(Piece::ROOK,   Piece::BLACK, "h8");
@@ -232,6 +247,23 @@ void Board::set_to_start_position()
 void Board::register_captured(Piece* piece)
 {
 
+}
+
+bool Board::get_in_check(Piece::Colour col, bool get_valid_move_check_test)
+{
+    Piece::Colour opp_col = col == Piece::WHITE ? Piece::BLACK : Piece::WHITE;
+
+    // Optimisation based on fact that white king is always m_pieces[0]
+    // and black king is always m_pieces[1]
+    Piece* king = m_pieces[col == Piece::WHITE ? 0 : 1];
+
+    for(std::vector<Piece*>::iterator it = m_pieces.begin()+2; it != m_pieces.end(); it++)
+    {
+        if ((*it)->get_colour() == opp_col &&
+            (*it)->check_valid_move(*this, Move(*it, king->get_loc()), get_valid_move_check_test))
+            return true;
+    }
+    return false;
 }
 
 void Board::set_from_edit_mode(std::vector<std::string> in)

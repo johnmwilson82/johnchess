@@ -70,17 +70,18 @@ public:
     };
 
 public: //ctor/dtor
-    Piece(Colour colour, BoardLocation loc) :
+    Piece(Colour colour, BoardLocation loc, Type type) :
         m_colour(colour),
-        m_loc(loc)
+        m_loc(loc),
+        m_type(type)
     {
     }
     virtual ~Piece();
 
 public: //public interface
-    virtual std::vector<Move> get_all_valid_moves(Board& board) = 0;
-    virtual bool check_valid_move(Board& board, Move move) {
-        std::vector<Move> valid_moves = get_all_valid_moves(board);
+    virtual std::vector<Move> get_all_valid_moves(Board& board, bool check_test=true) = 0;
+    virtual bool check_valid_move(Board& board, Move move, bool check_test=true) {
+        std::vector<Move> valid_moves = get_all_valid_moves(board, check_test);
         for (std::vector<Move>::iterator it = valid_moves.begin(); it != valid_moves.end(); it++)
         {
             if(*it == move)
@@ -91,25 +92,30 @@ public: //public interface
     virtual std::vector<std::string> get_symbol_list() = 0;
 
 public: // public methods
+    static inline Colour opposite_colour(Colour col) { return col == Piece::WHITE ? Piece::BLACK : Piece::WHITE; }
     inline Colour get_colour() { return m_colour; }
+    inline Type get_type() { return m_type; }
     inline BoardLocation get_loc() { return m_loc; }
     inline std::string get_symbol() { return get_symbol_list()[0]; }
     inline void set_on_board(bool val) { m_loc.set_on_board(val); }
-    inline bool move(Board& board, BoardLocation new_loc)
+    inline bool move(Board& board, BoardLocation new_loc, bool get_valid_move_check_test=true)
     {
-        if(!check_valid_move(board, Move(this, new_loc)))
+        if(!check_valid_move(board, Move(this, new_loc), get_valid_move_check_test))
             return false;
         m_loc = new_loc;
         return true;
     }
 
 protected:
-    std::vector<Move> get_all_slide_moves(std::vector<DynMove> dms, Board& board);
-    std::vector<Move> get_all_hop_moves(std::vector<DynMove> dms, Board& board);
+    std::vector<Move> get_all_slide_moves(std::vector<DynMove> dms, Board& board, bool check_test=true);
+    std::vector<Move> get_all_hop_moves(std::vector<DynMove> dms, Board& board, bool check_test=true);
+
+    bool push_move_with_check_test(bool check_test, Board &board, BoardLocation &new_loc, std::vector<Move> &move_list);
 
 protected:
     BoardLocation m_loc;
     Piece::Colour m_colour;
+    Piece::Type m_type;
 };
 
 class King : public Piece
@@ -117,7 +123,7 @@ class King : public Piece
 public:
     King(Colour colour, BoardLocation loc);
     ~King() {}
-    std::vector<Move> get_all_valid_moves(Board& board);
+    std::vector<Move> get_all_valid_moves(Board& board, bool check_test);
     std::vector<std::string> get_symbol_list();
 private:
     std::vector<DynMove> m_dm_list;
@@ -128,7 +134,7 @@ class Queen : public Piece
 public:
     Queen(Colour colour, BoardLocation loc);
     ~Queen() {}
-    std::vector<Move> get_all_valid_moves(Board& board);
+    std::vector<Move> get_all_valid_moves(Board& board, bool check_test);
     std::vector<std::string> get_symbol_list();
 private:
     std::vector<DynMove> m_dm_list;
@@ -140,7 +146,7 @@ class Rook : public Piece
 public:
     Rook(Colour colour, BoardLocation loc);
     ~Rook() {}
-    std::vector<Move> get_all_valid_moves(Board& board);
+    std::vector<Move> get_all_valid_moves(Board& board, bool check_test);
     std::vector<std::string> get_symbol_list();
 private:
     std::vector<DynMove> m_dm_list;
@@ -152,7 +158,7 @@ class Bishop : public Piece
 public:
     Bishop(Colour colour, BoardLocation loc);
     ~Bishop() {}
-    std::vector<Move> get_all_valid_moves(Board& board);
+    std::vector<Move> get_all_valid_moves(Board& board, bool check_test);
     std::vector<std::string> get_symbol_list();
 private:
     std::vector<DynMove> m_dm_list;
@@ -164,7 +170,7 @@ class Knight : public Piece
 public:
     Knight(Colour colour, BoardLocation loc);
     ~Knight() {}
-    std::vector<Move> get_all_valid_moves(Board& board);
+    std::vector<Move> get_all_valid_moves(Board& board, bool check_test);
     std::vector<std::string> get_symbol_list();
 private:
     std::vector<DynMove> m_dm_list;
@@ -175,7 +181,7 @@ class Pawn : public Piece
 public:
     Pawn(Colour colour, BoardLocation loc);
     ~Pawn() {}
-    std::vector<Move> get_all_valid_moves(Board& board);
+    std::vector<Move> get_all_valid_moves(Board& board, bool check_test);
     std::vector<std::string> get_symbol_list();
 };
 
