@@ -270,11 +270,10 @@ void Board::set_from_edit_mode(std::vector<std::string> in)
         	continue;
         }
 
-        // At this point we have a string in the form Tcr,
+        // At this point we have a string in the form 'Tcr' where:
         // T = type (P, N, B, R, Q, K),
         // cr = col + row
         std::string sq = it->substr(1);
-
 
         switch ((*it)[0])
         {

@@ -8,25 +8,54 @@ class Board;
 class DynMove;
 class Piece;
 
+/*! /brief Board location
+ *
+ * Defines a location on (or off) a given board, each piece will have a
+ * BoardLocation. BoardLocations are used to perform moves on and
+ * have flags to define whether the piece who's location they represent
+ * are on the board or not, and whether the result of any moves is valid
+ * or not.
+ */
 class BoardLocation
 {
 public: //ctor + dtor
     BoardLocation();
-    BoardLocation(const BoardLocation& board);
+    BoardLocation(const BoardLocation& boardloc);
     BoardLocation(std::string loc_str, Board* board);
     BoardLocation(int x, int y, Board* board);
     ~BoardLocation();
 
 public: // methods
+    //! Apply a move to a BoardLocation
+    /*!
+     * \param dm Relative move to be added to the current location
+     * \return New BoardLocation with the relative move applied
+     */
     BoardLocation apply_move(DynMove& dm);
+
+    //! Apply a move to a BoardLocation
+    /*!
+     * \param dx Relative shift in columns
+     * \param dy Relative shift in rows
+     * \return New BoardLocation with the relative move applied
+     */
     BoardLocation apply_move(int dx, int dy);
+
+    //! Apply a move in-place to a BoardLocation
+    /*!
+     * \param dx Relative shift in columns
+     * \param dy Relative shift in rows
+     * \return true is move if valid and resultant position is on the board, false otherwise
+     */
     bool apply_move_inplace(int dx, int dy);
 
+    //! Equals operator
     bool operator== (BoardLocation& bl)
     {
         return m_x == bl.m_x && m_y == bl.m_y;
     }
 
+    //! Return string representation of BoardLocation (using standard notation)
     std::string to_string()
     {
         std::string ret = "a1";
@@ -37,11 +66,22 @@ public: // methods
 
 public: // inlines
 
+    //! Get board column
+    /*!
+     * \return 0 for col a -> 7 for col h
+     */
     inline int get_x() { return m_x; }
+    //! Get board row
+    /*!
+     * \return 0 for row 1 -> 7 for row 8
+     */
     inline int get_y() { return m_y; }
+    //! Return true if BoardLocation is on the board
     inline bool get_on_board() { return m_on_board; }
+    //! Return true if BoardLocation is a valid location
     inline bool get_valid() { return m_valid; }
-    inline void set_on_board(bool val) { m_on_board = false; }
+    //! Set whether the BoardLocation is on the board or not (e.g. captured piece)
+    inline void set_on_board(bool val) { m_on_board = val; }
 
 private:
     void register_captured(Piece* piece);
@@ -54,6 +94,11 @@ private: // properties
 
 #include "pieces.h"
 
+/*! /brief Represents a square on a board
+ *
+ * This class holds information on each square, whether it's occupied
+ * and what piece, if any, is occupying it.
+ */
 class Square
 {
 public:
@@ -65,21 +110,25 @@ public:
         m_piece(piece)
     { }
 
+    //! Return true is the square is empty, false if occupied
     inline bool is_empty()
     {
         return m_piece == NULL ? true : false;
     }
 
+    //! Return a pointer to the occupying piece or NULL
     inline Piece* get_piece()
     {
         return m_piece;
     }
 
+    //! Remove any occupying piece from this square
     inline void remove_piece()
     {
         m_piece = NULL;
     }
 
+    //! Set the occupying piece on this square
     inline void set_piece(Piece* piece)
     {
         m_piece = piece;
@@ -89,6 +138,11 @@ private:
     Piece* m_piece;
 };
 
+/*! /brief Represents a chess board
+ *
+ * This class represents the chess board itself and is used to hold
+ * instantaneous position data for a game
+ */
 class Board
 {
 public:
@@ -97,39 +151,99 @@ public:
     {
         delete_all_pieces();
     }
+
+    //! Set the board to the starting position
+    /*!
+     * Calling this function resets all the pieces and squares on a board and sets
+     * all the pieces to their starting positions
+     */
     void set_to_start_position();
+
+    //! Return a ref to the square at the given x, y coordinates (0-7)
     inline Square& square(int x, int y)
     {
         return m_squares[x * m_dim_x + y];
     }
+
+    //! Return a ref to the square at the given BoardLocation
     inline Square& square(BoardLocation loc)
     {
         return m_squares[loc.get_x() * m_dim_x + loc.get_y()];
     }
+
+    //! Return true if the given x, y coordinates are on the board, false otherwise
     inline bool on_board(int x, int y) {
         return ((x >= 0) && (x < m_dim_x) && (y >= 0) && (y < m_dim_y)) ? true : false;
     }
 
-    bool add_piece(Piece::Type, Piece::Colour, std::string loc);
-    bool add_piece(Piece::Type, Piece::Colour, BoardLocation loc);
+    //! Apply a piece to the board at a given location
+    /*!
+     * \param type chess piece type
+     * \param col chess piece colour
+     * \param loc location as a string in standard notation
+     * \return true on success
+     */
+    bool add_piece(Piece::Type type, Piece::Colour col, std::string loc);
+
+    //! Apply a piece to the board at a given location
+    /*!
+     * \param type chess piece type
+     * \param col chess piece colour
+     * \param loc location as a BoardLocation
+     * \return true on success
+     */
+    bool add_piece(Piece::Type type, Piece::Colour col, BoardLocation loc);
+
+    //! Remove a piece from the board where location is given as a string in standard notation
+    /*!
+     * \return true on success and if there was a piece to remove
+     */
     bool remove_piece(std::string loc);
+
+    //! Remove a piece from the board where location is given as a BoardLocation
+    /*!
+     * \return true on success and if there was a piece to remove
+     */
     bool remove_piece(BoardLocation loc);
+
+    //! Move a piece on the board where move is given as a string in standard notation (e.g. a2a4)
+    /*!
+     * \return true on success and if there was a piece to remove
+     */
     bool move_piece(std::string move_str);
+
+    //! Move a piece on the board where move is defined by a current and new BoardLocation
+    /*!
+     * \return true on success and if there was a piece to remove
+     */
     bool move_piece(BoardLocation curr_loc, BoardLocation new_loc);
+
+    //! Return the number of columns
     int get_dim_x() { return m_dim_x; }
+
+    //! Return the number of rows
     int get_dim_y() { return m_dim_y; }
-    void set_from_edit_mode(std::vector<std::string> edit_mode_string);
+
+    //! Load a board position from XBoard edit mode commands
+    /*!
+     * \param edit_mode_string vector of strings constituting the edit mode strings
+     *                         (i.e. from 'edit' to '.')
+     */
+    void set_from_edit_mode(std::vector<std::string> edit_mode_strings);
 
 private:
+    //! Delete all the pieces from the board
     void delete_all_pieces();
+
+
     void register_captured(Piece* piece);
 
 private:
     int m_dim_x, m_dim_y;
-    std::vector<Square> m_squares;
+    std::vector<Square> m_squares; //!< board squares
     //std::vector< std::vector<Square*> > m_rows;
     //std::vector< std::vector<Square*> > m_cols;
-    std::vector<Piece*> m_pieces;
+    std::vector<Piece*> m_pieces;  //!< pieces on the board
 
 };
 
