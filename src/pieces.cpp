@@ -139,14 +139,14 @@ Queen::Queen(Colour colour, BoardLocation(loc)) :
     Piece(colour, loc)
 {
     std::vector<DynMove> dm_list;
-    m_dm_list.push_back(DynMove(-1, -1));
-    m_dm_list.push_back(DynMove(-1, 0));
-    m_dm_list.push_back(DynMove(-1, 1));
-    m_dm_list.push_back(DynMove(0, 1));
-    m_dm_list.push_back(DynMove(1, 1));
-    m_dm_list.push_back(DynMove(1, 0));
-    m_dm_list.push_back(DynMove(1, -1));
-    m_dm_list.push_back(DynMove(0, -1));
+    dm_list.push_back(DynMove(-1, -1));
+    dm_list.push_back(DynMove(-1, 0));
+    dm_list.push_back(DynMove(-1, 1));
+    dm_list.push_back(DynMove(0, 1));
+    dm_list.push_back(DynMove(1, 1));
+    dm_list.push_back(DynMove(1, 0));
+    dm_list.push_back(DynMove(1, -1));
+    dm_list.push_back(DynMove(0, -1));
     m_dm_list = dm_list;
 }
 
