@@ -235,7 +235,6 @@ private:
     //! Delete all the pieces from the board
     void delete_all_pieces();
 
-
     void register_captured(Piece* piece);
 
 private:
@@ -244,6 +243,7 @@ private:
     //std::vector< std::vector<Square*> > m_rows;
     //std::vector< std::vector<Square*> > m_cols;
     std::vector<Piece*> m_pieces;  //!< pieces on the board
+    Piece::Colour m_colour_to_move;
 
 };
 

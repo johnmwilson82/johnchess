@@ -162,6 +162,7 @@ bool Board::move_piece(std::string move_str)
     std::string curr_loc = move_str.substr(0, 2);
     std::string new_loc = move_str.substr(2);
 
+    m_colour_to_move = (m_colour_to_move == Piece::WHITE ? Piece::BLACK : Piece::WHITE);
     return move_piece(BoardLocation(curr_loc, this), BoardLocation(new_loc, this));
 }
 
@@ -183,6 +184,8 @@ bool Board::move_piece(BoardLocation curr_loc, BoardLocation new_loc)
 
     square(new_loc).set_piece(moving_piece);
     square(curr_loc).remove_piece();
+
+    m_colour_to_move = (m_colour_to_move == Piece::WHITE ? Piece::BLACK : Piece::WHITE);
     return true;
 }
 
@@ -222,6 +225,8 @@ void Board::set_to_start_position()
     add_piece(Piece::BISHOP, Piece::BLACK, "f8");
     add_piece(Piece::KNIGHT, Piece::BLACK, "g8");
     add_piece(Piece::ROOK,   Piece::BLACK, "h8");
+
+    m_colour_to_move = Piece::WHITE;
 }
 
 void Board::register_captured(Piece* piece)
