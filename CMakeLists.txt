@@ -1,7 +1,9 @@
 #cmake_minimum_required (VERSION 3.1.0 FATAL_ERROR)
 project(JOHNCHESS)
 
-add_executable(johnchess johnchess.cpp johnchess_app.cpp xboard_interface.cpp board.cpp pieces.cpp)
+SET(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+
+add_subdirectory(src)
 
 # add a target to generate API documentation with Doxygen
 find_package(Doxygen)
@@ -14,4 +16,4 @@ COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
 
- set_property(TARGET johnchess PROPERTY CXX_STANDARD 11)
+set_property(TARGET johnchess PROPERTY CXX_STANDARD 11)
