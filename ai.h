@@ -5,6 +5,10 @@
 #include <cstdlib>
 #include <iostream>
 
+/*! /brief Base AI class
+ *
+ * This class defines the functionality for an AI
+ */
 class AI
 {
 public:
@@ -13,14 +17,25 @@ public:
     {}
     virtual ~AI() {}
 
+    //! Called by the application class to request a move
+    /*!
+     * \param board pointer to the board that the AI will make a move on
+     * \return movement
+     */
     virtual Move make_move(Board* board) = 0;
 
+    //! Set the colour of the AI side
     void set_colour(Piece::Colour colour) { m_colour = colour; }
 
 protected:
     Piece::Colour m_colour;
 };
 
+/*! /brief Random moves AI
+ *
+ * This AI just picks the first move that it finds which is legal and
+ * plays it!
+ */
 class RandomAI : public AI
 {
 public:
