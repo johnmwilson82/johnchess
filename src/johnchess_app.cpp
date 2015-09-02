@@ -2,7 +2,8 @@
 #include <stdexcept>
 
 JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
-    m_app_opts(NULL)
+    m_app_opts(NULL),
+    m_force_mode(false)
 {
     m_app_opts = parse_args(argc, argv);
     m_xboard_interface = new XBoardInterface(get_input_stream(), get_output_stream(), "Johnchess v0.1");
@@ -27,6 +28,14 @@ JohnchessApp::~JohnchessApp()
     delete m_ai;
 }
 
+void JohnchessApp::make_ai_move()
+{
+    std::string move_string = m_ai->make_move(m_board).to_string();
+    if(!m_board->move_piece(move_string))
+        throw std::runtime_error("AI seems to have generated a nonsense move");
+    m_xboard_interface->send_move(move_string);
+}
+
 void JohnchessApp::main_loop()
 {
     bool finished = false;
@@ -44,10 +53,10 @@ void JohnchessApp::main_loop()
                     m_xboard_interface->reply_illegal_move(rcvd);
                 else
                 {
-                    std::string move_string = m_ai->make_move(m_board).to_string();
-                    if(!m_board->move_piece(move_string))
-                        throw std::runtime_error("AI seems to have generated a nonsense move");
-                    m_xboard_interface->send_move(move_string);
+                    if(!m_force_mode)
+                    {
+                        make_ai_move();
+                    }
                 }
                 break;
 
@@ -82,6 +91,10 @@ void JohnchessApp::main_loop()
             case XBoardInterface::CommandReceived::NONE:
                 break;
 
+            case XBoardInterface::CommandReceived::FORCE:
+                m_force_mode = true;
+                break;
+
             case XBoardInterface::CommandReceived::QUIT:
                 finished = true;
                 break;
@@ -89,6 +102,16 @@ void JohnchessApp::main_loop()
             case XBoardInterface::CommandReceived::EDIT:
                 m_board->set_from_edit_mode(m_xboard_interface->read_edit_mode());
                 break;
+
+            case XBoardInterface::CommandReceived::GO:
+                m_force_mode = false;
+                // if there are 0 params, this is an immediate go (alternatively it's playother)
+                if (rcvd.get_params().size() == 0)
+                {
+                    make_ai_move();
+                }
+                break;
+
         }
 
     }

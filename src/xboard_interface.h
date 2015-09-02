@@ -30,6 +30,7 @@ public:
             OTIM,
             EDIT,
             FORCE,
+            GO,
             NONE
         } type_t;
 

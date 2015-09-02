@@ -26,9 +26,11 @@ private:
     Board *m_board;
     app_opts_t* parse_args(int argc, const char* argv[]);
     void show_welcome();
+    void make_ai_move();
     app_opts_t* m_app_opts;
     std::istream& get_input_stream();
     std::ostream& get_output_stream();
+    bool m_force_mode;
     AI* m_ai;
 };
 

@@ -215,6 +215,17 @@ void XBoardInterface::CommandReceived::parse(std::string rcvd)
             m_type = FORCE;
             break;
         }
+        else if(!command.compare("go"))
+        {
+            m_type = GO;
+            break;
+        }
+        else if(!command.compare("playother"))
+        {
+            m_type = GO;
+            m_params.push_back("playother");
+            break;
+        }
         else if(!command.compare("edit"))
         {
             m_type = EDIT;
