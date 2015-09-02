@@ -3,3 +3,10 @@ Johnchess 0.1 readme placeholder
 1. Set up xboard to use johnchess as the chess engine (Engine-load new 1st engine-browse to johnchess in Engine Command)
 2. To start xboard in debug mode, use the following:
 xboard -debug -debugfile /dev/stdout -fcp <build-dir>/johnchess
+
+Building
+mkdir build
+cd build
+cmake ..
+make
+make docs (for building documentation - requires Doxygen)
