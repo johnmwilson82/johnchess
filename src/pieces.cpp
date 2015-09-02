@@ -71,8 +71,8 @@ std::vector<Move> Pawn::get_all_valid_moves(Board& board)
     std::vector<Move> ret;
     BoardLocation new_loc;
     BoardLocation curr_loc = m_loc;
-    int j = (m_colour == Piece::WHITE) && (m_loc.get_y() == 1) ||
-            (m_colour == Piece::BLACK) && (m_loc.get_y() == 6) ? 2 : 1;
+    int j = ((m_colour == Piece::WHITE) && (m_loc.get_y() == 1)) ||
+            ((m_colour == Piece::BLACK) && (m_loc.get_y() == 6)) ? 2 : 1;
     for(int i = 0; i < j; i++)
     {
         new_loc = curr_loc.apply_move(0, dir);

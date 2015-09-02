@@ -91,26 +91,9 @@ Board::Board(int dim_x, int dim_y) :
     //m_cols(dim_x),
     m_squares(dim_x*dim_y)
 {
-    /*for(int i = 0; i < dim_y; i++)
-    {
-        m_rows[i] = std::vector<Square&>(dim_x);
-    }
-
-    for(int i = 0; i < dim_x; i++)
-    {
-        m_cols[i] = std::vector<Square&>(dim_y);
-    }
-
-    for(int i = 0; i < dim_x; i++)
-    {
-        for(int j = 0; j < dim_y; j++)
-        {
-            m_rows[j][i] = square(i, j);
-            m_cols[i][j] = square(i, j);
-        }
-    }*/
     set_to_start_position();
 }
+
 void Board::delete_all_pieces()
 {
     for(std::vector<Piece*>::iterator it = m_pieces.begin(); it != m_pieces.end(); ++it)
@@ -181,6 +164,7 @@ bool Board::move_piece(std::string move_str)
 
     return move_piece(BoardLocation(curr_loc, this), BoardLocation(new_loc, this));
 }
+
 bool Board::move_piece(BoardLocation curr_loc, BoardLocation new_loc)
 {
     Piece* captured_piece = square(new_loc).get_piece();
