@@ -109,12 +109,14 @@ std::vector<Move> Pawn::get_all_valid_moves(Board& board, bool check_test=true)
             break;
     }
     new_loc = m_loc.apply_move(1, dir);
-    if (new_loc.get_valid() && !board.square(new_loc).is_empty() && board.square(new_loc).get_piece()->get_colour() != m_colour)
-        push_move_with_check_test(check_test, board, new_loc, ret);
+    if (new_loc.get_valid() && !board.square(new_loc).is_empty() &&
+        board.square(new_loc).get_piece()->get_colour() != m_colour)
+            push_move_with_check_test(check_test, board, new_loc, ret);
 
     new_loc = m_loc.apply_move(-1, dir);
-    if (new_loc.get_valid() && !board.square(new_loc).is_empty() && board.square(new_loc).get_piece()->get_colour() != m_colour)
-        push_move_with_check_test(check_test, board, new_loc, ret);
+    if (new_loc.get_valid() && !board.square(new_loc).is_empty() &&
+        board.square(new_loc).get_piece()->get_colour() != m_colour)
+            push_move_with_check_test(check_test, board, new_loc, ret);
 
     /*std::cout << "piece location = " << m_loc.get_x() << ", " << m_loc.get_y() << std::endl;
     for (int i = 0; i < ret.size(); i++)
@@ -149,7 +151,7 @@ King::King(Colour colour, BoardLocation(loc)) :
 
 std::vector<Move> King::get_all_valid_moves(Board& board, bool check_test=false)
 {
-    return get_all_hop_moves(m_dm_list, board);
+    return get_all_hop_moves(m_dm_list, board, check_test);
 }
 
 std::vector<std::string> King::get_symbol_list()
