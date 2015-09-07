@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 class Board;
 class DynMove;
@@ -146,6 +147,13 @@ private:
 class Board
 {
 public:
+    enum Mate {
+        CHECKMATE,
+        STALEMATE,
+        NO_MATE
+    };
+
+public:
     Board(int dim_x, int dim_y);
     ~Board()
     {
@@ -243,9 +251,37 @@ public:
 
     //! Return whether given colour's king is in check
     /*!
+     * \param col colour to test for check
      * \return true if parameter colour is in check, false otherwise
      */
     bool get_in_check(Piece::Colour col, bool get_valid_move_check_test=false);
+
+    //! Return if/what type of mate the board it in
+    /*!
+     * \param col colour to test for being in mate
+     * \return CHECKMATE, STALEMATE or NO_MATE
+     */
+    Mate get_mate(Piece::Colour col)
+    {
+        std::cout << "checking mate for colour" << (int) col << std::endl;;
+        if(get_num_available_moves(col) == 0)
+        {
+            if (get_in_check(col))
+                return CHECKMATE;
+            else
+                return STALEMATE;
+        }
+        return NO_MATE;
+    }
+
+    //! Return the number of available moves for a given colour
+    int get_num_available_moves(Piece::Colour col);
+
+    //! Return the colour whose move it is
+    Piece::Colour get_colour_to_move()
+    {
+        return m_colour_to_move;
+    }
 
 private:
     //! Delete all the pieces from the board

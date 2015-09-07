@@ -249,6 +249,7 @@ void Board::register_captured(Piece* piece)
 
 }
 
+// TODO: Does get_valid_move_check_test have any function here?
 bool Board::get_in_check(Piece::Colour col, bool get_valid_move_check_test)
 {
     Piece::Colour opp_col = col == Piece::WHITE ? Piece::BLACK : Piece::WHITE;
@@ -266,9 +267,22 @@ bool Board::get_in_check(Piece::Colour col, bool get_valid_move_check_test)
     return false;
 }
 
+int Board::get_num_available_moves(Piece::Colour col)
+{
+    int total_num_moves = 0;
+    for(std::vector<Piece*>::iterator it = m_pieces.begin(); it != m_pieces.end(); it++)
+    {
+        if ((*it)->get_colour() == col)
+            total_num_moves += (*it)->get_all_valid_moves(*this, true).size();
+    }
+    return total_num_moves;
+}
+
 void Board::set_from_edit_mode(std::vector<std::string> in)
 {
     Piece::Colour col = Piece::WHITE;
+    Piece* black_king;
+    Piece* white_king;
 
     for(std::vector<std::string>::iterator it = in.begin(); it != in.end(); it++)
     {
@@ -280,7 +294,7 @@ void Board::set_from_edit_mode(std::vector<std::string> in)
         }
         else if (!it->compare("."))
         {
-        	return;
+        	break;
         }
         else if (!it->compare("c"))
         {
@@ -315,12 +329,23 @@ void Board::set_from_edit_mode(std::vector<std::string> in)
         	break;
         case 'K':
         	add_piece(Piece::KING, col, sq);
+        	if (col == Piece::WHITE)
+        	{
+        	    white_king = m_pieces.back();
+        	    m_pieces.pop_back();
+        	}
+        	else if (col == Piece::BLACK)
+            {
+                black_king = m_pieces.back();
+                m_pieces.pop_back();
+            }
         	break;
         default:
         	throw std::runtime_error(std::string("Invalid edit string: ") + *it);
         }
-
     }
 
-
+    // Insert kings so we have [0] -> white king and [1] -> black king
+    m_pieces.insert(m_pieces.begin(), black_king);
+    m_pieces.insert(m_pieces.begin(), white_king);
 }

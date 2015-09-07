@@ -25,7 +25,6 @@ std::vector<Move> Piece::get_all_slide_moves(std::vector<DynMove> dms, Board& bo
         while(true)
         {
             BoardLocation new_loc = curr_loc.apply_move(*it);
-            //std::cout << new_loc.get_x() << ", " << new_loc.get_y() << " : " << m_loc.get_x() << ", " << m_loc.get_y() << std::endl;
             if (new_loc.get_valid())
             {
                 if (board.square(new_loc).is_empty())

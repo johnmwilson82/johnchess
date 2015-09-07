@@ -46,9 +46,12 @@ void JohnchessApp::main_loop()
             m_xboard_interface->reply_invalid(rcvd);
             continue;
         }
+
         switch(rcvd.get_type())
         {
             case XBoardInterface::CommandReceived::MOVE:
+            {
+                Piece::Colour colour_to_move = m_board->get_colour_to_move();
                 if(!m_board->move_piece(rcvd.get_move_string()))
                     m_xboard_interface->reply_illegal_move(rcvd);
                 else
@@ -58,8 +61,22 @@ void JohnchessApp::main_loop()
                         make_ai_move();
                     }
                 }
+                Board::Mate mate = m_board->get_mate(colour_to_move);
+                if(mate != Board::NO_MATE)
+                {
+                    if(mate == Board::STALEMATE)
+                    {
+                        // Do something for stalemate
+                        std::cout << "Stalemate" << std::endl;
+                    }
+                    else //if mate == Board::CHECKMATE
+                    {
+                        // Do something for checkmate
+                        std::cout << "Checkmate" << std::endl;
+                    }
+                }
                 break;
-
+            }
             case XBoardInterface::CommandReceived::INFO_REQ:
                 m_xboard_interface->reply_features();
                 break;
