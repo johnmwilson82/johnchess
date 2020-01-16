@@ -123,13 +123,18 @@ void XBoardInterface::CommandReceived::parse(std::string rcvd)
 {
     std::deque<std::string> params;
     std::size_t i = 0;
-    while (i != std::string::npos)
+    std::string rawcmd = rcvd; // make a copy
+
+    while ((i = rawcmd.find(' ')) != std::string::npos)
     {
-        std::size_t found = rcvd.find_first_of(" ", i);
-        params.push_back(rcvd.substr(i, found));
-        while(rcvd[found] == ' ') found++;
-        i = found;
+        params.push_back(rawcmd.substr(0, i));
+
+        // delete up to the delimeter AND the delimeter
+        rawcmd.erase(0, i + 1); 
     }
+    
+    if (!rawcmd.empty()) params.push_back(rawcmd);
+
     while (!params.empty())
     {
         std::string command = params[0];
