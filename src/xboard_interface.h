@@ -35,7 +35,7 @@ public:
         } type_t;
 
     public:
-        CommandReceived(std::string rcvd) :
+        CommandReceived(const std::string& rcvd) :
             m_raw(rcvd),
             m_invalid(false),
             m_finish(false),
@@ -74,7 +74,7 @@ public:
         }
 
     private:
-        bool check_move_string(std::string comm);
+        bool check_move_string(const std::string& comm);
         type_t m_type;
         bool m_invalid, m_finish;
         std::string m_raw;
@@ -82,29 +82,29 @@ public:
         std::deque<std::string> m_params;
 
     private:
-        void parse(std::string rcvd);
+        void parse(const std::string& rcvd);
     };
 
 
 public:
-    XBoardInterface(std::istream& instr, std::ostream& outstr, std::string app_name);
+    XBoardInterface(std::istream& instr, std::ostream& outstr, const std::string& app_name);
 
 public:
-    void tell_info(std::string infostring);
+    void tell_info(const std::string& infostring);
     CommandReceived wait_for_command();
     void reply_invalid(CommandReceived rcvd);
     void reply_illegal_move(CommandReceived rcvd);
     void reply_ping(CommandReceived rcvd);
-    void send_move(std::string move);
+    void send_move(const std::string& move);
     void reply_newline();
-    void add_variant(std::string variant_name);
-    void add_feature(std::string feature_str);
-    void add_option(std::string option_str);
+    void add_variant(const std::string& variant_name);
+    void add_feature(const std::string& feature_str);
+    void add_option(const std::string& option_str);
     void reply_features();
     std::vector<std::string> read_edit_mode();
 
 private:
-    void write_command(std::string command, std::string content);
+    void write_command(const std::string& command, const std::string& content);
 
 private:
     std::istream& m_instr;

@@ -52,12 +52,12 @@ BoardLocation::~BoardLocation()
 {
 }
 
-BoardLocation BoardLocation::apply_move(DynMove& dm)
+BoardLocation BoardLocation::apply_move(const DynMove& dm) const
 {
     return apply_move(dm.get_dx(), dm.get_dy());
 }
 
-BoardLocation BoardLocation::apply_move(int dx, int dy)
+BoardLocation BoardLocation::apply_move(int dx, int dy) const
 {
     // move a location by a number of squares in the x and y directions
     // and return the result as a new BoardLocation
@@ -94,15 +94,15 @@ Board::Board(int dim_x, int dim_y) :
     set_to_start_position();
 }
 
-Board::Board(Board& orig) :
+Board::Board(const Board& orig) :
     m_dim_x(orig.m_dim_x),
     m_dim_y(orig.m_dim_y),
     m_squares(orig.m_dim_x*orig.m_dim_y),
     m_colour_to_move(orig.m_colour_to_move)
 {
-    for(std::vector<Piece*>::iterator it = orig.m_pieces.begin(); it != orig.m_pieces.end(); it++)
+    for(const Piece* piece : orig.m_pieces) //std::vector<Piece*>::iterator it = orig.m_pieces.begin(); it != orig.m_pieces.end(); it++)
     {
-        add_piece((*it)->get_type(), (*it)->get_colour(), (*it)->get_loc());
+        add_piece(piece->get_type(), piece->get_colour(), piece->get_loc());
     }
 }
 
@@ -270,10 +270,10 @@ bool Board::get_in_check(Piece::Colour col, bool get_valid_move_check_test)
 int Board::get_num_available_moves(Piece::Colour col)
 {
     int total_num_moves = 0;
-    for(std::vector<Piece*>::iterator it = m_pieces.begin(); it != m_pieces.end(); it++)
+    for(const auto piece : m_pieces)
     {
-        if ((*it)->get_colour() == col)
-            total_num_moves += (*it)->get_all_valid_moves(*this, true).size();
+        if (piece->get_colour() == col)
+            total_num_moves += piece->get_all_valid_moves(*this, true).size();
     }
     return total_num_moves;
 }

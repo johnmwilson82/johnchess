@@ -1,7 +1,7 @@
 #include "xboard_interface.h"
 #include <csignal>
 
-XBoardInterface::XBoardInterface(std::istream& instr, std::ostream& outstr, std::string app_name) :
+XBoardInterface::XBoardInterface(std::istream& instr, std::ostream& outstr, const std::string& app_name) :
     m_instr(instr),
     m_outstr(outstr),
     m_app_name(app_name)
@@ -12,12 +12,12 @@ XBoardInterface::XBoardInterface(std::istream& instr, std::ostream& outstr, std:
 }
 
 
-void XBoardInterface::tell_info(std::string infostring)
+void XBoardInterface::tell_info(const std::string& infostring)
 {
     write_command("tellics say", infostring);
 }
 
-void XBoardInterface::write_command(std::string command, std::string content)
+void XBoardInterface::write_command(const std::string& command, const std::string& content)
 {
     m_outstr << command << " " << content << std::endl;
 }
@@ -37,17 +37,17 @@ void XBoardInterface::reply_newline()
     m_outstr << std::endl;
 }
 
-void XBoardInterface::add_variant(std::string variant_name)
+void XBoardInterface::add_variant(const std::string& variant_name)
 {
     m_variants.push_back(variant_name);
 }
 
-void XBoardInterface::add_feature(std::string feature_str)
+void XBoardInterface::add_feature(const std::string& feature_str)
 {
     m_features.push_back(feature_str);
 }
 
-void XBoardInterface::add_option(std::string option_str)
+void XBoardInterface::add_option(const std::string& option_str)
 {
     m_options.push_back(option_str);
 }
@@ -57,7 +57,7 @@ void XBoardInterface::reply_ping(CommandReceived rcvd)
     write_command("pong", rcvd.get_params()[0]);
 }
 
-void XBoardInterface::send_move(std::string move)
+void XBoardInterface::send_move(const std::string& move)
 {
     write_command("move", move);
 }
@@ -107,7 +107,7 @@ std::vector<std::string> XBoardInterface::read_edit_mode()
     return out;
 }
 
-bool XBoardInterface::CommandReceived::check_move_string(std::string comm)
+bool XBoardInterface::CommandReceived::check_move_string(const std::string& comm)
 {
     if (comm.size() != 4)
         return false;
@@ -119,7 +119,7 @@ bool XBoardInterface::CommandReceived::check_move_string(std::string comm)
            (comm[3] >= '1' && comm[3] <= '8');
 }
 
-void XBoardInterface::CommandReceived::parse(std::string rcvd)
+void XBoardInterface::CommandReceived::parse(const std::string& rcvd)
 {
     std::deque<std::string> params;
     std::size_t i = 0;

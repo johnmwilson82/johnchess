@@ -4,6 +4,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 
 /*! /brief Base AI class
  *
@@ -38,14 +39,19 @@ protected:
  */
 class RandomAI : public AI
 {
+private:
+    std::ofstream ofs;
 public:
     RandomAI(Piece::Colour colour) :
-        AI(colour)
+        AI(colour),
+        ofs("ai.txt")
     {}
 
     ~RandomAI() {};
     Move make_move(Board* board)
     {
+
+
         Piece *pc;
         std::vector<Move> avail_moves;
         do{
@@ -59,6 +65,15 @@ public:
             if(pc->get_colour() != m_colour)
                 continue;
             avail_moves = pc->get_all_valid_moves(*board);
+
+
+            ofs << "Available_moves for " << pc->get_loc().to_string() << "\n";
+            for(const auto move : avail_moves)
+            {
+                ofs << move.to_string() << ", ";
+            }
+            ofs << std::endl;
+            ofs.flush();
         } while(avail_moves.size() == 0);
 
         //now we have a piece that belongs to us, we'll randomly make a move

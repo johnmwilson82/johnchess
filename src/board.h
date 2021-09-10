@@ -32,7 +32,7 @@ public: // methods
      * \param dm Relative move to be added to the current location
      * \return New BoardLocation with the relative move applied
      */
-    BoardLocation apply_move(DynMove& dm);
+    BoardLocation apply_move(const DynMove& dm) const;
 
     //! Apply a move to a BoardLocation
     /*!
@@ -40,7 +40,7 @@ public: // methods
      * \param dy Relative shift in rows
      * \return New BoardLocation with the relative move applied
      */
-    BoardLocation apply_move(int dx, int dy);
+    BoardLocation apply_move(int dx, int dy) const;
 
     //! Apply a move in-place to a BoardLocation
     /*!
@@ -51,13 +51,13 @@ public: // methods
     bool apply_move_inplace(int dx, int dy);
 
     //! Equals operator
-    bool operator== (BoardLocation& bl)
+    bool operator== (const BoardLocation& bl) const
     {
         return m_x == bl.m_x && m_y == bl.m_y;
     }
 
     //! Return string representation of BoardLocation (using standard notation)
-    std::string to_string()
+    std::string to_string() const
     {
         std::string ret = "a1";
         ret[0] += m_x;
@@ -71,16 +71,16 @@ public: // inlines
     /*!
      * \return 0 for col a -> 7 for col h
      */
-    inline int get_x() { return m_x; }
+    inline int get_x() const { return m_x; }
     //! Get board row
     /*!
      * \return 0 for row 1 -> 7 for row 8
      */
-    inline int get_y() { return m_y; }
+    inline int get_y() const { return m_y; }
     //! Return true if BoardLocation is on the board
-    inline bool get_on_board() { return m_on_board; }
+    inline bool get_on_board() const { return m_on_board; }
     //! Return true if BoardLocation is a valid location
-    inline bool get_valid() { return m_valid; }
+    inline bool get_valid() const { return m_valid; }
     //! Set whether the BoardLocation is on the board or not (e.g. captured piece)
     inline void set_on_board(bool val) { m_on_board = val; }
 
@@ -112,13 +112,13 @@ public:
     { }
 
     //! Return true is the square is empty, false if occupied
-    inline bool is_empty()
+    inline bool is_empty() const
     {
         return m_piece == NULL ? true : false;
     }
 
     //! Return a pointer to the occupying piece or NULL
-    inline Piece* get_piece()
+    inline Piece* get_piece() const
     {
         return m_piece;
     }
@@ -159,7 +159,7 @@ public:
     {
         delete_all_pieces();
     }
-    Board(Board& board);
+    Board(const Board& board);
 
     //! Set the board to the starting position
     /*!
@@ -172,6 +172,12 @@ public:
     inline Square& square(int x, int y)
     {
         return m_squares[x * m_dim_x + y];
+    }
+
+    //! Return a ref to the square at the given BoardLocation
+    inline const Square& square(BoardLocation loc) const
+    {
+        return m_squares[loc.get_x() * m_dim_x + loc.get_y()];
     }
 
     //! Return a ref to the square at the given BoardLocation

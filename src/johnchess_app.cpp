@@ -1,5 +1,6 @@
 #include "johnchess_app.h"
 #include <stdexcept>
+#include <fstream>
 
 JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
     m_app_opts(NULL),
@@ -31,9 +32,61 @@ JohnchessApp::~JohnchessApp()
 void JohnchessApp::make_ai_move()
 {
     std::string move_string = m_ai->make_move(m_board).to_string();
+
     if(!m_board->move_piece(move_string))
+    {
         throw std::runtime_error("AI seems to have generated a nonsense move");
+    }
+
     m_xboard_interface->send_move(move_string);
+
+    std::ofstream ofs("current_board.txt");
+
+    ofs << "Move = " << move_string << std::endl;
+
+    for(int y = 7; y >= 0; --y)
+    {
+        for (int x = 0; x < 8; ++x)
+        {
+            const auto& sq = m_board->square(x, y);
+            if(sq.is_empty())
+            {
+                ofs << " _";
+            }
+            else
+            {
+                switch(sq.get_piece()->get_type())
+                {
+                    case Piece::KING:
+                        ofs << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " K" : " k");
+                        break;
+
+                    case Piece::QUEEN:
+                        ofs << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " Q" : " q");
+                        break;
+
+                    case Piece::ROOK:
+                        ofs << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " R" : " r");
+                        break;
+
+                    case Piece::BISHOP:
+                        ofs << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " B" : " b");
+                        break;
+
+                    case Piece::KNIGHT:
+                        ofs << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " N" : " n");
+                        break;
+
+                    case Piece::PAWN:
+                        ofs << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " P" : " p");
+                        break;
+                }
+            }
+            
+        }
+        ofs << std::endl;
+    }
+    ofs.flush();
 }
 
 void JohnchessApp::main_loop()
