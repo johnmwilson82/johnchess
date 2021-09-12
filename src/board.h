@@ -231,7 +231,7 @@ public:
     /*!
      * \return true on success and if there was a piece to remove
      */
-    bool move_piece(BoardLocation curr_loc, BoardLocation new_loc, bool check_test=true);
+    bool move_piece(const BoardLocation& curr_loc, const BoardLocation& new_loc, bool check_test=true);
 
     //! Return the number of columns
     int get_dim_x() { return m_dim_x; }
@@ -260,7 +260,7 @@ public:
      * \param col colour to test for check
      * \return true if parameter colour is in check, false otherwise
      */
-    bool get_in_check(Piece::Colour col, bool get_valid_move_check_test=false);
+    bool get_in_check(Piece::Colour col);
 
     //! Return if/what type of mate the board it in
     /*!

@@ -87,8 +87,6 @@ bool BoardLocation::apply_move_inplace(int dx, int dy)
 Board::Board(int dim_x, int dim_y) :
     m_dim_x(dim_x),
     m_dim_y(dim_y),
-    //m_rows(dim_y),
-    //m_cols(dim_x),
     m_squares(dim_x*dim_y)
 {
     set_to_start_position();
@@ -178,7 +176,7 @@ bool Board::move_piece(std::string move_str, bool check_test)
     return move_piece(BoardLocation(curr_loc, this), BoardLocation(new_loc, this), check_test);
 }
 
-bool Board::move_piece(BoardLocation curr_loc, BoardLocation new_loc, bool check_test)
+bool Board::move_piece(const BoardLocation& curr_loc, const BoardLocation& new_loc, bool check_test)
 {
     Piece* captured_piece = square(new_loc).get_piece();
     Piece* moving_piece = square(curr_loc).get_piece();
@@ -250,7 +248,7 @@ void Board::register_captured(Piece* piece)
 }
 
 // TODO: Does get_valid_move_check_test have any function here?
-bool Board::get_in_check(Piece::Colour col, bool get_valid_move_check_test)
+bool Board::get_in_check(Piece::Colour col)
 {
     Piece::Colour opp_col = col == Piece::WHITE ? Piece::BLACK : Piece::WHITE;
 
@@ -261,7 +259,7 @@ bool Board::get_in_check(Piece::Colour col, bool get_valid_move_check_test)
     for(std::vector<Piece*>::iterator it = m_pieces.begin()+2; it != m_pieces.end(); it++)
     {
         if ((*it)->get_colour() == opp_col &&
-            (*it)->check_valid_move(*this, Move(*it, king->get_loc()), get_valid_move_check_test))
+            (*it)->check_valid_move(*this, Move(*it, king->get_loc()), false))
             return true;
     }
     return false;

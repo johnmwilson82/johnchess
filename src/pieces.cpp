@@ -21,7 +21,7 @@ std::vector<Move> Piece::get_all_slide_moves(const std::vector<DynMove>& dms, co
     std::vector<Move> ret;
     for(const auto& move : dms)
     {
-        BoardLocation curr_loc = m_loc;
+        BoardLocation curr_loc(m_loc);
         while(true)
         {
             BoardLocation new_loc = curr_loc.apply_move(move);
@@ -59,26 +59,26 @@ std::vector<Move> Piece::get_all_hop_moves(const std::vector<DynMove>& dms, cons
         {
             push_move_with_check_test(check_test, board, new_loc, ret);
         }
-
     }
     return ret;
 }
 
-bool Piece::push_move_with_check_test(bool check_test, const Board &board, BoardLocation &new_loc, std::vector<Move> &move_list) const
+bool Piece::push_move_with_check_test(bool check_test, const Board &board, const BoardLocation &new_loc, std::vector<Move> &move_list) const
 {
     if(check_test)
     {
         Board test_board(board);
-        test_board.move_piece(m_loc, new_loc, false);
-        if(!test_board.get_in_check(m_colour, true))
+        //test_board.move_piece(m_loc, new_loc, false);
+        if(test_board.move_piece(m_loc, new_loc, false) &&
+           !test_board.get_in_check(m_colour))
         {
-            move_list.push_back(Move(this, new_loc));
+            move_list.emplace_back(this, new_loc);
             return true;
         }
     }
     else
     {
-        move_list.push_back(Move(this, new_loc));
+        move_list.emplace_back(this, new_loc);
         return true;
     }
     return false;

@@ -31,7 +31,7 @@ class Move
 // Move: Describes a move, which is the new location of a given piece
 public:
     Move(const Piece *piece, DynMove dm);
-    Move(const Piece *piece, BoardLocation new_loc) :
+    Move(const Piece *piece, const BoardLocation& new_loc) :
         m_piece(piece),
         m_new_loc(new_loc)
     {
@@ -98,7 +98,7 @@ public: // public methods
     inline BoardLocation get_loc() const { return m_loc; }
     inline std::string get_symbol() const { return get_symbol_list()[0]; }
     inline void set_on_board(bool val) { m_loc.set_on_board(val); }
-    inline bool move(Board& board, BoardLocation new_loc, bool get_valid_move_check_test=true)
+    inline bool move(Board& board, const BoardLocation& new_loc, bool get_valid_move_check_test=true)
     {
         if(!check_valid_move(board, Move(this, new_loc), get_valid_move_check_test))
             return false;
@@ -110,7 +110,7 @@ protected:
     std::vector<Move> get_all_slide_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test=true) const;
     std::vector<Move> get_all_hop_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test=true) const;
 
-    bool push_move_with_check_test(bool check_test, const Board &board, BoardLocation &new_loc, std::vector<Move> &move_list) const;
+    bool push_move_with_check_test(bool check_test, const Board& board, const BoardLocation& new_loc, std::vector<Move>& move_list) const;
 
 protected:
     BoardLocation m_loc;

@@ -1,0 +1,35 @@
+{
+    "tasks": [
+      {
+        "type": "cppbuild",
+        "label": "C/C++: g++.exe build project",
+        "command": "C:/msys64/mingw64/bin/g++.exe",
+        "args": ["-g", "${workspaceFolder}\\src\\*.cpp", "${workspaceFolder}\\app\\main.cpp", "-I", "${workspaceFolder}\\src\\", "-o", "${workspaceFolder}\\johnchess.exe", "-std=c++20"],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": ["$gcc"],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "detail": "compiler: C:/msys64/mingw64/bin/g++.exe"
+      },
+      {
+        "type": "cppbuild",
+        "label": "C/C++: g++.exe build test project",
+        "command": "C:/msys64/mingw64/bin/g++.exe",
+        "args": ["-g", "${workspaceFolder}\\tests\\*.cpp", "${workspaceFolder}\\src\\*.cpp", "-I", "${workspaceFolder}\\src\\", "-o", "${workspaceFolder}\\test_johnchess.exe", "-lgtest", "-lgtest_main", "-std=c++20"],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "problemMatcher": ["$gcc"],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "detail": "compiler: C:/msys64/mingw64/bin/g++.exe"
+      }
+    ],
+    "version": "2.0.0"
+  }
