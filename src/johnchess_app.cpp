@@ -7,36 +7,36 @@ JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
     m_force_mode(false)
 {
     m_app_opts = parse_args(argc, argv);
-    m_xboard_interface = new XBoardInterface(get_input_stream(), get_output_stream(), "Johnchess v0.1");
+    m_xboard_interface = std::make_unique<XBoardInterface>(get_input_stream(), get_output_stream(), "Johnchess v0.1");
     m_xboard_interface->add_feature("memory=1");
     m_xboard_interface->add_feature("setboard=0");
     m_xboard_interface->add_feature("ping=1");
     m_xboard_interface->add_variant("normal");
 
     show_welcome();
-    m_board = new Board(8, 8);
+    m_board = std::make_unique<Board>();
 
-    m_ai = new RandomAI(Piece::BLACK);
+    m_ai = std::make_unique<RandomAI>(Piece::BLACK);
 }
 
 JohnchessApp::~JohnchessApp()
 {
     if (m_app_opts)
         delete m_app_opts;
-
-    delete m_xboard_interface;
-    delete m_board;
-    delete m_ai;
 }
 
 void JohnchessApp::make_ai_move()
 {
-    std::string move_string = m_ai->make_move(m_board).to_string();
+    std::string move_string = m_ai->make_move(*m_board).to_string();
 
-    if(!m_board->move_piece(move_string))
+    auto new_board = std::make_unique<Board>(*m_board, move_string);
+
+    if(new_board->get_in_check(new_board->get_colour_to_move()))
     {
         throw std::runtime_error("AI seems to have generated a nonsense move");
     }
+
+    m_board = std::move(new_board);
 
     m_xboard_interface->send_move(move_string);
 
@@ -105,10 +105,16 @@ void JohnchessApp::main_loop()
             case XBoardInterface::CommandReceived::MOVE:
             {
                 Piece::Colour colour_to_move = m_board->get_colour_to_move();
-                if(!m_board->move_piece(rcvd.get_move_string()))
+
+                auto new_board = std::make_unique<Board>(*m_board, rcvd.get_move_string());
+
+                if(new_board->get_in_check(colour_to_move))
+                {
                     m_xboard_interface->reply_illegal_move(rcvd);
+                }
                 else
                 {
+                    m_board = std::move(new_board);
                     if(!m_force_mode)
                     {
                         make_ai_move();

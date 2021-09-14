@@ -1,5 +1,4 @@
-#ifndef JOHNCHESS_APP_H
-#define JOHNCHESS_APP_H
+#pragma once
 
 #include <iostream>
 #include "xboard_interface.h"
@@ -22,8 +21,10 @@ public: //public methods
     void main_loop();
 
 private:
-    XBoardInterface *m_xboard_interface;
-    Board *m_board;
+    std::unique_ptr<XBoardInterface> m_xboard_interface;
+    std::unique_ptr<Board> m_board;
+    std::unique_ptr<AI> m_ai;
+
     app_opts_t* parse_args(int argc, const char* argv[]);
     void show_welcome();
     void make_ai_move();
@@ -31,7 +32,5 @@ private:
     std::istream& get_input_stream();
     std::ostream& get_output_stream();
     bool m_force_mode;
-    AI* m_ai;
-};
 
-#endif //JOHNCHESS_APP_H
+};

@@ -1,20 +1,12 @@
 #include "pieces.h"
+#include "board.h"
 #include <iostream>
 
 Piece::~Piece()
 {
 }
 
-Move::Move(const Piece *piece, DynMove dm) :
-    m_piece(piece)
-{
-    m_new_loc = piece->get_loc().apply_move(dm);
-}
 
-std::string Move::to_string() const
-{
-    return m_piece->get_loc().to_string() + m_new_loc.to_string();
-}
 
 std::vector<Move> Piece::get_all_slide_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test) const
 {
@@ -24,20 +16,20 @@ std::vector<Move> Piece::get_all_slide_moves(const std::vector<DynMove>& dms, co
         BoardLocation curr_loc(m_loc);
         while(true)
         {
-            BoardLocation new_loc = curr_loc.apply_move(move);
-            if (new_loc.get_valid())
+            if (curr_loc.apply_move_inplace(move))
             {
-                if (board.square(new_loc).is_empty())
+                if (board.square(curr_loc).is_empty())
                 {
-                    push_move_with_check_test(check_test, board, new_loc, ret);
-                    curr_loc = new_loc;
+                    // Move
+                    ret.emplace_back(*this, curr_loc);
                 }
-                else if (board.square(new_loc).get_piece()->get_colour() != m_colour)
+                else if (board.square(curr_loc).get_piece()->get_colour() != m_colour)
                 {
-                    push_move_with_check_test(check_test, board, new_loc, ret);
+                    // Capture
+                    ret.emplace_back(*this, curr_loc);
                     break;
                 }
-                else
+                else // Can't move in given direction
                     break;
             }
             else
@@ -47,84 +39,68 @@ std::vector<Move> Piece::get_all_slide_moves(const std::vector<DynMove>& dms, co
     return ret;
 }
 
+
 std::vector<Move> Piece::get_all_hop_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test) const
 {
     std::vector<Move> ret;
     for(const auto& move : dms)
     {
-        BoardLocation new_loc = m_loc.apply_move(move);
+        BoardLocation curr_loc(m_loc);
 
-        if (new_loc.get_valid() && (board.square(new_loc).is_empty() ||
-           (board.square(new_loc).get_piece()->get_colour() != m_colour)))
+        if (curr_loc.apply_move_inplace(move) && 
+            (board.square(curr_loc).is_empty() || (board.square(curr_loc).get_piece()->get_colour() != m_colour)))
         {
-            push_move_with_check_test(check_test, board, new_loc, ret);
+            ret.emplace_back(*this, curr_loc);
         }
     }
     return ret;
 }
 
-bool Piece::push_move_with_check_test(bool check_test, const Board &board, const BoardLocation &new_loc, std::vector<Move> &move_list) const
-{
-    if(check_test)
-    {
-        Board test_board(board);
-        //test_board.move_piece(m_loc, new_loc, false);
-        if(test_board.move_piece(m_loc, new_loc, false) &&
-           !test_board.get_in_check(m_colour))
-        {
-            move_list.emplace_back(this, new_loc);
-            return true;
-        }
-    }
-    else
-    {
-        move_list.emplace_back(this, new_loc);
-        return true;
-    }
-    return false;
-}
 
 Pawn::Pawn(Colour colour, BoardLocation(loc)) :
     Piece(colour, loc, PAWN)
 {
 }
 
-std::vector<Move> Pawn::get_all_valid_moves(const Board& board, bool check_test=true) const
+
+std::vector<Move> Pawn::get_all_valid_moves(const Board& board) const
 {
     int dir = m_colour == Piece::WHITE ? 1 : -1;
     std::vector<Move> ret;
-    BoardLocation new_loc;
-    BoardLocation curr_loc(m_loc);
 
+    // Advance
     int j = ((m_colour == Piece::WHITE) && (m_loc.get_y() == 1)) ||
             ((m_colour == Piece::BLACK) && (m_loc.get_y() == 6)) ? 2 : 1;
     for(int i = 0; i < j; i++)
     {
-        new_loc = curr_loc.apply_move(0, dir * (i+1));
-        if (new_loc.get_valid() && board.square(new_loc).is_empty())
+        BoardLocation adv_loc(m_loc.apply_move(0, dir * (i+1)));
+        if (adv_loc.get_valid() && board.square(adv_loc).is_empty())
         {
-            push_move_with_check_test(check_test, board, new_loc, ret);
+            ret.emplace_back(*this, adv_loc);
         }
         else
             break;
     }
-    new_loc = curr_loc.apply_move(1, dir);
-    if (new_loc.get_valid() && !board.square(new_loc).is_empty() &&
-        board.square(new_loc).get_piece()->get_colour() != m_colour)
+
+    // Take right
+    BoardLocation tr_loc = m_loc.apply_move(1, dir);
+    if (tr_loc.get_valid() && !board.square(tr_loc).is_empty() &&
+        board.square(tr_loc).get_piece()->get_colour() != m_colour)
     {
-        push_move_with_check_test(check_test, board, new_loc, ret);
+        ret.emplace_back(*this, tr_loc);
     }
 
-
-    new_loc = curr_loc.apply_move(-1, dir);
-    if (new_loc.get_valid() && !board.square(new_loc).is_empty() &&
-        board.square(new_loc).get_piece()->get_colour() != m_colour)
+    // Take left
+    BoardLocation tl_loc = m_loc.apply_move(-1, dir);
+    if (tl_loc.get_valid() && !board.square(tl_loc).is_empty() &&
+        board.square(tl_loc).get_piece()->get_colour() != m_colour)
     {
-        push_move_with_check_test(check_test, board, new_loc, ret);
+        ret.emplace_back(*this, tl_loc);
     }
 
     return ret;
 }
+
 
 std::vector<std::string> Pawn::get_symbol_list() const
 {
@@ -132,6 +108,7 @@ std::vector<std::string> Pawn::get_symbol_list() const
     symbs.push_back("P");
     return symbs;
 }
+
 
 King::King(Colour colour, BoardLocation(loc)) :
     Piece(colour, loc, KING)
@@ -148,10 +125,12 @@ King::King(Colour colour, BoardLocation(loc)) :
     m_dm_list = dm_list;
 }
 
-std::vector<Move> King::get_all_valid_moves(const Board& board, bool check_test=true) const
+
+std::vector<Move> King::get_all_valid_moves(const Board& board) const
 {
-    return get_all_hop_moves(m_dm_list, board, check_test);
+    return get_all_hop_moves(m_dm_list, board, true);
 }
+
 
 std::vector<std::string> King::get_symbol_list() const
 {
@@ -159,6 +138,7 @@ std::vector<std::string> King::get_symbol_list() const
     symbs.push_back("K");
     return symbs;
 }
+
 
 Queen::Queen(Colour colour, BoardLocation(loc)) :
     Piece(colour, loc, QUEEN)
@@ -175,11 +155,13 @@ Queen::Queen(Colour colour, BoardLocation(loc)) :
     m_dm_list = dm_list;
 }
 
-std::vector<Move> Queen::get_all_valid_moves(const Board& board, bool check_test=true) const
+
+std::vector<Move> Queen::get_all_valid_moves(const Board& board) const
 {
 
-    return get_all_slide_moves(m_dm_list, board, check_test);
+    return get_all_slide_moves(m_dm_list, board, true);
 }
+
 
 std::vector<std::string> Queen::get_symbol_list() const
 {
@@ -187,6 +169,7 @@ std::vector<std::string> Queen::get_symbol_list() const
     symbs.push_back("Q");
     return symbs;
 }
+
 
 Rook::Rook(Colour colour, BoardLocation(loc)) :
     Piece(colour, loc, ROOK)
@@ -199,10 +182,12 @@ Rook::Rook(Colour colour, BoardLocation(loc)) :
     m_dm_list = dm_list;
 }
 
-std::vector<Move> Rook::get_all_valid_moves(const Board& board, bool check_test=true) const
+
+std::vector<Move> Rook::get_all_valid_moves(const Board& board) const
 {
-    return get_all_slide_moves(m_dm_list, board, check_test);
+    return get_all_slide_moves(m_dm_list, board, true);
 }
+
 
 std::vector<std::string> Rook::get_symbol_list() const
 {
@@ -210,6 +195,7 @@ std::vector<std::string> Rook::get_symbol_list() const
     symbs.push_back("R");
     return symbs;
 }
+
 
 Bishop::Bishop(Colour colour, BoardLocation(loc)) :
     Piece(colour, loc, BISHOP)
@@ -222,10 +208,12 @@ Bishop::Bishop(Colour colour, BoardLocation(loc)) :
     m_dm_list = dm_list;
 }
 
-std::vector<Move> Bishop::get_all_valid_moves(const Board& board, bool check_test=true) const
+
+std::vector<Move> Bishop::get_all_valid_moves(const Board& board) const
 {
-    return get_all_slide_moves(m_dm_list, board, check_test);
+    return get_all_slide_moves(m_dm_list, board, true);
 }
+
 
 std::vector<std::string> Bishop::get_symbol_list() const
 {
@@ -233,6 +221,7 @@ std::vector<std::string> Bishop::get_symbol_list() const
     symbs.push_back("B");
     return symbs;
 }
+
 
 Knight::Knight(Colour colour, BoardLocation(loc)) :
     Piece(colour, loc, KNIGHT)
@@ -249,11 +238,13 @@ Knight::Knight(Colour colour, BoardLocation(loc)) :
     m_dm_list = dm_list;
 }
 
-std::vector<Move> Knight::get_all_valid_moves(const Board& board, bool check_test=true) const
+
+std::vector<Move> Knight::get_all_valid_moves(const Board& board) const
 {
 
-    return get_all_hop_moves(m_dm_list, board, check_test);
+    return get_all_hop_moves(m_dm_list, board, true);
 }
+
 
 std::vector<std::string> Knight::get_symbol_list() const
 {

@@ -1,0 +1,36 @@
+Available_moves for e8
+DSB Available_moves for c1
+
+Available_moves for e8
+DSB Available_moves for c1
+c1d2, c1e3, c1f4, c1g5, c1h6, 
+Available_moves for e8
+DSB Available_moves for c1
+c1d2, c1e3, c1f4, c1g5, c1h6, 
+Available_moves for e8
+e8e7, DSB Available_moves for c1
+c1d2, c1e3, c1f4, 
+Available_moves for e8
+e8e7, DSB Available_moves for c1
+c1d2, c1e3, c1f4, c1g5, 
+Available_moves for e8
+e8d7, e8e7, DSB Available_moves for c1
+c1d2, c1e3, c1f4, 
+Available_moves for e8
+e8d7, e8d8, e8e7, DSB Available_moves for c1
+c1d2, c1e3, c1f4, c1g5, c1h6, 
+Available_moves for e8
+e8d7, e8d8, e8e7, DSB Available_moves for c1
+c1d2, c1e3, c1f4, c1g5, c1h6, 
+Available_moves for e8
+e8d7, e8d8, e8e7, DSB Available_moves for c1
+c1d2, c1e3, c1f4, 
+Available_moves for e8
+e8d7, e8d8, e8e7, DSB Available_moves for c1
+c1d2, c1e3, c1f4, 
+Available_moves for e8
+e8d8, e8e7, DSB Available_moves for c1
+c1d2, c1e3, c1f4, 
+Available_moves for e8
+e8d8, e8e7, DSB Available_moves for c1
+c1d2, c1e3, c1f4, 

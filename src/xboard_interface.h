@@ -1,5 +1,4 @@
-#ifndef XBOARD_INTERFACE_H
-#define XBOARD_INTERFACE_H
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -115,5 +114,3 @@ private:
     std::vector<std::string> m_features;
     std::vector<std::string> m_options;
 };
-
-#endif
