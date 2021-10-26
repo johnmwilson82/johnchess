@@ -58,7 +58,7 @@ public:
 
     inline const std::vector<std::shared_ptr<Piece>>& get_attackers(Piece::Colour col) const
     {
-        return (col == Piece::BLACK) ? m_white_attackers : m_black_attackers;
+        return (col == Piece::WHITE) ? m_white_attackers : m_black_attackers;
     }
     
 private:

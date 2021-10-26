@@ -50,9 +50,8 @@ public:
     ~RandomAI() {};
     Move make_move(const Board& board)
     {
-        std::vector<Move> avail_moves;
-        std::vector<Move> king_moves;
-        std::vector<Move> dsb_moves;
+        std::list<Move> avail_moves;
+
         static auto dsb = board.square(2, 0).get_piece();
         do{
             //choose random square
@@ -67,21 +66,17 @@ public:
                 continue;
             if(pc->get_colour() != m_colour)
                 continue;
+
             avail_moves = pc->get_all_valid_moves(board);
 
-            king_moves = king->get_all_valid_moves(board);
-            ofs << "Available_moves for " << king->get_loc().to_string() << "\n";
-            for(const auto move : king_moves)
-            {
-                ofs << move.to_string() << ", ";
-            }
-
-            dsb_moves = dsb->get_all_valid_moves(board);
-            ofs << "DSB Available_moves for " << dsb->get_loc().to_string() << "\n";
-            for(const auto move : dsb_moves)
-            {
-                ofs << move.to_string() << ", ";
-            }
+            bool in_check;
+            // Erase moves that put ai into check
+            avail_moves.remove_if([&](const Move& move) {
+                Board test_board(board, move);
+                in_check = test_board.get_in_check(m_colour);
+                ofs << "Move " << move.to_string() << (in_check ? " in check" : " not in check") << std::endl;
+                return in_check;
+            });
 
             ofs << std::endl;
             ofs.flush();
@@ -91,6 +86,8 @@ public:
         //now we have a piece that belongs to us, we'll randomly make a move
         int mv_num = rand() % avail_moves.size();
 
-        return avail_moves[mv_num];
+        auto it = avail_moves.begin();
+        std::advance(it, mv_num);
+        return *it;
     }
 };

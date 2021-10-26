@@ -8,9 +8,9 @@ Piece::~Piece()
 
 
 
-std::vector<Move> Piece::get_all_slide_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test) const
+std::list<Move> Piece::get_all_slide_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test) const
 {
-    std::vector<Move> ret;
+    std::list<Move> ret;
     for(const auto& move : dms)
     {
         BoardLocation curr_loc(m_loc);
@@ -40,9 +40,9 @@ std::vector<Move> Piece::get_all_slide_moves(const std::vector<DynMove>& dms, co
 }
 
 
-std::vector<Move> Piece::get_all_hop_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test) const
+std::list<Move> Piece::get_all_hop_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test) const
 {
-    std::vector<Move> ret;
+    std::list<Move> ret;
     for(const auto& move : dms)
     {
         BoardLocation curr_loc(m_loc);
@@ -63,10 +63,10 @@ Pawn::Pawn(Colour colour, BoardLocation(loc)) :
 }
 
 
-std::vector<Move> Pawn::get_all_valid_moves(const Board& board) const
+std::list<Move> Pawn::get_all_valid_moves(const Board& board) const
 {
     int dir = m_colour == Piece::WHITE ? 1 : -1;
-    std::vector<Move> ret;
+    std::list<Move> ret;
 
     // Advance
     int j = ((m_colour == Piece::WHITE) && (m_loc.get_y() == 1)) ||
@@ -126,7 +126,7 @@ King::King(Colour colour, BoardLocation(loc)) :
 }
 
 
-std::vector<Move> King::get_all_valid_moves(const Board& board) const
+std::list<Move> King::get_all_valid_moves(const Board& board) const
 {
     return get_all_hop_moves(m_dm_list, board, true);
 }
@@ -156,7 +156,7 @@ Queen::Queen(Colour colour, BoardLocation(loc)) :
 }
 
 
-std::vector<Move> Queen::get_all_valid_moves(const Board& board) const
+std::list<Move> Queen::get_all_valid_moves(const Board& board) const
 {
 
     return get_all_slide_moves(m_dm_list, board, true);
@@ -183,7 +183,7 @@ Rook::Rook(Colour colour, BoardLocation(loc)) :
 }
 
 
-std::vector<Move> Rook::get_all_valid_moves(const Board& board) const
+std::list<Move> Rook::get_all_valid_moves(const Board& board) const
 {
     return get_all_slide_moves(m_dm_list, board, true);
 }
@@ -209,7 +209,7 @@ Bishop::Bishop(Colour colour, BoardLocation(loc)) :
 }
 
 
-std::vector<Move> Bishop::get_all_valid_moves(const Board& board) const
+std::list<Move> Bishop::get_all_valid_moves(const Board& board) const
 {
     return get_all_slide_moves(m_dm_list, board, true);
 }
@@ -239,7 +239,7 @@ Knight::Knight(Colour colour, BoardLocation(loc)) :
 }
 
 
-std::vector<Move> Knight::get_all_valid_moves(const Board& board) const
+std::list<Move> Knight::get_all_valid_moves(const Board& board) const
 {
 
     return get_all_hop_moves(m_dm_list, board, true);

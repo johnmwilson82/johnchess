@@ -105,6 +105,9 @@ public: // inlines
     //! Set whether the BoardLocation is on the board or not (e.g. captured piece)
     inline void set_on_board(bool val) { m_on_board = val; }
 
+    //! Set whether the BoardLocation is on the board or not (e.g. captured piece)
+    inline bool get_on_board() {return m_on_board; }
+
 private:
     void register_captured(Piece* piece);
 

@@ -4,46 +4,65 @@
 
 
 Board::Board() :
-    m_squares(BOARD_DIM*BOARD_DIM)
+    m_squares(BOARD_DIM*BOARD_DIM),
+    m_pieces(2)
 {
-    set_to_start_position();
+    //set_to_start_position();
 }
 
 Board::Board(const Board& orig) :
     m_squares(BOARD_DIM*BOARD_DIM),
-    m_colour_to_move(orig.m_colour_to_move)
+    m_colour_to_move(orig.m_colour_to_move),
+    m_pieces(2)
 {
     for(const auto& piece : orig.m_pieces)
     {
-        add_piece(piece->get_type(), piece->get_colour(), piece->get_loc());
+        if(piece->get_on_board())
+        {
+            add_piece(piece->get_type(), piece->get_colour(), piece->get_loc());
+        }
     }
+
+    populate_squares_properties();
 }
 
 Board::Board(const Board& orig, const Move& move) :
     m_squares(BOARD_DIM*BOARD_DIM),
-    m_colour_to_move(orig.m_colour_to_move)
+    m_colour_to_move(orig.m_colour_to_move),
+    m_pieces(2)
 {
     for(const auto& piece : orig.m_pieces)
     {
-        add_piece(piece->get_type(), piece->get_colour(), piece->get_loc());
+        if(piece->get_on_board())
+        {
+            add_piece(piece->get_type(), piece->get_colour(), piece->get_loc());
+        }
     }
 
     move_piece(move.get_from_loc(), move.get_to_loc());
+
+    populate_squares_properties();
 }
 
 Board::Board(const Board& orig, const std::string& move_str) :
     m_squares(BOARD_DIM*BOARD_DIM),
-    m_colour_to_move(orig.m_colour_to_move)
+    m_colour_to_move(orig.m_colour_to_move),
+    m_pieces(2)
 {
     for(const auto& piece : orig.m_pieces)
     {
-        add_piece(piece->get_type(), piece->get_colour(), piece->get_loc());
+        if(piece->get_on_board())
+        {
+            add_piece(piece->get_type(), piece->get_colour(), piece->get_loc());
+        }
     }
 
     std::string curr_loc = move_str.substr(0, 2);
     std::string new_loc = move_str.substr(2);
 
     move_piece(BoardLocation(curr_loc, *this), BoardLocation(new_loc, *this));
+
+    populate_squares_properties();
 }
 
 void Board::populate_squares_properties()
@@ -59,11 +78,12 @@ void Board::populate_squares_properties()
 
 void Board::delete_all_pieces()
 {
-    for(auto piece : m_pieces)
+    for(auto& sq : m_squares)
     {
-        square(piece->get_loc()).remove_piece();
+        sq.remove_piece();
     }
     m_pieces.clear();
+    m_pieces.resize(2);
 }
 
 bool Board::add_piece(Piece::Type type, Piece::Colour col, std::string loc)
@@ -80,7 +100,9 @@ bool Board::add_piece(Piece::Type type, Piece::Colour col, BoardLocation loc)
     switch (type)
     {
         case Piece::KING:
-            new_piece = m_pieces.emplace_back(std::make_shared<King>(col, loc));
+            // Insert kings so we have [0] -> white king and [1] -> black king
+            new_piece = std::make_shared<King>(col, loc);
+            m_pieces[col == Piece::WHITE ? 0 : 1] = new_piece;
             break;
         case Piece::QUEEN:
             new_piece = m_pieces.emplace_back(std::make_shared<Queen>(col, loc));
@@ -110,7 +132,6 @@ bool Board::remove_piece(std::string loc)
 
 bool Board::remove_piece(BoardLocation loc)
 {
-    // This doesn't fully delete the pieces, just removes them from play
     if(square(loc).is_empty())
         return false;
 
@@ -192,6 +213,8 @@ void Board::set_to_start_position()
     add_piece(Piece::ROOK,   Piece::BLACK, "h8");
 
     m_colour_to_move = Piece::WHITE;
+
+    populate_squares_properties();
 }
 
 void Board::register_captured(std::shared_ptr<Piece> piece)
@@ -272,24 +295,10 @@ void Board::set_from_edit_mode(std::vector<std::string> in)
         	break;
         case 'K':
         	add_piece(Piece::KING, col, sq);
-        	if (col == Piece::WHITE)
-        	{
-        	    white_king = m_pieces.back();
-        	    m_pieces.pop_back();
-        	}
-        	else if (col == Piece::BLACK)
-            {
-                black_king = m_pieces.back();
-                m_pieces.pop_back();
-            }
         	break;
         default:
         	throw std::runtime_error(std::string("Invalid edit string: ") + *it);
         }
     }
-
-    // Insert kings so we have [0] -> white king and [1] -> black king
-    m_pieces.insert(m_pieces.begin(), black_king);
-    m_pieces.insert(m_pieces.begin(), white_king);
 }
 

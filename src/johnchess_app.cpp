@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <fstream>
 
+#include "utils/board_strings.h"
+
 JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
     m_app_opts(NULL),
     m_force_mode(false)
@@ -15,6 +17,7 @@ JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
 
     show_welcome();
     m_board = std::make_unique<Board>();
+    m_board->set_to_start_position();
 
     m_ai = std::make_unique<RandomAI>(Piece::BLACK);
 }
@@ -44,48 +47,8 @@ void JohnchessApp::make_ai_move()
 
     ofs << "Move = " << move_string << std::endl;
 
-    for(int y = 7; y >= 0; --y)
-    {
-        for (int x = 0; x < 8; ++x)
-        {
-            const auto& sq = m_board->square(x, y);
-            if(sq.is_empty())
-            {
-                ofs << " _";
-            }
-            else
-            {
-                switch(sq.get_piece()->get_type())
-                {
-                    case Piece::KING:
-                        ofs << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " K" : " k");
-                        break;
+    ofs << utils::board_to_string_repr(*m_board);
 
-                    case Piece::QUEEN:
-                        ofs << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " Q" : " q");
-                        break;
-
-                    case Piece::ROOK:
-                        ofs << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " R" : " r");
-                        break;
-
-                    case Piece::BISHOP:
-                        ofs << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " B" : " b");
-                        break;
-
-                    case Piece::KNIGHT:
-                        ofs << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " N" : " n");
-                        break;
-
-                    case Piece::PAWN:
-                        ofs << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " P" : " p");
-                        break;
-                }
-            }
-            
-        }
-        ofs << std::endl;
-    }
     ofs.flush();
 }
 

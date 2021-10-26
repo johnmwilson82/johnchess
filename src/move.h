@@ -34,7 +34,7 @@ public:
     Move(const Piece& piece, const BoardLocation& new_loc);
 
     bool operator== (const Move& m) const;
-
+    
     std::string to_string() const;
 
     const BoardLocation& get_to_loc() const;

@@ -54,21 +54,8 @@ public:
         return m_squares[x * BOARD_DIM + y];
     }
 
-    //! Return a const ref to the square at the given x, y coordinates (0-7)
-    inline Square& square(int x, int y)
-    {
-        return m_squares[x * BOARD_DIM + y];
-    }
-
-
     //! Return a const ref to the square at the given BoardLocation
     inline const Square& square(BoardLocation loc) const
-    {
-        return m_squares[loc.get_x() * BOARD_DIM + loc.get_y()];
-    }
-
-    //! Return a ref to the square at the given BoardLocation
-    inline Square& square(BoardLocation loc)
     {
         return m_squares[loc.get_x() * BOARD_DIM + loc.get_y()];
     }
@@ -84,15 +71,6 @@ public:
      *                         (i.e. from 'edit' to '.')
      */
     void set_from_edit_mode(std::vector<std::string> edit_mode_strings);
-
-    //! Return whether this board is in check
-    /*!
-     * \return true if either side is in check, false otherwise
-     */
-    inline bool get_in_check() const
-    {
-        return get_in_check(Piece::WHITE) || get_in_check(Piece::BLACK);
-    }
 
     //! Return whether given colour's king is in check
     /*!
@@ -119,19 +97,25 @@ public:
         return NO_MATE;
     }
 
-    //! Return the number of available moves for a given colour
-    int get_num_available_moves(Piece::Colour col) const;
-
     //! Return the colour whose move it is
     Piece::Colour get_colour_to_move()
     {
         return m_colour_to_move;
     }
 
-private:
+    //! Apply a piece to the board at a given location
+    /*!
+     * \param type chess piece type
+     * \param col chess piece colour
+     * \param loc location as a BoardLocation
+     * \return true on success
+     */
+    bool add_piece(Piece::Type type, Piece::Colour col, BoardLocation loc);
+
     //! Delete all the pieces from the board
     void delete_all_pieces();
 
+private:
     void register_captured(std::shared_ptr<Piece>piece);
 
     //! Apply a piece to the board at a given location
@@ -142,15 +126,6 @@ private:
      * \return true on success
      */
     bool add_piece(Piece::Type type, Piece::Colour col, std::string loc);
-
-    //! Apply a piece to the board at a given location
-    /*!
-     * \param type chess piece type
-     * \param col chess piece colour
-     * \param loc location as a BoardLocation
-     * \return true on success
-     */
-    bool add_piece(Piece::Type type, Piece::Colour col, BoardLocation loc);
 
     //! Move a piece on the board where move is given as a string in standard notation (e.g. a2a4)
     /*!
@@ -178,4 +153,18 @@ private:
 
     void populate_squares_properties();
 
+    //! Return a ref to the square at the given BoardLocation
+    inline Square& square(BoardLocation loc)
+    {
+        return m_squares[loc.get_x() * BOARD_DIM + loc.get_y()];
+    }
+
+    //! Return a const ref to the square at the given x, y coordinates (0-7)
+    inline Square& square(int x, int y)
+    {
+        return m_squares[x * BOARD_DIM + y];
+    }
+
+    //! Return the number of available moves for a given colour
+    int get_num_available_moves(Piece::Colour col) const;
 };
