@@ -28,6 +28,8 @@ public:
         BLACK
     };
 
+    static constexpr Colour opposite_colour(Colour col) { return col == WHITE ? BLACK : WHITE; }
+
 public: //ctor/dtor
     Piece(const Colour& colour, const BoardLocation& loc, const Type& type) :
         m_colour(colour),
@@ -50,8 +52,6 @@ public: //public interface
     virtual std::vector<std::string> get_symbol_list() const = 0;
 
 public: // public methods
-    static inline Colour opposite_colour(Colour col) { return col == Piece::WHITE ? Piece::BLACK : Piece::WHITE; }
-
     inline Colour get_colour() const { return m_colour; }
 
     inline Type get_type() const { return m_type; }
@@ -63,13 +63,19 @@ public: // public methods
     inline bool get_on_board() { return m_loc.get_on_board(); }
     inline void set_on_board(bool val) { m_loc.set_on_board(val); }
 
-    inline void move(const BoardLocation& new_loc) { m_loc = new_loc; }
+    inline void move(const BoardLocation& new_loc) {
+        m_moved = true;
+        m_loc = new_loc; 
+    }
+
+    inline bool has_moved() { return m_moved; }
 
 protected:
     std::list<Move> get_all_slide_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test=true) const;
     std::list<Move> get_all_hop_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test=true) const;
 
 protected:
+    bool m_moved = false;
     BoardLocation m_loc;
     Piece::Colour m_colour;
     Piece::Type m_type;

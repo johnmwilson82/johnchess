@@ -128,7 +128,63 @@ King::King(Colour colour, BoardLocation(loc)) :
 
 std::list<Move> King::get_all_valid_moves(const Board& board) const
 {
-    return get_all_hop_moves(m_dm_list, board, true);
+    bool can_castle_ks = false;
+    bool can_castle_qs = false;
+
+    if(!m_moved)
+    {
+        const auto& right_sq1 = board.square(m_loc.get_x()+1, m_loc.get_y());
+        const auto& right_sq2 = board.square(m_loc.get_x()+2, m_loc.get_y());
+        const auto& right_rook_sq = board.square(m_loc.get_x()+3, m_loc.get_y());
+
+        if(right_sq1.is_empty() && right_sq1.get_attackers(opposite_colour(m_colour)).empty() &&
+           right_sq2.is_empty() && right_sq2.get_attackers(opposite_colour(m_colour)).empty() &&
+           !right_rook_sq.is_empty() && !right_rook_sq.get_piece()->has_moved())
+        {
+            can_castle_ks = true;
+        }
+
+        const auto& left_sq1 = board.square(m_loc.get_x()-1, m_loc.get_y());
+        const auto& left_sq2 = board.square(m_loc.get_x()-2, m_loc.get_y());
+        const auto& left_sq3 = board.square(m_loc.get_x()-3, m_loc.get_y());
+        const auto& left_rook_sq = board.square(m_loc.get_x()-4, m_loc.get_y());
+
+        if(left_sq1.is_empty() && left_sq1.get_attackers(opposite_colour(m_colour)).empty() &&
+           left_sq2.is_empty() && left_sq2.get_attackers(opposite_colour(m_colour)).empty() &&
+           left_sq3.is_empty() && left_sq3.get_attackers(opposite_colour(m_colour)).empty() &&
+           !left_rook_sq.is_empty() && !left_rook_sq.get_piece()->has_moved())
+        {
+            can_castle_qs = true;
+        }
+    }
+
+    std::list<Move> ret = get_all_hop_moves(m_dm_list, board, true);
+
+    if(can_castle_qs)
+    {
+        if(m_colour == WHITE)
+        {
+            ret.emplace_back(*this, BoardLocation("g1", board));
+        }
+        else
+        {
+            ret.emplace_back(*this, BoardLocation("g8", board));
+        }
+    }
+
+    if(can_castle_ks)
+    {
+        if(m_colour == WHITE)
+        {
+            ret.emplace_back(*this, BoardLocation("c1", board));
+        }
+        else
+        {
+            ret.emplace_back(*this, BoardLocation("c8", board));
+        }
+    }
+
+    return ret;
 }
 
 

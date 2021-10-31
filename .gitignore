@@ -3,3 +3,5 @@ build/
 *.fen
 *.pgn
 *.exe
+ai.txt
+current_board.txt

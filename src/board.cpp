@@ -140,6 +140,49 @@ bool Board::remove_piece(BoardLocation loc)
     return true;
 }
 
+std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> Board::check_castling_rook_move(const Piece& moving_piece, const BoardLocation& new_loc)
+{
+    if(moving_piece.get_type() != Piece::KING)
+    {
+        // Not a king move
+        return {};
+    }
+
+    // White king
+    if(moving_piece.get_loc() == BoardLocation("e1", *this))
+    {
+        if(new_loc == BoardLocation("g1", *this))
+        {
+            // King's side castling
+            return std::make_pair(square(7, 0).get_piece(), BoardLocation("f1", *this));
+        }
+
+        if(new_loc == BoardLocation("c1", *this))
+        {
+            // Queens's side castling
+            return std::make_pair(square(0, 0).get_piece(), BoardLocation("d1", *this));
+        }
+    }
+
+    // Black king
+    if(moving_piece.get_loc() == BoardLocation("e8", *this))
+    {
+        if(new_loc == BoardLocation("g8", *this))
+        {
+            // King's side castling
+            return std::make_pair(square(7, 7).get_piece(), BoardLocation("f8", *this));
+        }
+
+        if(new_loc == BoardLocation("c8", *this))
+        {
+            // Queens's side castling
+            return std::make_pair(square(0, 7).get_piece(), BoardLocation("d8", *this));
+        }
+    }
+
+    return {};
+}
+
 bool Board::move_piece(std::string move_str)
 {
     std::string curr_loc = move_str.substr(0, 2);
@@ -157,6 +200,9 @@ bool Board::move_piece(const BoardLocation& curr_loc, const BoardLocation& new_l
     if(!moving_piece)
         return false;
 
+    // Check castling
+    auto castling_rook_move = check_castling_rook_move(*moving_piece, new_loc);
+
     moving_piece->move(new_loc);
 
     if(captured_piece)
@@ -167,6 +213,19 @@ bool Board::move_piece(const BoardLocation& curr_loc, const BoardLocation& new_l
 
     square(new_loc).set_piece(moving_piece);
     square(curr_loc).remove_piece();
+
+    // Implement castling
+    if(castling_rook_move.has_value())
+    {
+        // Move is a castle move
+        auto rook = castling_rook_move->first;
+        auto rook_new_loc = castling_rook_move->second;
+        auto rook_curr_loc = rook->get_loc();
+
+        rook->move(rook_new_loc);
+        square(rook_new_loc).set_piece(rook);
+        square(rook_curr_loc).remove_piece();
+    }
 
     m_colour_to_move = (m_colour_to_move == Piece::WHITE ? Piece::BLACK : Piece::WHITE);
     return true;
