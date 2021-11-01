@@ -58,7 +58,7 @@ std::list<Move> Piece::get_all_hop_moves(const std::vector<DynMove>& dms, const 
 
 
 Pawn::Pawn(Colour colour, BoardLocation(loc)) :
-    Piece(colour, loc, PAWN)
+    ClonablePiece<Pawn>(colour, loc, PAWN)
 {
 }
 
@@ -111,7 +111,7 @@ std::vector<std::string> Pawn::get_symbol_list() const
 
 
 King::King(Colour colour, BoardLocation(loc)) :
-    Piece(colour, loc, KING)
+    ClonablePiece<King>(colour, loc, KING)
 {
     std::vector<DynMove> dm_list;
     dm_list.push_back(DynMove(-1, -1));
@@ -133,9 +133,9 @@ std::list<Move> King::get_all_valid_moves(const Board& board) const
 
     if(!m_moved)
     {
-        const auto& right_sq1 = board.square(m_loc.get_x()+1, m_loc.get_y());
-        const auto& right_sq2 = board.square(m_loc.get_x()+2, m_loc.get_y());
-        const auto& right_rook_sq = board.square(m_loc.get_x()+3, m_loc.get_y());
+        const auto& right_sq1 = board.square(m_loc.apply_move(1, 0));
+        const auto& right_sq2 = board.square(m_loc.apply_move(2, 0));
+        const auto& right_rook_sq = board.square(m_loc.apply_move(3, 0));
 
         if(right_sq1.is_empty() && right_sq1.get_attackers(opposite_colour(m_colour)).empty() &&
            right_sq2.is_empty() && right_sq2.get_attackers(opposite_colour(m_colour)).empty() &&
@@ -144,10 +144,10 @@ std::list<Move> King::get_all_valid_moves(const Board& board) const
             can_castle_ks = true;
         }
 
-        const auto& left_sq1 = board.square(m_loc.get_x()-1, m_loc.get_y());
-        const auto& left_sq2 = board.square(m_loc.get_x()-2, m_loc.get_y());
-        const auto& left_sq3 = board.square(m_loc.get_x()-3, m_loc.get_y());
-        const auto& left_rook_sq = board.square(m_loc.get_x()-4, m_loc.get_y());
+        const auto& left_sq1 = board.square(m_loc.apply_move(-1, 0));
+        const auto& left_sq2 = board.square(m_loc.apply_move(-2, 0));
+        const auto& left_sq3 = board.square(m_loc.apply_move(-3, 0));
+        const auto& left_rook_sq = board.square(m_loc.apply_move(-4, 0));
 
         if(left_sq1.is_empty() && left_sq1.get_attackers(opposite_colour(m_colour)).empty() &&
            left_sq2.is_empty() && left_sq2.get_attackers(opposite_colour(m_colour)).empty() &&
@@ -197,7 +197,7 @@ std::vector<std::string> King::get_symbol_list() const
 
 
 Queen::Queen(Colour colour, BoardLocation(loc)) :
-    Piece(colour, loc, QUEEN)
+    ClonablePiece<Queen>(colour, loc, QUEEN)
 {
     std::vector<DynMove> dm_list;
     dm_list.push_back(DynMove(-1, -1));
@@ -228,7 +228,7 @@ std::vector<std::string> Queen::get_symbol_list() const
 
 
 Rook::Rook(Colour colour, BoardLocation(loc)) :
-    Piece(colour, loc, ROOK)
+    ClonablePiece<Rook>(colour, loc, ROOK)
 {
     std::vector<DynMove> dm_list;
     dm_list.push_back(DynMove(-1, 0));
@@ -254,7 +254,7 @@ std::vector<std::string> Rook::get_symbol_list() const
 
 
 Bishop::Bishop(Colour colour, BoardLocation(loc)) :
-    Piece(colour, loc, BISHOP)
+    ClonablePiece<Bishop>(colour, loc, BISHOP)
 {
     std::vector<DynMove> dm_list;
     dm_list.push_back(DynMove(-1, -1));
@@ -280,7 +280,7 @@ std::vector<std::string> Bishop::get_symbol_list() const
 
 
 Knight::Knight(Colour colour, BoardLocation(loc)) :
-    Piece(colour, loc, KNIGHT)
+    ClonablePiece<Knight>(colour, loc, KNIGHT)
 {
     std::vector<DynMove> dm_list;
     dm_list.push_back(DynMove(-1, 2));

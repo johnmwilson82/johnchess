@@ -110,7 +110,8 @@ public:
      * \param loc location as a BoardLocation
      * \return true on success
      */
-    bool add_piece(Piece::Type type, Piece::Colour col, BoardLocation loc);
+    template<typename T>
+    bool add_piece(Piece::Colour col, BoardLocation loc);
 
     //! Delete all the pieces from the board
     void delete_all_pieces();
@@ -125,7 +126,10 @@ private:
      * \param loc location as a string in standard notation
      * \return true on success
      */
-    bool add_piece(Piece::Type type, Piece::Colour col, std::string loc);
+    template<typename T>
+    bool add_piece(Piece::Colour col, std::string loc);
+
+    bool add_piece(const Piece& piece);
 
     //! Move a piece on the board where move is given as a string in standard notation (e.g. a2a4)
     /*!

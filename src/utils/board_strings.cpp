@@ -38,51 +38,51 @@ Board board_from_string_repr(const std::string& board_str)
 
             if(sq == "p")
             {
-                ret.add_piece(Piece::PAWN, Piece::BLACK, bl);
+                ret.add_piece<Pawn>(Piece::BLACK, bl);
             }
             else if(sq == "r")
             {
-                ret.add_piece(Piece::ROOK, Piece::BLACK, bl);
+                ret.add_piece<Rook>(Piece::BLACK, bl);
             }
             else if(sq == "n")
             {
-                ret.add_piece(Piece::KNIGHT, Piece::BLACK, bl);
+                ret.add_piece<Knight>(Piece::BLACK, bl);
             }
             else if(sq == "b")
             {
-                ret.add_piece(Piece::BISHOP, Piece::BLACK, bl);
+                ret.add_piece<Bishop>(Piece::BLACK, bl);
             }
             else if(sq == "q")
             {
-                ret.add_piece(Piece::QUEEN, Piece::BLACK, bl);
+                ret.add_piece<Queen>(Piece::BLACK, bl);
             }
             else if(sq == "k")
             {
-                ret.add_piece(Piece::KING, Piece::BLACK, bl);
+                ret.add_piece<King>(Piece::BLACK, bl);
             }
             else if(sq == "P")
             {
-                ret.add_piece(Piece::PAWN, Piece::WHITE, bl);
+                ret.add_piece<Pawn>(Piece::WHITE, bl);
             }
             else if(sq == "R")
             {
-                ret.add_piece(Piece::ROOK, Piece::WHITE, bl);
+                ret.add_piece<Rook>(Piece::WHITE, bl);
             }
             else if(sq == "N")
             {
-                ret.add_piece(Piece::KNIGHT, Piece::WHITE, bl);
+                ret.add_piece<Knight>(Piece::WHITE, bl);
             }
             else if(sq == "B")
             {
-                ret.add_piece(Piece::BISHOP, Piece::WHITE, bl);
+                ret.add_piece<Bishop>(Piece::WHITE, bl);
             }
             else if(sq == "Q")
             {
-                ret.add_piece(Piece::QUEEN, Piece::WHITE, bl);
+                ret.add_piece<Queen>(Piece::WHITE, bl);
             }
             else if(sq == "K")
             {
-                ret.add_piece(Piece::KING, Piece::WHITE, bl);
+                ret.add_piece<King>(Piece::WHITE, bl);
             }
 
             line.erase(0, pos + 2);

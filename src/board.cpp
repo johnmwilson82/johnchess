@@ -19,7 +19,7 @@ Board::Board(const Board& orig) :
     {
         if(piece->get_on_board())
         {
-            add_piece(piece->get_type(), piece->get_colour(), piece->get_loc());
+            add_piece(*piece);
         }
     }
 
@@ -35,7 +35,7 @@ Board::Board(const Board& orig, const Move& move) :
     {
         if(piece->get_on_board())
         {
-            add_piece(piece->get_type(), piece->get_colour(), piece->get_loc());
+            add_piece(*piece);
         }
     }
 
@@ -53,7 +53,7 @@ Board::Board(const Board& orig, const std::string& move_str) :
     {
         if(piece->get_on_board())
         {
-            add_piece(piece->get_type(), piece->get_colour(), piece->get_loc());
+            add_piece(*piece);
         }
     }
 
@@ -86,42 +86,55 @@ void Board::delete_all_pieces()
     m_pieces.resize(2);
 }
 
-bool Board::add_piece(Piece::Type type, Piece::Colour col, std::string loc)
+template<typename T>
+bool Board::add_piece(Piece::Colour col, std::string loc)
 {
-    return add_piece(type, col, BoardLocation(loc, *this));
+    return add_piece<T>(col, BoardLocation(loc, *this));
 }
 
-bool Board::add_piece(Piece::Type type, Piece::Colour col, BoardLocation loc)
+template<typename T>
+bool Board::add_piece(Piece::Colour col, BoardLocation loc)
 {
     if (!square(loc).is_empty())
         return false;
 
-    std::shared_ptr<Piece> new_piece;
-    switch (type)
-    {
-        case Piece::KING:
-            // Insert kings so we have [0] -> white king and [1] -> black king
-            new_piece = std::make_shared<King>(col, loc);
-            m_pieces[col == Piece::WHITE ? 0 : 1] = new_piece;
-            break;
-        case Piece::QUEEN:
-            new_piece = m_pieces.emplace_back(std::make_shared<Queen>(col, loc));
-            break;
-        case Piece::ROOK:
-            new_piece = m_pieces.emplace_back(std::make_shared<Rook>(col, loc));
-            break;
-        case Piece::KNIGHT:
-            new_piece = m_pieces.emplace_back(std::make_shared<Knight>(col, loc));
-            break;
-        case Piece::BISHOP:
-            new_piece = m_pieces.emplace_back(std::make_shared<Bishop>(col, loc));
-            break;
-        case Piece::PAWN:
-            new_piece = m_pieces.emplace_back(std::make_shared<Pawn>(col, loc));
-            break;
-    }
+    auto new_piece = m_pieces.emplace_back(std::make_shared<T>(col, loc));
 
     square(loc).set_piece(new_piece);
+    return true;
+}
+
+
+template<>
+bool Board::add_piece<King>(Piece::Colour col, BoardLocation loc)
+{
+    if (!square(loc).is_empty())
+        return false;
+
+    auto new_piece = std::make_shared<King>(col, loc);
+    m_pieces[col == Piece::WHITE ? 0 : 1] = new_piece;
+
+    square(loc).set_piece(new_piece);
+    return true;
+}
+
+bool Board::add_piece(const Piece& piece)
+{
+    if (!square(piece.get_loc()).is_empty())
+        return false;
+
+    std::shared_ptr<Piece> new_piece;
+    if(piece.get_type() == Piece::KING)
+    {
+        new_piece = piece.clone();
+        m_pieces[piece.get_colour() == Piece::WHITE ? 0 : 1] = new_piece;
+    }
+    else
+    {
+        new_piece = m_pieces.emplace_back(piece.clone());
+    }
+
+    square(piece.get_loc()).set_piece(new_piece);
     return true;
 }
 
@@ -236,40 +249,40 @@ void Board::set_to_start_position()
     delete_all_pieces();
     // Kings will occupy the first two elements of m_pieces for
     // quick lookup
-    add_piece(Piece::KING,   Piece::WHITE, "e1");
-    add_piece(Piece::KING,   Piece::BLACK, "e8");
+    add_piece<King>(Piece::WHITE, "e1");
+    add_piece<King>(Piece::BLACK, "e8");
 
-    add_piece(Piece::PAWN,   Piece::WHITE, "a2");
-    add_piece(Piece::PAWN,   Piece::WHITE, "b2");
-    add_piece(Piece::PAWN,   Piece::WHITE, "c2");
-    add_piece(Piece::PAWN,   Piece::WHITE, "d2");
-    add_piece(Piece::PAWN,   Piece::WHITE, "e2");
-    add_piece(Piece::PAWN,   Piece::WHITE, "f2");
-    add_piece(Piece::PAWN,   Piece::WHITE, "g2");
-    add_piece(Piece::PAWN,   Piece::WHITE, "h2");
-    add_piece(Piece::ROOK,   Piece::WHITE, "a1");
-    add_piece(Piece::KNIGHT, Piece::WHITE, "b1");
-    add_piece(Piece::BISHOP, Piece::WHITE, "c1");
-    add_piece(Piece::QUEEN,  Piece::WHITE, "d1");
-    add_piece(Piece::BISHOP, Piece::WHITE, "f1");
-    add_piece(Piece::KNIGHT, Piece::WHITE, "g1");
-    add_piece(Piece::ROOK,   Piece::WHITE, "h1");
+    add_piece<Pawn>(Piece::WHITE, "a2");
+    add_piece<Pawn>(Piece::WHITE, "b2");
+    add_piece<Pawn>(Piece::WHITE, "c2");
+    add_piece<Pawn>(Piece::WHITE, "d2");
+    add_piece<Pawn>(Piece::WHITE, "e2");
+    add_piece<Pawn>(Piece::WHITE, "f2");
+    add_piece<Pawn>(Piece::WHITE, "g2");
+    add_piece<Pawn>(Piece::WHITE, "h2");
+    add_piece<Rook>(Piece::WHITE, "a1");
+    add_piece<Knight>(Piece::WHITE, "b1");
+    add_piece<Bishop>(Piece::WHITE, "c1");
+    add_piece<Queen>(Piece::WHITE, "d1");
+    add_piece<Bishop>(Piece::WHITE, "f1");
+    add_piece<Knight>(Piece::WHITE, "g1");
+    add_piece<Rook>(Piece::WHITE, "h1");
 
-    add_piece(Piece::PAWN,   Piece::BLACK, "a7");
-    add_piece(Piece::PAWN,   Piece::BLACK, "b7");
-    add_piece(Piece::PAWN,   Piece::BLACK, "c7");
-    add_piece(Piece::PAWN,   Piece::BLACK, "d7");
-    add_piece(Piece::PAWN,   Piece::BLACK, "e7");
-    add_piece(Piece::PAWN,   Piece::BLACK, "f7");
-    add_piece(Piece::PAWN,   Piece::BLACK, "g7");
-    add_piece(Piece::PAWN,   Piece::BLACK, "h7");
-    add_piece(Piece::ROOK,   Piece::BLACK, "a8");
-    add_piece(Piece::KNIGHT, Piece::BLACK, "b8");
-    add_piece(Piece::BISHOP, Piece::BLACK, "c8");
-    add_piece(Piece::QUEEN,  Piece::BLACK, "d8");
-    add_piece(Piece::BISHOP, Piece::BLACK, "f8");
-    add_piece(Piece::KNIGHT, Piece::BLACK, "g8");
-    add_piece(Piece::ROOK,   Piece::BLACK, "h8");
+    add_piece<Pawn>(Piece::BLACK, "a7");
+    add_piece<Pawn>(Piece::BLACK, "b7");
+    add_piece<Pawn>(Piece::BLACK, "c7");
+    add_piece<Pawn>(Piece::BLACK, "d7");
+    add_piece<Pawn>(Piece::BLACK, "e7");
+    add_piece<Pawn>(Piece::BLACK, "f7");
+    add_piece<Pawn>(Piece::BLACK, "g7");
+    add_piece<Pawn>(Piece::BLACK, "h7");
+    add_piece<Rook>(Piece::BLACK, "a8");
+    add_piece<Knight>(Piece::BLACK, "b8");
+    add_piece<Bishop>(Piece::BLACK, "c8");
+    add_piece<Queen>(Piece::BLACK, "d8");
+    add_piece<Bishop>(Piece::BLACK, "f8");
+    add_piece<Knight>(Piece::BLACK, "g8");
+    add_piece<Rook>(Piece::BLACK, "h8");
 
     m_colour_to_move = Piece::WHITE;
 
@@ -338,22 +351,22 @@ void Board::set_from_edit_mode(std::vector<std::string> in)
         switch ((*it)[0])
         {
         case 'P':
-        	add_piece(Piece::PAWN, col, sq);
+        	add_piece<Pawn>(col, sq);
         	break;
         case 'N':
-        	add_piece(Piece::KNIGHT, col, sq);
+        	add_piece<Knight>(col, sq);
         	break;
         case 'B':
-        	add_piece(Piece::BISHOP, col, sq);
+        	add_piece<Bishop>(col, sq);
         	break;
         case 'R':
-        	add_piece(Piece::ROOK, col, sq);
+        	add_piece<Rook>(col, sq);
         	break;
         case 'Q':
-        	add_piece(Piece::QUEEN, col, sq);
+        	add_piece<Queen>(col, sq);
         	break;
         case 'K':
-        	add_piece(Piece::KING, col, sq);
+        	add_piece<King>(col, sq);
         	break;
         default:
         	throw std::runtime_error(std::string("Invalid edit string: ") + *it);
