@@ -213,6 +213,22 @@ bool Board::move_piece(const BoardLocation& curr_loc, const BoardLocation& new_l
     if(!moving_piece)
         return false;
 
+    // en passant rules
+    if((!captured_piece && moving_piece->get_type() == Piece::PAWN) &&
+        (curr_loc.get_x() != new_loc.get_x()))
+    {
+        captured_piece = square(
+                new_loc.apply_move(DynMove(0, moving_piece->get_colour() == Piece::WHITE ? -1 : 1))
+            ).get_piece();
+    }
+
+    if((moving_piece->get_type() == Piece::PAWN) &&
+        ((curr_loc.get_y() == 1 && new_loc.get_y() == 3) ||
+         (curr_loc.get_y() == 6) && new_loc.get_y() == 4))
+    {
+        moving_piece->set_capturable_en_passant(true);
+    }
+
     // Check castling
     auto castling_rook_move = check_castling_rook_move(*moving_piece, new_loc);
 
@@ -221,7 +237,7 @@ bool Board::move_piece(const BoardLocation& curr_loc, const BoardLocation& new_l
     if(captured_piece)
     {
         register_captured(captured_piece);
-        remove_piece(new_loc);
+        remove_piece(captured_piece->get_loc());
     }
 
     square(new_loc).set_piece(moving_piece);

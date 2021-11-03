@@ -77,11 +77,16 @@ public: // public methods
 
     inline void move(const BoardLocation& new_loc) {
         m_moved = true;
-        m_just_moved = true;
         m_loc = new_loc;
     }
 
+    inline void set_capturable_en_passant(bool val)
+    {
+        m_capturable_en_passant = val;
+    }
+    
     inline bool has_moved() { return m_moved; }
+    inline bool capturable_en_passant() { return m_capturable_en_passant; }
 
 protected:
     std::list<Move> get_all_slide_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test=true) const;
@@ -89,7 +94,7 @@ protected:
 
 protected:
     bool m_moved = false;
-    bool m_just_moved = false;
+    bool m_capturable_en_passant = false;
     BoardLocation m_loc;
     Piece::Colour m_colour;
     Piece::Type m_type;

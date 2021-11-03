@@ -2,7 +2,6 @@
 #include "board.h"
 #include "pieces.h"
 
-
 BoardLocation::BoardLocation(const BoardLocation& board_loc) :
     m_x(board_loc.m_x),
     m_y(board_loc.m_y),

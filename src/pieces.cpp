@@ -98,6 +98,29 @@ std::list<Move> Pawn::get_all_valid_moves(const Board& board) const
         ret.emplace_back(*this, tl_loc);
     }
 
+    // Check en passant
+    if((m_colour == Piece::WHITE && m_loc.get_y() == 4) ||
+       (m_colour == Piece::BLACK && m_loc.get_y() == 3))
+    {
+        BoardLocation enpassant_tr_loc = m_loc.apply_move(1, 0);
+        if (tr_loc.get_valid() && 
+            !board.square(enpassant_tr_loc).is_empty() &&
+            board.square(enpassant_tr_loc).get_piece()->get_colour() != m_colour &&
+            board.square(enpassant_tr_loc).get_piece()->capturable_en_passant())
+        {
+            ret.emplace_back(*this, tr_loc);
+        }
+
+        BoardLocation enpassant_tl_loc = m_loc.apply_move(-1, 0);
+        if (tl_loc.get_valid() && 
+            !board.square(enpassant_tl_loc).is_empty() &&
+            board.square(enpassant_tl_loc).get_piece()->get_colour() != m_colour &&
+            board.square(enpassant_tl_loc).get_piece()->capturable_en_passant())
+        {
+            ret.emplace_back(*this, tl_loc);
+        }
+    }
+    
     return ret;
 }
 
