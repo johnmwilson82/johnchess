@@ -117,8 +117,6 @@ public:
     void delete_all_pieces();
 
 private:
-    void register_captured(std::shared_ptr<Piece>piece);
-
     //! Apply a piece to the board at a given location
     /*!
      * \param type chess piece type
@@ -141,7 +139,7 @@ private:
     /*!
      * \return true on success and if there was a piece to remove
      */
-    bool move_piece(const BoardLocation& curr_loc, const BoardLocation& new_loc);
+    bool move_piece(const Move& move);
 
     //! Remove a piece from the board where location is given as a string in standard notation
     /*!

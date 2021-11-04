@@ -1,6 +1,7 @@
 #include "move.h"
 
 #include "pieces.h"
+#include "board.h"
 
 Move::Move(const Piece &piece, const DynMove& dm) :
     m_piece(piece),
@@ -11,6 +12,37 @@ Move::Move(const Piece &piece, const BoardLocation& new_loc) :
     m_piece(piece),
     m_new_loc(new_loc)
 {
+}
+
+Move::Move(const Board& board, const std::string& move_str) :
+    m_piece(*board.square(BoardLocation(move_str.substr(0, 2), board)).get_piece()),
+    m_new_loc(move_str.substr(2, 2), board)
+{
+    if(move_str.length() == 5)
+    {
+        switch(move_str[4])
+        {
+            case 'q':
+            case 'Q':
+                m_queening_type = PromotionType::QUEEN;
+                break;
+
+            case 'R':
+            case 'r':
+                m_queening_type = PromotionType::ROOK;
+                break;
+
+            case 'B':
+            case 'b':
+                m_queening_type = PromotionType::BISHOP;
+                break;
+
+            case 'N':
+            case 'n':
+                m_queening_type = PromotionType::KNIGHT;
+                break;
+        }
+    }
 }
 
 bool Move::operator== (const Move& m) const

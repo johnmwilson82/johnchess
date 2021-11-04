@@ -39,7 +39,7 @@ Board::Board(const Board& orig, const Move& move) :
         }
     }
 
-    move_piece(move.get_from_loc(), move.get_to_loc());
+    move_piece(move);
 
     populate_squares_properties();
 }
@@ -57,10 +57,7 @@ Board::Board(const Board& orig, const std::string& move_str) :
         }
     }
 
-    std::string curr_loc = move_str.substr(0, 2);
-    std::string new_loc = move_str.substr(2);
-
-    move_piece(BoardLocation(curr_loc, *this), BoardLocation(new_loc, *this));
+    move_piece(move_str);
 
     populate_squares_properties();
 }
@@ -202,11 +199,14 @@ bool Board::move_piece(std::string move_str)
     std::string new_loc = move_str.substr(2);
 
     m_colour_to_move = (m_colour_to_move == Piece::WHITE ? Piece::BLACK : Piece::WHITE);
-    return move_piece(BoardLocation(curr_loc, *this), BoardLocation(new_loc, *this));
+    return move_piece(Move(*this, move_str));
 }
 
-bool Board::move_piece(const BoardLocation& curr_loc, const BoardLocation& new_loc)
+bool Board::move_piece(const Move& move)
 {
+    const auto& new_loc = move.get_to_loc();
+    const auto& curr_loc = move.get_from_loc();
+
     auto captured_piece = square(new_loc).get_piece();
     auto moving_piece = square(curr_loc).get_piece();
 
@@ -232,15 +232,41 @@ bool Board::move_piece(const BoardLocation& curr_loc, const BoardLocation& new_l
     // Check castling
     auto castling_rook_move = check_castling_rook_move(*moving_piece, new_loc);
 
-    moving_piece->move(new_loc);
-
     if(captured_piece)
     {
-        register_captured(captured_piece);
         remove_piece(captured_piece->get_loc());
+        square(new_loc).remove_piece();
     }
 
-    square(new_loc).set_piece(moving_piece);
+    if(move.get_queening_type().has_value())
+    {
+        switch(*move.get_queening_type())
+        {
+            case Move::PromotionType::QUEEN:
+                add_piece<Queen>(moving_piece->get_colour(), new_loc);
+                break;
+
+            case Move::PromotionType::ROOK:
+                add_piece<Rook>(moving_piece->get_colour(), new_loc);
+                break;
+
+            case Move::PromotionType::BISHOP:
+                add_piece<Bishop>(moving_piece->get_colour(), new_loc);
+                break;
+
+            case Move::PromotionType::KNIGHT:
+                add_piece<Knight>(moving_piece->get_colour(), new_loc);
+                break;
+        }
+
+        remove_piece(moving_piece->get_loc());
+    }
+    else
+    {
+        moving_piece->move(new_loc);
+        square(new_loc).set_piece(moving_piece);
+    }
+    
     square(curr_loc).remove_piece();
 
     // Implement castling
@@ -303,11 +329,6 @@ void Board::set_to_start_position()
     m_colour_to_move = Piece::WHITE;
 
     populate_squares_properties();
-}
-
-void Board::register_captured(std::shared_ptr<Piece> piece)
-{
-
 }
 
 bool Board::get_in_check(Piece::Colour col) const

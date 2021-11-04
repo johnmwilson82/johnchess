@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include "board_location.h"
 
@@ -30,8 +31,16 @@ class Move
 
 // Move: Describes a move, which is the new location of a given piece
 public:
+    enum class PromotionType {
+        QUEEN,
+        ROOK,
+        BISHOP,
+        KNIGHT
+    };
+
     Move(const Piece& piece, const DynMove& dm);
     Move(const Piece& piece, const BoardLocation& new_loc);
+    Move(const Board& board, const std::string& move_str);
 
     bool operator== (const Move& m) const;
     
@@ -39,10 +48,12 @@ public:
 
     const BoardLocation& get_to_loc() const;
     const BoardLocation get_from_loc() const;
+    const std::optional<PromotionType> get_queening_type() const { return m_queening_type; }
 
 private:
     BoardLocation m_new_loc;
     const Piece& m_piece;
+    std::optional<PromotionType> m_queening_type;
 };
 
 class MoveHashFunction

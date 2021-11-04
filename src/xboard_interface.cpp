@@ -109,9 +109,17 @@ std::vector<std::string> XBoardInterface::read_edit_mode()
 
 bool XBoardInterface::CommandReceived::check_move_string(const std::string& comm)
 {
-    if (comm.size() != 4)
+    if (comm.size() < 4 || comm.size() > 5)
         return false;
 
+    if (comm.size() == 5)
+    {
+        if ((comm[4] != 'n') && (comm[4] != 'b') &&  
+            (comm[4] != 'r') && (comm[4] != 'q'))
+        {
+            return false;
+        }
+    }
     //move string is always in the form 'a2a4'
     return (comm[0] >= 'a' && comm[0] <= 'h') &&
            (comm[1] >= '1' && comm[1] <= '8') &&
