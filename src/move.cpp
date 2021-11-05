@@ -24,22 +24,22 @@ Move::Move(const Board& board, const std::string& move_str) :
         {
             case 'q':
             case 'Q':
-                m_queening_type = PromotionType::QUEEN;
+                m_promotion_type = PromotionType::QUEEN;
                 break;
 
             case 'R':
             case 'r':
-                m_queening_type = PromotionType::ROOK;
+                m_promotion_type = PromotionType::ROOK;
                 break;
 
             case 'B':
             case 'b':
-                m_queening_type = PromotionType::BISHOP;
+                m_promotion_type = PromotionType::BISHOP;
                 break;
 
             case 'N':
             case 'n':
-                m_queening_type = PromotionType::KNIGHT;
+                m_promotion_type = PromotionType::KNIGHT;
                 break;
         }
     }
@@ -52,7 +52,31 @@ bool Move::operator== (const Move& m) const
 
 std::string Move::to_string() const
 {
-    return m_piece.get_loc().to_string() + m_new_loc.to_string();
+    std::string move_str = m_piece.get_loc().to_string() + m_new_loc.to_string();
+
+    if(m_promotion_type.has_value())
+    {
+        switch (*m_promotion_type)
+        {
+        case PromotionType::BISHOP:
+            move_str += "b";
+            break;
+        
+        case PromotionType::KNIGHT:
+            move_str += "n";
+            break;
+        
+        case PromotionType::QUEEN:
+            move_str += "q";
+            break;
+        
+        case PromotionType::ROOK:
+            move_str += "r";
+            break;
+        }
+    }
+
+    return move_str;
 }
 
 const BoardLocation& Move::get_to_loc() const

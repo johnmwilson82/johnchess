@@ -30,13 +30,15 @@ JohnchessApp::~JohnchessApp()
 
 void JohnchessApp::make_ai_move()
 {
+    auto moving_colour = m_board->get_colour_to_move();
+
     std::string move_string = m_ai->make_move(*m_board).to_string();
 
     auto new_board = std::make_unique<Board>(*m_board, move_string);
 
-    if(new_board->get_in_check(new_board->get_colour_to_move()))
+    if(new_board->get_in_check(moving_colour))
     {
-        throw std::runtime_error("AI seems to have generated a nonsense move");
+        throw std::runtime_error("AI seems to have generated a nonsense move :" + move_string);
     }
 
     m_board = std::move(new_board);

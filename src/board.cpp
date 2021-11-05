@@ -195,10 +195,6 @@ std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> Board::check_cas
 
 bool Board::move_piece(std::string move_str)
 {
-    std::string curr_loc = move_str.substr(0, 2);
-    std::string new_loc = move_str.substr(2);
-
-    m_colour_to_move = (m_colour_to_move == Piece::WHITE ? Piece::BLACK : Piece::WHITE);
     return move_piece(Move(*this, move_str));
 }
 
@@ -224,7 +220,7 @@ bool Board::move_piece(const Move& move)
 
     if((moving_piece->get_type() == Piece::PAWN) &&
         ((curr_loc.get_y() == 1 && new_loc.get_y() == 3) ||
-         (curr_loc.get_y() == 6) && new_loc.get_y() == 4))
+         (curr_loc.get_y() == 6 && new_loc.get_y() == 4)))
     {
         moving_piece->set_capturable_en_passant(true);
     }
@@ -238,9 +234,9 @@ bool Board::move_piece(const Move& move)
         square(new_loc).remove_piece();
     }
 
-    if(move.get_queening_type().has_value())
+    if(move.get_promotion_type().has_value())
     {
-        switch(*move.get_queening_type())
+        switch(*move.get_promotion_type())
         {
             case Move::PromotionType::QUEEN:
                 add_piece<Queen>(moving_piece->get_colour(), new_loc);

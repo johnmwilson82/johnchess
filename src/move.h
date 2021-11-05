@@ -48,12 +48,14 @@ public:
 
     const BoardLocation& get_to_loc() const;
     const BoardLocation get_from_loc() const;
-    const std::optional<PromotionType> get_queening_type() const { return m_queening_type; }
+
+    const void set_promotion_type(PromotionType promotion_type) { m_promotion_type = promotion_type; }
+    const std::optional<PromotionType> get_promotion_type() const { return m_promotion_type; }
 
 private:
     BoardLocation m_new_loc;
     const Piece& m_piece;
-    std::optional<PromotionType> m_queening_type;
+    std::optional<PromotionType> m_promotion_type;
 };
 
 class MoveHashFunction

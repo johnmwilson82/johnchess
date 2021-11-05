@@ -1,5 +1,6 @@
 #include "pieces.h"
 #include "board.h"
+
 #include <iostream>
 
 Piece::~Piece()
@@ -68,6 +69,23 @@ std::list<Move> Pawn::get_all_valid_moves(const Board& board) const
     int dir = m_colour == Piece::WHITE ? 1 : -1;
     std::list<Move> ret;
 
+    auto emplace_pawn_move = [&] (const BoardLocation& adv_loc)
+    {
+        if((m_colour == Piece::WHITE && adv_loc.get_y() == 7) ||
+           (m_colour == Piece::BLACK && adv_loc.get_y() == 0))
+        {
+            for(auto promote_to : std::array { Move::PromotionType::QUEEN, Move::PromotionType::ROOK, Move::PromotionType::BISHOP, Move::PromotionType::KNIGHT })
+            {
+                auto& move = ret.emplace_back(*this, adv_loc);
+                move.set_promotion_type(promote_to);
+            }
+        }
+        else
+        {
+            ret.emplace_back(*this, adv_loc);
+        }
+    };
+
     // Advance
     int j = ((m_colour == Piece::WHITE) && (m_loc.get_y() == 1)) ||
             ((m_colour == Piece::BLACK) && (m_loc.get_y() == 6)) ? 2 : 1;
@@ -76,7 +94,7 @@ std::list<Move> Pawn::get_all_valid_moves(const Board& board) const
         BoardLocation adv_loc(m_loc.apply_move(0, dir * (i+1)));
         if (adv_loc.get_valid() && board.square(adv_loc).is_empty())
         {
-            ret.emplace_back(*this, adv_loc);
+            emplace_pawn_move(adv_loc);
         }
         else
             break;
@@ -87,7 +105,7 @@ std::list<Move> Pawn::get_all_valid_moves(const Board& board) const
     if (tr_loc.get_valid() && !board.square(tr_loc).is_empty() &&
         board.square(tr_loc).get_piece()->get_colour() != m_colour)
     {
-        ret.emplace_back(*this, tr_loc);
+        emplace_pawn_move(tr_loc);
     }
 
     // Take left
@@ -95,7 +113,7 @@ std::list<Move> Pawn::get_all_valid_moves(const Board& board) const
     if (tl_loc.get_valid() && !board.square(tl_loc).is_empty() &&
         board.square(tl_loc).get_piece()->get_colour() != m_colour)
     {
-        ret.emplace_back(*this, tl_loc);
+        emplace_pawn_move(tl_loc);
     }
 
     // Check en passant
@@ -108,7 +126,7 @@ std::list<Move> Pawn::get_all_valid_moves(const Board& board) const
             board.square(enpassant_tr_loc).get_piece()->get_colour() != m_colour &&
             board.square(enpassant_tr_loc).get_piece()->capturable_en_passant())
         {
-            ret.emplace_back(*this, tr_loc);
+            emplace_pawn_move(tr_loc);
         }
 
         BoardLocation enpassant_tl_loc = m_loc.apply_move(-1, 0);
@@ -117,7 +135,7 @@ std::list<Move> Pawn::get_all_valid_moves(const Board& board) const
             board.square(enpassant_tl_loc).get_piece()->get_colour() != m_colour &&
             board.square(enpassant_tl_loc).get_piece()->capturable_en_passant())
         {
-            ret.emplace_back(*this, tl_loc);
+            emplace_pawn_move(tl_loc);
         }
     }
     
