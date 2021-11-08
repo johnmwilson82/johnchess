@@ -9,7 +9,7 @@
 
 class XBoardInterface
 {
-public:
+public:        
     class CommandReceived
     {
     public:
@@ -30,8 +30,10 @@ public:
             EDIT,
             FORCE,
             GO,
+            RESULT,
             NONE
         } type_t;
+
 
     public:
         CommandReceived(const std::string& rcvd) :
@@ -88,6 +90,12 @@ public:
 public:
     XBoardInterface(std::istream& instr, std::ostream& outstr, const std::string& app_name);
 
+    enum class Result {
+        WHITE_WIN,
+        BLACK_WIN,
+        DRAW,
+    };
+
 public:
     void tell_info(const std::string& infostring);
     CommandReceived wait_for_command();
@@ -100,6 +108,8 @@ public:
     void add_feature(const std::string& feature_str);
     void add_option(const std::string& option_str);
     void reply_features();
+    void reply_result(Result result);
+
     std::vector<std::string> read_edit_mode();
 
 private:

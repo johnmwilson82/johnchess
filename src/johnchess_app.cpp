@@ -54,6 +54,32 @@ void JohnchessApp::make_ai_move()
     ofs.flush();
 }
 
+bool JohnchessApp::check_game_end()
+{
+    Piece::Colour colour_to_move = m_board->get_colour_to_move();
+
+    // Check whether AI player is in mate
+    Board::Mate mate = m_board->get_mate(colour_to_move);
+    if(mate != Board::NO_MATE)
+    {
+        if(mate == Board::STALEMATE)
+        {
+            m_xboard_interface->reply_result(XBoardInterface::Result::DRAW);
+        }
+        else //if mate == Board::CHECKMATE
+        {
+            // Do something for checkmate
+            m_xboard_interface->reply_result(
+                colour_to_move == Piece::BLACK ? 
+                XBoardInterface::Result::WHITE_WIN :
+                XBoardInterface::Result::BLACK_WIN);
+        }
+        return true;
+    }
+
+    return false;
+}
+
 void JohnchessApp::main_loop()
 {
     bool finished = false;
@@ -76,29 +102,21 @@ void JohnchessApp::main_loop()
                 if(new_board->get_in_check(colour_to_move))
                 {
                     m_xboard_interface->reply_illegal_move(rcvd);
+                    break;
                 }
-                else
+
+                m_board = std::move(new_board); 
+                // Check whether received move has caused game end
+                if(check_game_end()) break;
+
+                if(!m_force_mode)
                 {
-                    m_board = std::move(new_board);
-                    if(!m_force_mode)
-                    {
-                        make_ai_move();
-                    }
+                    make_ai_move();
                 }
-                Board::Mate mate = m_board->get_mate(colour_to_move);
-                if(mate != Board::NO_MATE)
-                {
-                    if(mate == Board::STALEMATE)
-                    {
-                        // Do something for stalemate
-                        std::cout << "Stalemate" << std::endl;
-                    }
-                    else //if mate == Board::CHECKMATE
-                    {
-                        // Do something for checkmate
-                        std::cout << "Checkmate" << std::endl;
-                    }
-                }
+
+                // Check whether AI move has caused game end
+                if(check_game_end()) break;
+
                 break;
             }
             case XBoardInterface::CommandReceived::INFO_REQ:

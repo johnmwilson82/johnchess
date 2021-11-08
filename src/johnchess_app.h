@@ -28,6 +28,8 @@ private:
     app_opts_t* parse_args(int argc, const char* argv[]);
     void show_welcome();
     void make_ai_move();
+    bool check_game_end();
+
     app_opts_t* m_app_opts;
     std::istream& get_input_stream();
     std::ostream& get_output_stream();

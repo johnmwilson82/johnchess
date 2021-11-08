@@ -11,6 +11,24 @@ XBoardInterface::XBoardInterface(std::istream& instr, std::ostream& outstr, cons
     signal(SIGINT, SIG_IGN);
 }
 
+void XBoardInterface::reply_result(Result result){
+
+    switch(result)
+    {
+        case Result::WHITE_WIN:
+            std::cout << "1-0 {White wins}" << std::endl;
+            break;
+
+        case Result::BLACK_WIN:
+            std::cout << "0-1 {Black wins}" << std::endl;
+            break;
+
+        case Result::DRAW:
+            std::cout << "1/2-1/2 {Draw}" << std::endl;
+            break;
+    }
+
+}
 
 void XBoardInterface::tell_info(const std::string& infostring)
 {
@@ -231,6 +249,12 @@ void XBoardInterface::CommandReceived::parse(const std::string& rcvd)
         else if(!command.compare("go"))
         {
             m_type = GO;
+            break;
+        }
+        else if(!command.compare("result"))
+        {
+            m_type = GO;
+            m_params = params;
             break;
         }
         else if(!command.compare("playother"))

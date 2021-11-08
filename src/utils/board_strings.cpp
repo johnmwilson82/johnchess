@@ -92,6 +92,8 @@ Board board_from_string_repr(const std::string& board_str)
     }
     std::cout << s << std::endl;
 
+    ret.populate_squares_properties();
+    
     return ret;
 }
 

@@ -86,8 +86,7 @@ public:
      */
     Mate get_mate(Piece::Colour col) const
     {
-        std::cout << "checking mate for colour" << (int) col << std::endl;;
-        if(get_num_available_moves(col) == 0)
+        if(get_all_legal_moves(col).size() == 0)
         {
             if (get_in_check(col))
                 return CHECKMATE;
@@ -115,6 +114,9 @@ public:
 
     //! Delete all the pieces from the board
     void delete_all_pieces();
+
+    //! This shouldn't really be public TODO: refactor the board_from_string_repr stuff
+    void populate_squares_properties();
 
 private:
     //! Apply a piece to the board at a given location
@@ -155,8 +157,6 @@ private:
      */
     bool remove_piece(BoardLocation loc);
 
-    void populate_squares_properties();
-
     //! Return a ref to the square at the given BoardLocation
     inline Square& square(BoardLocation loc)
     {
@@ -170,5 +170,5 @@ private:
     }
 
     //! Return the number of available moves for a given colour
-    int get_num_available_moves(Piece::Colour col) const;
+    std::list<Move> get_all_legal_moves(Piece::Colour col) const;
 };

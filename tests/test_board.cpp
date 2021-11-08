@@ -98,3 +98,22 @@ TEST_F(BoardTests, CheckBlackRookCaptureWhitePawn)
 
     EXPECT_EQ(board_str3, out_str3);
 }
+
+TEST_F(BoardTests, CheckWhiteMate) 
+{
+    std::string board_str(
+        " r n b q k b _ r\n"
+        " p p p p _ Q _ p\n"
+        " _ _ _ _ _ _ p _\n"
+        " _ _ _ _ p _ _ _\n"
+        " _ _ B _ P _ n _\n"
+        " _ _ _ P _ _ _ _\n"
+        " P P P _ _ P P P\n"
+        " R N B _ K _ N R\n"
+    );
+
+    Board board = board_from_string_repr(board_str);
+
+    EXPECT_TRUE(board.get_mate(Piece::BLACK));
+    EXPECT_FALSE(board.get_mate(Piece::WHITE));
+}

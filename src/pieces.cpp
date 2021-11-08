@@ -69,6 +69,7 @@ std::list<Move> Pawn::get_all_valid_moves(const Board& board) const
     int dir = m_colour == Piece::WHITE ? 1 : -1;
     std::list<Move> ret;
 
+    // Promotion
     auto emplace_pawn_move = [&] (const BoardLocation& adv_loc)
     {
         if((m_colour == Piece::WHITE && adv_loc.get_y() == 7) ||

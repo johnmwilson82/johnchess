@@ -66,9 +66,12 @@ void Board::populate_squares_properties()
 {
     for(const auto& piece : m_pieces)
     {
-        for(const auto& move : piece->get_all_valid_moves(*this))
+        if(piece->get_on_board())
         {
-            square(move.get_to_loc()).add_attacker(piece);
+            for(const auto& move : piece->get_all_valid_moves(*this))
+            {
+                square(move.get_to_loc()).add_attacker(piece);
+            }
         }
     }
 }
@@ -142,6 +145,7 @@ bool Board::remove_piece(std::string loc)
 
 bool Board::remove_piece(BoardLocation loc)
 {
+    
     if(square(loc).is_empty())
         return false;
 
@@ -338,15 +342,25 @@ bool Board::get_in_check(Piece::Colour col) const
     return square(king->get_loc()).get_attackers(opp_col).size() > 0;
 }
 
-int Board::get_num_available_moves(Piece::Colour col) const
+std::list<Move> Board::get_all_legal_moves(Piece::Colour col) const
 {
-    int total_num_moves = 0;
+    std::list<Move> ret;
+
     for(const auto piece : m_pieces)
     {
-        if (piece->get_colour() == col)
-            total_num_moves += piece->get_all_valid_moves(*this).size();
+        if (piece->get_colour() == col && piece->get_on_board())
+        {
+            auto moves = piece->get_all_valid_moves(*this);
+            ret.splice(ret.end(), moves);
+        }
     }
-    return total_num_moves;
+
+    ret.remove_if([&](const Move& move){
+        Board test_board(*this, move);
+        return test_board.get_in_check(col);
+    });
+
+    return ret;
 }
 
 void Board::set_from_edit_mode(std::vector<std::string> in)
