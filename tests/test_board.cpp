@@ -114,6 +114,6 @@ TEST_F(BoardTests, CheckWhiteMate)
 
     Board board = board_from_string_repr(board_str);
 
-    EXPECT_TRUE(board.get_mate(Piece::BLACK));
-    EXPECT_FALSE(board.get_mate(Piece::WHITE));
+    EXPECT_EQ(board.get_mate(Piece::BLACK), Board::CHECKMATE);
+    EXPECT_EQ(board.get_mate(Piece::WHITE), Board::NO_MATE);
 }

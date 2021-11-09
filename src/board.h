@@ -37,7 +37,7 @@ public:
     {
         delete_all_pieces();
     }
-    Board(const Board& board);
+
     Board(const Board& board, const Move& move);
     Board(const Board& board, const std::string& move_str);
 

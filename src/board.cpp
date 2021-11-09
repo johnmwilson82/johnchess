@@ -7,23 +7,6 @@ Board::Board() :
     m_squares(BOARD_DIM*BOARD_DIM),
     m_pieces(2)
 {
-    //set_to_start_position();
-}
-
-Board::Board(const Board& orig) :
-    m_squares(BOARD_DIM*BOARD_DIM),
-    m_colour_to_move(orig.m_colour_to_move),
-    m_pieces(2)
-{
-    for(const auto& piece : orig.m_pieces)
-    {
-        if(piece->get_on_board())
-        {
-            add_piece(*piece);
-        }
-    }
-
-    populate_squares_properties();
 }
 
 Board::Board(const Board& orig, const Move& move) :
