@@ -85,8 +85,8 @@ public: // public methods
         m_capturable_en_passant = val;
     }
     
-    inline bool has_moved() { return m_moved; }
-    inline bool capturable_en_passant() { return m_capturable_en_passant; }
+    inline bool has_moved() const { return m_moved; }
+    inline bool capturable_en_passant() const { return m_capturable_en_passant; }
 
 protected:
     std::list<Move> get_all_slide_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test=true) const;
