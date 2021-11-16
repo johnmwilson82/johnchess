@@ -5,3 +5,7 @@ build/
 *.exe
 ai.txt
 current_board.txt
+.vs
+x64/
+*.user
+packages/

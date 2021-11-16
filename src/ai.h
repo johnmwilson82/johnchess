@@ -1,10 +1,11 @@
 #pragma once
 
-#include "board.h"
-
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+
+#include "board_tree.h"
+#include "board.h"
 
 /*! /brief Base AI class
  *
@@ -89,5 +90,33 @@ public:
         auto it = avail_moves.begin();
         std::advance(it, mv_num);
         return *it;
+    }
+};
+
+class BasicAI : public AI
+{
+private:
+    std::ofstream ofs;
+    std::unique_ptr<BoardTree> board_tree;
+
+public:
+    BasicAI(Piece::Colour colour) :
+        AI(colour),
+        ofs("ai.txt")
+    {}
+
+    ~BasicAI() {};
+    Move make_move(const Board& board)
+    {
+        if(!board_tree)
+        {
+            board_tree = std::make_unique<BoardTree>(board);
+        }
+        else
+        {
+            board_tree->set_new_root_from_board(board);
+        }
+
+        return board_tree->search_root(2, Piece::BLACK);
     }
 };

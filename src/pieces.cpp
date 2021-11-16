@@ -75,7 +75,7 @@ std::list<Move> Pawn::get_all_valid_moves(const Board& board) const
         if((m_colour == Piece::WHITE && adv_loc.get_y() == 7) ||
            (m_colour == Piece::BLACK && adv_loc.get_y() == 0))
         {
-            for(auto promote_to : std::array { Move::PromotionType::QUEEN, Move::PromotionType::ROOK, Move::PromotionType::BISHOP, Move::PromotionType::KNIGHT })
+            for(auto promote_to : { Move::PromotionType::QUEEN, Move::PromotionType::ROOK, Move::PromotionType::BISHOP, Move::PromotionType::KNIGHT })
             {
                 auto& move = ret.emplace_back(*this, adv_loc);
                 move.set_promotion_type(promote_to);

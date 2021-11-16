@@ -1,7 +1,5 @@
 #include "gtest/gtest.h"
 
-#define private public
-
 #include <board.h>
 #include <utils\board_strings.h>
 

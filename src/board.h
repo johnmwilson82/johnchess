@@ -96,10 +96,24 @@ public:
         return NO_MATE;
     }
 
+    //!< pieces on the board
+    void for_all_pieces(std::function<void(const Piece& piece)> fn) const
+    {
+        for(const auto& ppc : m_pieces)
+        {
+            fn(*ppc);
+        }
+    } 
+
     //! Return the colour whose move it is
-    Piece::Colour get_colour_to_move()
+    Piece::Colour get_colour_to_move() const
     {
         return m_colour_to_move;
+    }
+
+    void set_colour_to_move(Piece::Colour colour)
+    {
+        m_colour_to_move = colour;
     }
 
     //! Apply a piece to the board at a given location
@@ -118,7 +132,12 @@ public:
     //! This shouldn't really be public TODO: refactor the board_from_string_repr stuff
     void populate_squares_properties();
 
-private:
+    //! Return the number of available moves for a given colour
+    std::list<Move> get_all_legal_moves(Piece::Colour col) const;
+
+    //! Return the number of available moves for colour to move
+    std::list<Move> get_all_legal_moves() const;
+
     //! Apply a piece to the board at a given location
     /*!
      * \param type chess piece type
@@ -129,6 +148,19 @@ private:
     template<typename T>
     bool add_piece(Piece::Colour col, std::string loc);
 
+    //! Return a ref to the square at the given BoardLocation
+    inline Square& square(BoardLocation loc)
+    {
+        return m_squares[loc.get_x() * BOARD_DIM + loc.get_y()];
+    }
+
+    //! Return a const ref to the square at the given x, y coordinates (0-7)
+    inline Square& square(int x, int y)
+    {
+        return m_squares[x * BOARD_DIM + y];
+    }
+
+private:
     bool add_piece(const Piece& piece);
 
     //! Move a piece on the board where move is given as a string in standard notation (e.g. a2a4)
@@ -157,18 +189,5 @@ private:
      */
     bool remove_piece(BoardLocation loc);
 
-    //! Return a ref to the square at the given BoardLocation
-    inline Square& square(BoardLocation loc)
-    {
-        return m_squares[loc.get_x() * BOARD_DIM + loc.get_y()];
-    }
 
-    //! Return a const ref to the square at the given x, y coordinates (0-7)
-    inline Square& square(int x, int y)
-    {
-        return m_squares[x * BOARD_DIM + y];
-    }
-
-    //! Return the number of available moves for a given colour
-    std::list<Move> get_all_legal_moves(Piece::Colour col) const;
 };

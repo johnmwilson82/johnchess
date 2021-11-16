@@ -20,7 +20,7 @@ Board board_from_string_repr(const std::string& board_str)
         s.erase(0, pos + 1);
     }
 
-    size_t row_idx = 8;
+    int row_idx = 8;
 
     Board ret;
     
@@ -30,7 +30,7 @@ Board board_from_string_repr(const std::string& board_str)
         --row_idx;
         
         std::string sq;
-        size_t col_idx = 0;
+        int col_idx = 0;
         while ((pos = line.find(" ")) != std::string::npos) {
             sq = line.substr(pos+1, pos+1);
 

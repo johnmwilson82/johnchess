@@ -88,11 +88,3 @@ const BoardLocation Move::get_from_loc() const
 {
     return m_piece.get_loc();
 }
-
-size_t MoveHashFunction::operator()(const Move& move) const
-{
-    return  move.m_piece.get_loc().get_x() + 
-            move.m_piece.get_loc().get_y() * BOARD_DIM +
-            move.m_new_loc.get_x() * BOARD_DIM * BOARD_DIM + 
-            move.m_new_loc.get_y() * BOARD_DIM * BOARD_DIM * BOARD_DIM;
-}

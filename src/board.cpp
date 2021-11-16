@@ -339,11 +339,17 @@ std::list<Move> Board::get_all_legal_moves(Piece::Colour col) const
     }
 
     ret.remove_if([&](const Move& move){
+
         Board test_board(*this, move);
         return test_board.get_in_check(col);
     });
 
     return ret;
+}
+
+std::list<Move> Board::get_all_legal_moves() const
+{
+    return get_all_legal_moves(m_colour_to_move);
 }
 
 void Board::set_from_edit_mode(std::vector<std::string> in)

@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="test_board.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="test_read_write_board.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="test_zobrist_hash.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\board.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\board_location.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\board_tree.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\heuristic.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\johnchess_app.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\move.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pieces.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\xboard_interface.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\zobrist_hash.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utils\board_strings.cpp">
+      <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="test_ai.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\ai.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\board.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\board_location.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\board_tree.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\heuristic.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\johnchess_app.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\move.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pieces.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\square.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\xboard_interface.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\zobrist_hash.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils\board_strings.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="tests">
+      <UniqueIdentifier>{57ec4944-a922-4b05-b1e1-aa624e3adc9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2300d3a7-ee81-4c48-912e-c6ae90d44ac4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\utils">
+      <UniqueIdentifier>{f7b4e3f7-881c-45dc-97bd-1527e64fa7a4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\src\CMakeLists.txt">
+      <Filter>src</Filter>
+    </Text>
+  </ItemGroup>
+</Project>

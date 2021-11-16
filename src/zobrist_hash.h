@@ -35,4 +35,5 @@ public:
     ZobristHash();
 
     uint64_t get_hash(const Board& board) const;
+    uint64_t get_hash(const Board& board, const Move& move) const;
 };

@@ -27,8 +27,6 @@ class MoveHashFunction;
 
 class Move
 {
-    friend class MoveHashFunction;
-
 // Move: Describes a move, which is the new location of a given piece
 public:
     enum class PromotionType {
@@ -56,10 +54,4 @@ private:
     BoardLocation m_new_loc;
     const Piece& m_piece;
     std::optional<PromotionType> m_promotion_type;
-};
-
-class MoveHashFunction
-{
-public:
-    size_t operator()(const Move& move) const;
 };
