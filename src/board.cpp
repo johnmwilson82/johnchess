@@ -2,8 +2,8 @@
 
 #include "board.h"
 
-
 Board::Board() :
+    m_colour_to_move(Piece::WHITE),
     m_pieces(2)
 {
 }
@@ -23,6 +23,14 @@ Board::Board(const Board& orig, const Move& move) :
     move_piece(move);
 
     populate_squares_properties();
+}
+
+
+Board::Board(const Board& orig) :
+    m_colour_to_move(orig.m_colour_to_move),
+    m_pieces(orig.m_pieces),
+    m_squares(orig.m_squares)
+{
 }
 
 Board::Board(const Board& orig, const std::string& move_str) :
@@ -125,7 +133,6 @@ bool Board::remove_piece(std::string loc)
 
 bool Board::remove_piece(BoardLocation loc)
 {
-    
     if(square(loc).is_empty())
         return false;
 
@@ -262,7 +269,7 @@ bool Board::move_piece(const Move& move)
         square(rook_curr_loc).remove_piece();
     }
 
-    m_colour_to_move = (m_colour_to_move == Piece::WHITE ? Piece::BLACK : Piece::WHITE);
+    m_colour_to_move = Piece::opposite_colour(m_colour_to_move);
     return true;
 }
 

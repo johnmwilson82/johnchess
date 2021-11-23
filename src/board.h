@@ -7,6 +7,9 @@
 
 class DynMove;
 
+#include <boost/container/static_vector.hpp>
+
+
 #include "board_location.h"
 #include "square.h"
 #include "pieces.h"
@@ -29,7 +32,7 @@ public:
     
 private:
     std::array<Square, BOARD_DIM*BOARD_DIM> m_squares; //!< board squares
-    std::vector<std::shared_ptr<Piece>> m_pieces;  //!< pieces on the board
+    boost::container::static_vector<std::shared_ptr<Piece>, 32> m_pieces;  //!< pieces on the board
     Piece::Colour m_colour_to_move;
 
 public:
@@ -38,7 +41,7 @@ public:
     {
         delete_all_pieces();
     }
-
+    Board(const Board& board);
     Board(const Board& board, const Move& move);
     Board(const Board& board, const std::string& move_str);
 
@@ -102,7 +105,10 @@ public:
     {
         for(const auto& ppc : m_pieces)
         {
-            fn(*ppc);
+            if (ppc->get_on_board())
+            {
+                fn(*ppc);
+            }
         }
     } 
 

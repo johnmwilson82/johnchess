@@ -6,6 +6,7 @@
 #include "zobrist_hash.h"
 #include "heuristic.h"
 
+#include "utils/board_strings.h"
 
 class BoardTreeNode
 {
@@ -20,24 +21,29 @@ private:
 
     std::list<std::shared_ptr<BoardTreeNode>> m_child_nodes; 
     std::optional<uint64_t> m_prev_hash;
+    std::optional<Move> m_move;
+    bool m_check_for_mate = false;
 
 public:
-    std::shared_ptr<BoardTreeNode> rebase(const Move& move, hash_map_t& hash_map, const ZobristHash& hasher);
-
-    std::shared_ptr<BoardTreeNode> rebase(uint64_t new_root_hash, hash_map_t& hash_map);
-
-    void delete_node(hash_map_t& hash_map);
-
     std::shared_ptr<BoardTreeNode> child_node(const Move& move, hash_map_t& hash_map, const ZobristHash& hasher);
+
+    std::list<std::shared_ptr<BoardTreeNode>> get_children() { return m_child_nodes; };
 
     const Board& get_board() const;
 
     uint64_t get_hash() const;
 
-    const ShannonHeuristic& get_heuristic() const;
+    const double get_score(Piece::Colour ai_col, Piece::Colour colour_to_move) const;
 
     BoardTreeNode(const Board& board, const ZobristHash& hasher);
     BoardTreeNode(const BoardTreeNode& node, const Move& move, const ZobristHash& hasher);
+    BoardTreeNode(const BoardTreeNode& node, const Move& move);
+
+    std::optional<Move> get_move() const { return m_move; }
+
+    void set_check_for_mate() { m_check_for_mate = true; }
+
+    void set_root_node() { m_prev_hash = std::nullopt; }
 };
 
 class BoardTree
@@ -50,88 +56,105 @@ private:
 
     double best_heuristic;
 
+    void prune_except_hash(uint64_t base_hash, uint64_t except_hash)
+    {
+        if (base_hash == except_hash)
+        {
+            return;
+        }
+
+        if (nodes.contains(base_hash))
+        {
+            auto base_node = nodes.at(base_hash);
+            for (auto& child : base_node->get_children())
+            {
+                prune_except_hash(child->get_hash(), except_hash);
+            }
+
+            nodes.erase(base_hash);
+        }
+    }
+
+    void rebase(uint64_t new_hash)
+    {
+        prune_except_hash(root_node->get_hash(), new_hash);
+
+        root_node = nodes.at(new_hash);
+
+        root_node->set_root_node();
+    }
+
 public:
     void set_new_root_from_move(const Move& move)
     {
-        auto old_root_node = root_node;
-        root_node = root_node->rebase(move, nodes, *hasher);
-        nodes.erase(old_root_node->get_hash());
-        old_root_node.reset();
+        Board new_root_board(root_node->get_board(), move);
+
+        set_new_root_from_board(new_root_board);
     }
 
     void set_new_root_from_board(const Board& board)
     {
-        uint64_t hash = hasher->get_hash(board);
-        auto old_root_node = root_node;
-        root_node = root_node->rebase(hash, nodes);
-        nodes.erase(old_root_node->get_hash());
-        old_root_node.reset();
+        auto new_node = nodes.at(hasher->get_hash(board));
+
+        rebase(hasher->get_hash(board));
     }
 
-    void search(uint8_t search_depth, double& best_heuristic, std::shared_ptr<BoardTreeNode> btn, Piece::Colour ai_colour)
+    void populate_tree(uint8_t search_depth, std::shared_ptr<BoardTreeNode> btn, Piece::Colour colour_to_move)
     {
         if(search_depth > 0)
         {
-            auto available_moves = btn->get_board().get_all_legal_moves();
+            auto available_moves = btn->get_board().get_all_legal_moves(colour_to_move);
 
             for(const auto& move : available_moves)
             {
                 auto child = btn->child_node(move, nodes, *hasher);
 
-                double prev_best_heuristic = best_heuristic;
+                //for (int i = 0; i < 4 - search_depth; ++i)
+                //{
+                //    std::cout << "  ";
+                //}
 
-                search(search_depth-1,
-                       best_heuristic,
-                       child, 
-                       ai_colour);
-
-                if (best_heuristic != prev_best_heuristic)
-                {
-                    //std::cout << "best child move = " << move.to_string() << ", heuristic = " << best_heuristic << std::endl;
-                }
+                //std::cout << child->get_move()->to_string() << " - " << child->get_score(Piece::BLACK, colour_to_move) << std::endl;
+                
+                populate_tree(search_depth-1, child, Piece::opposite_colour(colour_to_move));
             }
-        }
-        else
-        {
-            // +ve heuristics benefit white
-            // We need to find the heuristic that least benefits white
-            double heuristic = Piece::WHITE == ai_colour ?
-                btn->get_heuristic().get() : -btn->get_heuristic().get();
 
-            if (btn->get_board().get_colour_to_move() == ai_colour)
+            if (available_moves.size() == 0)
             {
-                if (heuristic > best_heuristic)
-                {
-                    best_heuristic = heuristic;
-                }
-            }
-            else
-            {
-                if (heuristic < best_heuristic)
-                {
-                    best_heuristic = heuristic;
-                }
+                btn->set_check_for_mate();
             }
         }
     }
 
-    Move search_root(uint8_t search_depth, Piece::Colour ai_colour)
+    Move search(uint8_t search_depth, Piece::Colour ai_colour)
     {
-        auto available_moves = root_node->get_board().get_all_legal_moves();
+        auto available_moves = root_node->get_board().get_all_legal_moves(ai_colour);
 
-        double best_heuristic = -9999;
+        //std::list<Move> available_moves = { Move(root_node->get_board(), "d4e2") };
+
         std::unique_ptr<Move> best_move;
+        double best_score = -9999;
 
         for(const auto& move : available_moves)
         {
             auto child = root_node->child_node(move, nodes, *hasher);
-            double heuristic = 0;
-            search(search_depth, heuristic, child, ai_colour);
-            if (heuristic > best_heuristic)
+
+            //std::cout << "==============================================" << std::endl;
+            //std::cout << child->get_move()->to_string() << " - " << child->get_score(Piece::BLACK, Piece::opposite_colour(ai_colour)) << std::endl;
+
+            populate_tree(search_depth, child, Piece::opposite_colour(ai_colour));
+
+            auto child_score = child->get_score(ai_colour, Piece::opposite_colour(ai_colour));
+
+            //std::cout << "move = " << move.to_string() << ", heuristic = " << child_score << std::endl;
+
+            if (child_score > best_score)
             {
                 best_move = std::make_unique<Move>(move);
-                best_heuristic = heuristic;
-                std::cout << "best move = " << best_move->to_string() << ", heuristic = " << best_heuristic << std::endl;
+
+                best_score = child_score;
+
+                //std::cout << "best move = " << best_move->to_string() << ", heuristic = " << best_score << std::endl;
             }
         }
 
@@ -141,5 +164,7 @@ public:
     BoardTree(const Board& board) :
         hasher(std::make_unique<ZobristHash>()),
         root_node(std::make_shared<BoardTreeNode>(board, *hasher))
-    {}
+    {
+        nodes.emplace(root_node->get_hash(), root_node);
+    }
 };

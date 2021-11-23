@@ -19,7 +19,7 @@ JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
     m_board = std::make_unique<Board>();
     m_board->set_to_start_position();
 
-    m_ai = std::make_unique<BasicAI>(Piece::BLACK);
+    m_ai = std::make_unique<BasicAI>(Piece::BLACK, 2);
 }
 
 JohnchessApp::~JohnchessApp()
@@ -51,6 +51,7 @@ void JohnchessApp::make_ai_move()
 
     ofs << utils::board_to_string_repr(*m_board);
 
+    ofs << std::endl << (m_board->get_colour_to_move() == Piece::WHITE ? "White" : "Black") << " to move" << std::endl;
     ofs.flush();
 }
 

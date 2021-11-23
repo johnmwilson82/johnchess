@@ -31,11 +31,11 @@ TEST_F(AiTests, CheckFindBackRankMateWhite)
     Board board = board_from_string_repr(board_str);
     board.set_colour_to_move(Piece::WHITE);
 
-    BasicAI ai(Piece::WHITE);
+    BasicAI ai(Piece::WHITE, 1);
 
     auto move = ai.make_move(board);
 
-    EXPECT_EQ(move.to_string(), std::string("d1d88"));
+    EXPECT_EQ(move.to_string(), std::string("d1d8"));
 }
 
 TEST_F(AiTests, CheckFindBackRankMateBlack)
@@ -54,7 +54,7 @@ TEST_F(AiTests, CheckFindBackRankMateBlack)
     Board board = board_from_string_repr(board_str);
     board.set_colour_to_move(Piece::BLACK);
 
-    BasicAI ai(Piece::BLACK);
+    BasicAI ai(Piece::BLACK, 1);
 
     auto move = ai.make_move(board);
 
@@ -65,9 +65,55 @@ TEST_F(AiTests, CheckFindBackRankMateBlack)
 TEST_F(AiTests, CheckMoveQueenFromDangerBlack)
 {
     std::string board_str(
-        " q _ _ _ _ R k _\n"
-        " P P P _ _ p p p\n"
-        " _ P P _ _ _ _ _\n"
+        " _ q b _ _ r k _\n"
+        " p p _ _ _ p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ B\n"
+        " _ _ _ _ _ _ K _\n"
+    );
+
+    Board board = board_from_string_repr(board_str);
+    board.set_colour_to_move(Piece::BLACK);
+
+    BasicAI ai(Piece::BLACK, 1);
+
+    auto move = ai.make_move(board);
+
+    EXPECT_EQ(move.to_string(), std::string("b8a8"));
+}
+
+TEST_F(AiTests, CheckMoveQueenFromDangerWhite)
+{
+    std::string board_str(
+        " r b b _ _ r k _\n"
+        " p p _ _ _ p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ P\n"
+        " _ _ _ _ _ _ B Q\n"
+        " _ _ _ _ _ _ K _\n"
+    );
+
+    Board board = board_from_string_repr(board_str);
+    board.set_colour_to_move(Piece::WHITE);
+
+    BasicAI ai(Piece::WHITE, 1);
+
+    auto move = ai.make_move(board);
+
+    EXPECT_EQ(move.to_string(), std::string("h2h1"));
+}
+
+TEST_F(AiTests, CheckWillForkWhite)
+{
+    std::string board_str(
+        " _ _ q _ _ _ k _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ N _\n"
         " _ _ _ _ _ _ _ _\n"
         " _ _ _ _ _ _ _ _\n"
         " _ _ _ _ _ _ _ _\n"
@@ -76,11 +122,34 @@ TEST_F(AiTests, CheckMoveQueenFromDangerBlack)
     );
 
     Board board = board_from_string_repr(board_str);
-    board.set_colour_to_move(Piece::BLACK);
+    board.set_colour_to_move(Piece::WHITE);
 
-    BasicAI ai(Piece::BLACK);
+    BasicAI ai(Piece::WHITE, 2);
 
     auto move = ai.make_move(board);
 
-    EXPECT_EQ(move.to_string(), std::string("a8e8"));
+    EXPECT_EQ(move.to_string(), std::string("g6e7"));
+}
+
+TEST_F(AiTests, CheckWillForkBlack)
+{
+    std::string board_str(
+        " _ _ _ _ _ _ k _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ n _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ Q _ _ _ K _\n"
+    );
+
+    Board board = board_from_string_repr(board_str);
+    board.set_colour_to_move(Piece::BLACK);
+
+    BasicAI ai(Piece::BLACK, 2);
+
+    auto move = ai.make_move(board);
+
+    EXPECT_EQ(move.to_string(), std::string("d4e2"));
 }

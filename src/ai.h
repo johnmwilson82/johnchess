@@ -96,27 +96,29 @@ public:
 class BasicAI : public AI
 {
 private:
-    std::ofstream ofs;
-    std::unique_ptr<BoardTree> board_tree;
+    std::ofstream m_ofs;
+    std::unique_ptr<BoardTree> m_board_tree;
+    uint8_t m_search_depth;
 
 public:
-    BasicAI(Piece::Colour colour) :
+    BasicAI(Piece::Colour colour, uint8_t search_depth) :
         AI(colour),
-        ofs("ai.txt")
+        m_search_depth(search_depth),
+        m_ofs("ai.txt")
     {}
 
     ~BasicAI() {};
     Move make_move(const Board& board)
     {
-        if(!board_tree)
+        if(!m_board_tree)
         {
-            board_tree = std::make_unique<BoardTree>(board);
+            m_board_tree = std::make_unique<BoardTree>(board);
         }
         else
         {
-            board_tree->set_new_root_from_board(board);
+            m_board_tree->set_new_root_from_board(board);
         }
 
-        return board_tree->search_root(2, Piece::BLACK);
+        return m_board_tree->search(m_search_depth, m_colour);
     }
 };

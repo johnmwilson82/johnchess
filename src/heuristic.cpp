@@ -51,6 +51,6 @@ ShannonHeuristic::ShannonHeuristic(const Board& board)
 
     board.for_all_pieces(piece_fn);    
     
-    accum += board.get_all_legal_moves(Piece::WHITE).size() * 0.1;
-    accum -= board.get_all_legal_moves(Piece::BLACK).size() * 0.1;
+    //accum += board.get_all_legal_moves(Piece::WHITE).size() * 0.1;
+    //accum -= board.get_all_legal_moves(Piece::BLACK).size() * 0.1;
 }
