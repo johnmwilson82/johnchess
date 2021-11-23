@@ -4,13 +4,11 @@
 
 
 Board::Board() :
-    m_squares(BOARD_DIM*BOARD_DIM),
     m_pieces(2)
 {
 }
 
 Board::Board(const Board& orig, const Move& move) :
-    m_squares(BOARD_DIM*BOARD_DIM),
     m_colour_to_move(orig.m_colour_to_move),
     m_pieces(2)
 {
@@ -28,7 +26,6 @@ Board::Board(const Board& orig, const Move& move) :
 }
 
 Board::Board(const Board& orig, const std::string& move_str) :
-    m_squares(BOARD_DIM*BOARD_DIM),
     m_colour_to_move(orig.m_colour_to_move),
     m_pieces(2)
 {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -27,7 +28,7 @@ public:
 
     
 private:
-    std::vector<Square> m_squares; //!< board squares
+    std::array<Square, BOARD_DIM*BOARD_DIM> m_squares; //!< board squares
     std::vector<std::shared_ptr<Piece>> m_pieces;  //!< pieces on the board
     Piece::Colour m_colour_to_move;
 

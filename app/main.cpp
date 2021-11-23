@@ -1,4 +1,4 @@
-#include "johnchess_app.h"
+#include "../src/johnchess_app.h"
 
 int main(int argc, const char* argv[])
 {

@@ -56,13 +56,13 @@ public:
         }
     }
 
-    inline const std::vector<std::shared_ptr<Piece>>& get_attackers(Piece::Colour col) const
+    inline const std::list<std::shared_ptr<Piece>>& get_attackers(Piece::Colour col) const
     {
         return (col == Piece::WHITE) ? m_white_attackers : m_black_attackers;
     }
     
 private:
     std::shared_ptr<Piece> m_piece;
-    std::vector<std::shared_ptr<Piece>> m_white_attackers;
-    std::vector<std::shared_ptr<Piece>> m_black_attackers;
+    std::list<std::shared_ptr<Piece>> m_white_attackers;
+    std::list<std::shared_ptr<Piece>> m_black_attackers;
 };
