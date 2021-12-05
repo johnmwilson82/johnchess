@@ -65,7 +65,6 @@ const double BoardTreeNode::get_score(Piece::Colour ai_col, Piece::Colour colour
             }
         }
 
-        double thing = m_heuristic.get() * return_multiplier;
         return m_heuristic.get() * return_multiplier;
 
     }
@@ -102,7 +101,6 @@ BoardTreeNode::BoardTreeNode(const BoardTreeNode& node, const Move& move, const 
     m_heuristic(m_board),
     m_move(move)
 {
-    //std::cout << "hash = " << std::hex << m_hash << ", heuristic = " << std::dec << m_heuristic.get() << ", move = " << move.to_string() << std::endl;
 }
 
 // Version for copying from existing nodes, with new move
@@ -113,5 +111,4 @@ BoardTreeNode::BoardTreeNode(const BoardTreeNode& node, const Move& move) :
     m_heuristic(node.m_heuristic),
     m_move(move)
 {
-    //std::cout << "hash = " << std::hex << m_hash << ", heuristic = " << std::dec << m_heuristic.get() << ", move = " << move.to_string() << std::endl;
 }

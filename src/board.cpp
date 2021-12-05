@@ -122,6 +122,8 @@ bool Board::add_piece(const Piece& piece)
         new_piece = m_pieces.emplace_back(piece.clone());
     }
 
+    new_piece->set_has_moved(piece.has_moved());
+
     square(piece.get_loc()).set_piece(new_piece);
     return true;
 }

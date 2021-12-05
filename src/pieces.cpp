@@ -206,11 +206,11 @@ std::list<Move> King::get_all_valid_moves(const Board& board) const
     {
         if(m_colour == WHITE)
         {
-            ret.emplace_back(*this, BoardLocation("g1", board));
+            ret.emplace_back(*this, BoardLocation("c1", board));
         }
         else
         {
-            ret.emplace_back(*this, BoardLocation("g8", board));
+            ret.emplace_back(*this, BoardLocation("c8", board));
         }
     }
 
@@ -218,11 +218,11 @@ std::list<Move> King::get_all_valid_moves(const Board& board) const
     {
         if(m_colour == WHITE)
         {
-            ret.emplace_back(*this, BoardLocation("c1", board));
+            ret.emplace_back(*this, BoardLocation("g1", board));
         }
         else
         {
-            ret.emplace_back(*this, BoardLocation("c8", board));
+            ret.emplace_back(*this, BoardLocation("g8", board));
         }
     }
 

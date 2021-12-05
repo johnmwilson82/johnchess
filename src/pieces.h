@@ -85,6 +85,7 @@ public: // public methods
         m_capturable_en_passant = val;
     }
     
+    inline void set_has_moved(bool has_moved) { m_moved = has_moved; }
     inline bool has_moved() const { return m_moved; }
     inline bool capturable_en_passant() const { return m_capturable_en_passant; }
 

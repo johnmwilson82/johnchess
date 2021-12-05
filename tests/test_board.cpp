@@ -117,3 +117,70 @@ TEST_F(BoardTests, CheckWhiteMate)
     EXPECT_EQ(board.get_mate(Piece::BLACK), Board::CHECKMATE);
     EXPECT_EQ(board.get_mate(Piece::WHITE), Board::NO_MATE);
 }
+
+TEST_F(BoardTests, CheckCastling)
+{
+    std::string board_str_pre_castle(
+        " r n b q k b _ r\n"
+        " p p p _ p p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ p _ _ _ _\n"
+        " _ _ _ _ n _ _ _\n"
+        " _ _ _ B P N _ _\n"
+        " P P P P _ P P P\n"
+        " R N B Q K _ _ R\n"
+    );
+
+    Board pre_castle_board = board_from_string_repr(board_str_pre_castle);
+
+    std::string expected_board_str_post_castle(
+        " r n b q k b _ r\n"
+        " p p p _ p p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ p _ _ _ _\n"
+        " _ _ _ _ n _ _ _\n"
+        " _ _ _ B P N _ _\n"
+        " P P P P _ P P P\n"
+        " R N B Q _ R K _\n"
+    );
+
+
+    Move castle_move(pre_castle_board, "e1g1");
+
+    Board new_board(pre_castle_board, castle_move);
+
+    auto board_str_post_castle = board_to_string_repr(new_board);
+
+    EXPECT_EQ(board_str_post_castle, expected_board_str_post_castle);
+}
+
+TEST_F(BoardTests, CheckCastlingInLegalMoves)
+{
+    std::string board_str(
+        " r _ b q k b n r\n"
+        " p p p p p p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ n B _ P _ _ _\n"
+        " _ _ _ _ _ N _ _\n"
+        " P P P P _ P P P\n"
+        " R N B Q K _ _ R\n"
+    );
+
+    Board board = board_from_string_repr(board_str);
+
+    const auto moves = board.get_all_legal_moves(Piece::WHITE);
+
+    bool found = false;
+
+    for (const auto& move : moves)
+    {
+        if (move.get_to_loc() == BoardLocation(6, 0, board) &&
+            move.get_from_loc() == BoardLocation(4, 0, board))
+        {
+            found = true;
+        }
+    }
+
+    EXPECT_TRUE(found);
+}

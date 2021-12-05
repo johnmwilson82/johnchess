@@ -61,3 +61,46 @@ TEST_F(ZobristHashTests, CheckHashWithRemovedPawn)
 
     EXPECT_EQ(board_hash_only_e4 ^ board_hash_no_e4, board_hash);
 }
+
+
+TEST_F(ZobristHashTests, CheckHashThroughCastling)
+{
+    std::string board_str_pre_castle(
+        " r n b q k b _ r\n"
+        " p p p _ p p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ p _ _ _ _\n"
+        " _ _ _ _ n _ _ _\n"
+        " _ _ _ B P N _ _\n"
+        " P P P P _ P P P\n"
+        " R N B Q K _ _ R\n"
+    );
+
+    Board pre_castle_board = board_from_string_repr(board_str_pre_castle);
+
+    std::string board_str_post_castle(
+        " r n b q k b _ r\n"
+        " p p p _ p p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ p _ _ _ _\n"
+        " _ _ _ _ n _ _ _\n"
+        " _ _ _ B P N _ _\n"
+        " P P P P _ P P P\n"
+        " R N B Q _ R K _\n"
+    );
+
+    Board post_castle_board = board_from_string_repr(board_str_post_castle);
+    post_castle_board.square(5, 0).get_piece()->set_has_moved(true);
+    post_castle_board.square(6, 0).get_piece()->set_has_moved(true);
+
+    Move castle_move(pre_castle_board, "e1g1");
+
+    Board new_board(pre_castle_board, castle_move);
+
+    auto expected_hash = hasher->get_hash(post_castle_board);
+
+    auto new_hash = hasher->get_hash(new_board);
+
+    EXPECT_EQ(expected_hash, new_hash);
+
+}
