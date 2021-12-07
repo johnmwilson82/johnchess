@@ -98,7 +98,8 @@ void JohnchessApp::main_loop()
             {
                 Piece::Colour colour_to_move = m_board->get_colour_to_move();
 
-                auto new_board = std::make_unique<Board>(*m_board, rcvd.get_move_string());
+                const auto rcvd_move = rcvd.get_move_string();
+                auto new_board = std::make_unique<Board>(*m_board, rcvd_move);
 
                 if(new_board->get_in_check(colour_to_move))
                 {

@@ -10,11 +10,12 @@ std::shared_ptr<BoardTreeNode> BoardTreeNode::child_node(const Move& move, hash_
 
     if(hash_map.contains(hash))
     {
-        auto prev_btn = hash_map.at(hash);
+        auto btn = hash_map.at(hash).lock();
 
-        auto btn = std::make_shared<BoardTreeNode>(*prev_btn, move);
-
-        m_child_nodes.push_back(btn);
+        if (btn->get_ply() > m_ply)
+        {
+            m_child_nodes.emplace_back(btn, move);
+        }
 
         return btn;
     }
@@ -24,7 +25,7 @@ std::shared_ptr<BoardTreeNode> BoardTreeNode::child_node(const Move& move, hash_
 
         hash_map.emplace(btn->m_hash, btn);
 
-        m_child_nodes.push_back(btn);
+        m_child_nodes.emplace_back(btn, move);
 
         return btn;
     }
@@ -70,7 +71,7 @@ const double BoardTreeNode::get_score(Piece::Colour ai_col, Piece::Colour colour
     }
 
     auto child_scores = m_child_nodes |
-        std::views::transform([&](std::shared_ptr<BoardTreeNode> node) { return node->get_score(ai_col, Piece::opposite_colour(colour_to_move)); });
+        std::views::transform([&](edge_t edge) { return edge.first->get_score(ai_col, Piece::opposite_colour(colour_to_move)); });
 
     if (ai_col == colour_to_move)
     {
@@ -84,31 +85,18 @@ const double BoardTreeNode::get_score(Piece::Colour ai_col, Piece::Colour colour
 
 // Root node
 BoardTreeNode::BoardTreeNode(const Board& board, const ZobristHash& hasher) :
-    m_prev_hash(std::nullopt),
     m_board(board),
     m_hash(hasher.get_hash(m_board)),
     m_heuristic(m_board),
-    m_move(std::nullopt)
+    m_ply(0)
 {
-    //std::cout << "hash = " << std::hex << m_hash << ", heuristic = " << std::dec << m_heuristic.get() << std::endl;
 }
 
 
 BoardTreeNode::BoardTreeNode(const BoardTreeNode& node, const Move& move, const ZobristHash& hasher) :
-    m_prev_hash(node.get_hash()),
     m_board(node.m_board, move),
     m_hash(hasher.get_hash(m_board)),
     m_heuristic(m_board),
-    m_move(move)
-{
-}
-
-// Version for copying from existing nodes, with new move
-BoardTreeNode::BoardTreeNode(const BoardTreeNode& node, const Move& move) :
-    m_prev_hash(node.get_hash()),
-    m_board(node.m_board),
-    m_hash(node.m_hash),
-    m_heuristic(node.m_heuristic),
-    m_move(move)
+    m_ply(node.m_ply + 1)
 {
 }

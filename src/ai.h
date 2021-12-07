@@ -49,7 +49,7 @@ public:
     {}
 
     ~RandomAI() {};
-    Move make_move(const Board& board)
+    Move make_move(const Board& board) override
     {
         std::list<Move> avail_moves;
 
@@ -108,7 +108,7 @@ public:
     {}
 
     ~BasicAI() {};
-    Move make_move(const Board& board)
+    Move make_move(const Board& board) override
     {
         if(!m_board_tree)
         {
