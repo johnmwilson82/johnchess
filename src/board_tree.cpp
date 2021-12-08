@@ -1,102 +1,141 @@
 #include "board_tree.h"
 #include <vector>
-#include <ranges>
-#include <algorithm>
 
 
-std::shared_ptr<BoardTreeNode> BoardTreeNode::child_node(const Move& move, hash_map_t& hash_map, const ZobristHash& hasher)
+
+bool BoardTree::prune_except_hash(uint64_t base_hash, uint64_t except_hash)
 {
-    auto hash = hasher.get_hash(m_board, move);
-
-    if(hash_map.contains(hash))
+    if (base_hash == except_hash)
     {
-        auto btn = hash_map.at(hash).lock();
-
-        if (btn->get_ply() > m_ply)
-        {
-            m_child_nodes.emplace_back(btn, move);
-        }
-
-        return btn;
+        return false;
     }
-    else
+
+    if (nodes.contains(base_hash))
     {
-        auto btn = std::make_shared<BoardTreeNode>(*this, move, hasher);
-
-        hash_map.emplace(btn->m_hash, btn);
-
-        m_child_nodes.emplace_back(btn, move);
-
-        return btn;
-    }
-}
-
-
-const Board& BoardTreeNode::get_board() const
-{
-    return m_board;
-}
-
-
-uint64_t BoardTreeNode::get_hash() const
-{
-    return m_hash;
-}
-
-
-
-const double BoardTreeNode::get_score(Piece::Colour ai_col, Piece::Colour colour_to_move) const
-{
-    double return_multiplier = ai_col == Piece::WHITE ? 1.0 : -1.0;
-
-    if (m_child_nodes.empty())
-    {
-        if (m_check_for_mate)
         {
-            switch (m_board.get_mate(colour_to_move))
+            auto& children = nodes.at(base_hash).lock()->get_children();
+
+            while (!children.empty())
             {
-            case Board::CHECKMATE:
-                return 200;
+                auto child = children.front();
 
-            case Board::STALEMATE:
-                return 0;
+                children.pop_front();
 
-            default:
-                break;
+                prune_except_hash(child.first->get_hash(), except_hash);
             }
         }
 
-        return m_heuristic.get() * return_multiplier;
-
+        if (nodes.at(base_hash).use_count() <= 1)
+        {
+            nodes.erase(base_hash);
+        }
     }
 
-    auto child_scores = m_child_nodes |
-        std::views::transform([&](edge_t edge) { return edge.first->get_score(ai_col, Piece::opposite_colour(colour_to_move)); });
-
-    if (ai_col == colour_to_move)
-    {
-        return *std::ranges::max_element(child_scores);
-    }
-    else
-    {
-        return *std::ranges::min_element(child_scores);
-    }
-}
-
-// Root node
-BoardTreeNode::BoardTreeNode(const Board& board, const ZobristHash& hasher) :
-    m_board(board),
-    m_hash(hasher.get_hash(m_board)),
-    m_heuristic(m_board),
-    m_ply(0)
-{
+    return true;
 }
 
 
-BoardTreeNode::BoardTreeNode(const BoardTreeNode& node, const Move& move, const ZobristHash& hasher) :
-    m_board(node.m_board, move),
-    m_hash(hasher.get_hash(m_board)),
-    m_heuristic(m_board),
-    m_ply(node.m_ply + 1)
+void BoardTree::rebase(uint64_t new_hash)
 {
+    // Store a reference to the root node here so it isn't removed
+    auto new_root_node = nodes.at(new_hash).lock();
+
+    prune_except_hash(root_node->get_hash(), new_hash);
+
+    root_node = new_root_node;
+}
+
+
+void BoardTree::set_new_root_from_move(const Move& move)
+{
+    Board new_root_board(root_node->get_board(), move);
+
+    set_new_root_from_board(new_root_board);
+}
+
+
+void BoardTree::set_new_root_from_board(const Board& board)
+{
+    rebase(hasher->get_hash(board));
+}
+
+
+void BoardTree::populate_tree(uint8_t search_depth, std::list<std::shared_ptr<BoardTreeNode>> btns, Piece::Colour colour_to_move)
+{
+    if (search_depth == 0)
+    {
+        return;
+    }
+
+    std::list<std::shared_ptr<BoardTreeNode>> new_btns;
+
+    for (auto btn : btns)
+    {
+        auto available_moves = btn->get_board().get_all_legal_moves(colour_to_move);
+
+        for (const auto& move : available_moves)
+        {
+            auto child = btn->child_node(move, nodes, *hasher);
+
+            //for (int i = 0; i < 4 - search_depth; ++i)
+            //{
+            //    std::cout << "  ";
+            //}
+
+            //std::cout << move.to_string() << " - " << child->get_score(Piece::BLACK, colour_to_move) << std::endl;
+
+            new_btns.push_back(child);
+        }
+
+        if (available_moves.size() == 0)
+        {
+            btn->set_check_for_mate();
+        }
+    }
+
+    populate_tree(search_depth - 1, new_btns, Piece::opposite_colour(colour_to_move));
+}
+
+
+Move BoardTree::search(uint8_t search_depth, Piece::Colour ai_colour)
+{
+    auto available_moves = root_node->get_board().get_all_legal_moves(ai_colour);
+
+    //std::list<Move> available_moves = { Move(root_node->get_board(), "d4e2") };
+
+    std::unique_ptr<Move> best_move;
+    double best_score = -9999;
+
+    for (const auto& move : available_moves)
+    {
+        auto child = root_node->child_node(move, nodes, *hasher);
+
+        //std::cout << "==============================================" << std::endl;
+        //std::cout << move.to_string() << " - " << child->get_score(Piece::BLACK, Piece::opposite_colour(ai_colour)) << std::endl;
+
+        populate_tree(search_depth, { child }, Piece::opposite_colour(ai_colour));
+
+        auto child_score = child->get_score(ai_colour, Piece::opposite_colour(ai_colour));
+
+        //std::cout << "move = " << move.to_string() << ", heuristic = " << child_score << std::endl;
+
+        if (child_score > best_score)
+        {
+            best_move = std::make_unique<Move>(move);
+
+            best_score = child_score;
+
+            //std::cout << "best move = " << best_move->to_string() << ", heuristic = " << best_score << std::endl;
+        }
+    }
+
+    return *best_move;
+}
+
+
+BoardTree::BoardTree(const Board& board) :
+    hasher(std::make_unique<ZobristHash>()),
+    root_node(std::make_shared<BoardTreeNode>(board, *hasher))
+{
+    nodes.emplace(root_node->get_hash(), root_node);
 }

@@ -43,6 +43,9 @@
     <ClCompile Include="test_ai.cpp">
       <Filter>tests</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\board_tree_node.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ai.h">
@@ -80,6 +83,9 @@
     </ClInclude>
     <ClInclude Include="..\src\utils\board_strings.h">
       <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\board_tree_node.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

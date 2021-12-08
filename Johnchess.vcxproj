@@ -151,6 +151,7 @@
     <ClInclude Include="src\board.h" />
     <ClInclude Include="src\board_location.h" />
     <ClInclude Include="src\board_tree.h" />
+    <ClInclude Include="src\board_tree_node.h" />
     <ClInclude Include="src\heuristic.h" />
     <ClInclude Include="src\johnchess_app.h" />
     <ClInclude Include="src\move.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="src\board.cpp" />
     <ClCompile Include="src\board_location.cpp" />
     <ClCompile Include="src\board_tree.cpp" />
+    <ClCompile Include="src\board_tree_node.cpp" />
     <ClCompile Include="src\heuristic.cpp" />
     <ClCompile Include="src\johnchess_app.cpp" />
     <ClCompile Include="src\move.cpp" />
