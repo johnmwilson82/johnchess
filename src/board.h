@@ -167,6 +167,12 @@ public:
         return m_squares[x * BOARD_DIM + y];
     }
 
+    //! Move a piece on the board where move is defined by a current and new BoardLocation
+    /*!
+     * \return true on success and if there was a piece to remove
+     */
+    bool move_piece(const Move& move);
+
 private:
     bool add_piece(const Piece& piece);
 
@@ -175,12 +181,6 @@ private:
      * \return true on success and if there was a piece to remove
      */
     bool move_piece(std::string move_str);
-
-    //! Move a piece on the board where move is defined by a current and new BoardLocation
-    /*!
-     * \return true on success and if there was a piece to remove
-     */
-    bool move_piece(const Move& move);
 
     //! Remove a piece from the board where location is given as a string in standard notation
     /*!

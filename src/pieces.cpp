@@ -179,8 +179,8 @@ std::list<Move> King::get_all_valid_moves(const Board& board) const
         const auto& right_sq2 = board.square(m_loc.apply_move(2, 0));
         const auto& right_rook_sq = board.square(m_loc.apply_move(3, 0));
 
-        if(right_sq1.is_empty() && right_sq1.get_attackers(opposite_colour(m_colour)).empty() &&
-           right_sq2.is_empty() && right_sq2.get_attackers(opposite_colour(m_colour)).empty() &&
+        if(right_sq1.is_empty() && right_sq1.get_attackers(opposite_colour(m_colour)) == 0 &&
+           right_sq2.is_empty() && right_sq2.get_attackers(opposite_colour(m_colour)) == 0 &&
            !right_rook_sq.is_empty() && !right_rook_sq.get_piece()->has_moved())
         {
             can_castle_ks = true;
@@ -191,9 +191,9 @@ std::list<Move> King::get_all_valid_moves(const Board& board) const
         const auto& left_sq3 = board.square(m_loc.apply_move(-3, 0));
         const auto& left_rook_sq = board.square(m_loc.apply_move(-4, 0));
 
-        if(left_sq1.is_empty() && left_sq1.get_attackers(opposite_colour(m_colour)).empty() &&
-           left_sq2.is_empty() && left_sq2.get_attackers(opposite_colour(m_colour)).empty() &&
-           left_sq3.is_empty() && left_sq3.get_attackers(opposite_colour(m_colour)).empty() &&
+        if(left_sq1.is_empty() && left_sq1.get_attackers(opposite_colour(m_colour)) == 0 &&
+           left_sq2.is_empty() && left_sq2.get_attackers(opposite_colour(m_colour)) == 0 &&
+           left_sq3.is_empty() && left_sq3.get_attackers(opposite_colour(m_colour)) == 0 &&
            !left_rook_sq.is_empty() && !left_rook_sq.get_piece()->has_moved())
         {
             can_castle_qs = true;

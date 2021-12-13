@@ -104,3 +104,41 @@ TEST_F(ZobristHashTests, CheckHashThroughCastling)
     EXPECT_EQ(expected_hash, new_hash);
 
 }
+
+TEST_F(ZobristHashTests, CheckMoveHash)
+{
+    std::string board_str_pre_move(
+        " r n b q k b _ r\n"
+        " p p p _ p p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ p _ _ _ _\n"
+        " _ _ _ _ n _ _ _\n"
+        " _ _ _ B P N _ _\n"
+        " P _ P P _ P P P\n"
+        " R N B Q _ R K _\n"
+    );
+
+    Board pre_move_board = board_from_string_repr(board_str_pre_move);
+
+    Move move(pre_move_board, "c1a3");
+
+    std::string board_str_post_move(
+        " r n b q k b _ r\n"
+        " p p p _ p p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ p _ _ _ _\n"
+        " _ _ _ _ n _ _ _\n"
+        " B _ _ B P N _ _\n"
+        " P _ P P _ P P P\n"
+        " R N _ Q _ R K _\n"
+    );
+
+    Board post_move_board = board_from_string_repr(board_str_post_move);
+
+    auto test_hash = hasher->get_hash(pre_move_board, move);
+
+    auto expected_hash = hasher->get_hash(post_move_board);
+
+    EXPECT_EQ(expected_hash, test_hash);
+
+}

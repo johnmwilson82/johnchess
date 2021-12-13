@@ -48,21 +48,21 @@ public:
     {
         if(attacker->get_colour() == Piece::WHITE)
         {
-            m_white_attackers.push_back(attacker);
+            ++m_white_attackers;
         }
         else
         {
-            m_black_attackers.push_back(attacker);
+            ++m_black_attackers;
         }
     }
 
-    inline const std::list<std::shared_ptr<Piece>>& get_attackers(Piece::Colour col) const
+    inline uint8_t get_attackers(Piece::Colour col) const
     {
         return (col == Piece::WHITE) ? m_white_attackers : m_black_attackers;
     }
     
 private:
     std::shared_ptr<Piece> m_piece;
-    std::list<std::shared_ptr<Piece>> m_white_attackers;
-    std::list<std::shared_ptr<Piece>> m_black_attackers;
+    uint8_t m_white_attackers = 0;
+    uint8_t m_black_attackers = 0;
 };

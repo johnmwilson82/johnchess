@@ -61,7 +61,9 @@ uint64_t ZobristHash::get_hash(const Board& board) const
 
 uint64_t ZobristHash::get_hash(const Board& board, const Move& move) const
 {
-    Board new_root_board(board, move);
+    Board new_board(board);
 
-    return get_hash(new_root_board);
+    new_board.move_piece(move);
+
+    return get_hash(new_board);
 }

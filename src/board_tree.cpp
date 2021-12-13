@@ -75,16 +75,9 @@ void BoardTree::populate_tree(uint8_t search_depth, std::list<std::shared_ptr<Bo
 
         for (const auto& move : available_moves)
         {
-            auto child = btn->child_node(move, nodes, *hasher);
-
-            //for (int i = 0; i < 4 - search_depth; ++i)
-            //{
-            //    std::cout << "  ";
-            //}
-
-            //std::cout << move.to_string() << " - " << child->get_score(Piece::BLACK, colour_to_move) << std::endl;
-
-            new_btns.push_back(child);
+            new_btns.emplace_back(
+                btn->child_node(move, nodes, *hasher)
+            );
         }
 
         if (available_moves.size() == 0)
@@ -101,8 +94,6 @@ Move BoardTree::search(uint8_t search_depth, Piece::Colour ai_colour)
 {
     auto available_moves = root_node->get_board().get_all_legal_moves(ai_colour);
 
-    //std::list<Move> available_moves = { Move(root_node->get_board(), "d4e2") };
-
     std::unique_ptr<Move> best_move;
     double best_score = -9999;
 
@@ -110,22 +101,15 @@ Move BoardTree::search(uint8_t search_depth, Piece::Colour ai_colour)
     {
         auto child = root_node->child_node(move, nodes, *hasher);
 
-        //std::cout << "==============================================" << std::endl;
-        //std::cout << move.to_string() << " - " << child->get_score(Piece::BLACK, Piece::opposite_colour(ai_colour)) << std::endl;
-
         populate_tree(search_depth, { child }, Piece::opposite_colour(ai_colour));
 
         auto child_score = child->get_score(ai_colour, Piece::opposite_colour(ai_colour));
-
-        //std::cout << "move = " << move.to_string() << ", heuristic = " << child_score << std::endl;
 
         if (child_score > best_score)
         {
             best_move = std::make_unique<Move>(move);
 
             best_score = child_score;
-
-            //std::cout << "best move = " << best_move->to_string() << ", heuristic = " << best_score << std::endl;
         }
     }
 

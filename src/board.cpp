@@ -28,9 +28,21 @@ Board::Board(const Board& orig, const Move& move) :
 
 Board::Board(const Board& orig) :
     m_colour_to_move(orig.m_colour_to_move),
-    m_pieces(orig.m_pieces),
+    m_pieces(2),
     m_squares(orig.m_squares)
 {
+    for (auto& square : m_squares)
+    {
+        square.remove_piece();
+    }
+
+    for (const auto& piece : orig.m_pieces)
+    {
+        if (piece->get_on_board())
+        {
+            add_piece(*piece);
+        }
+    }
 }
 
 Board::Board(const Board& orig, const std::string& move_str) :
@@ -272,6 +284,7 @@ bool Board::move_piece(const Move& move)
     }
 
     m_colour_to_move = Piece::opposite_colour(m_colour_to_move);
+
     return true;
 }
 
@@ -328,7 +341,7 @@ bool Board::get_in_check(Piece::Colour col) const
     // and black king is always m_pieces[1]
     auto king = m_pieces[col == Piece::WHITE ? 0 : 1];
 
-    return square(king->get_loc()).get_attackers(opp_col).size() > 0;
+    return square(king->get_loc()).get_attackers(opp_col) > 0;
 }
 
 std::list<Move> Board::get_all_legal_moves(Piece::Colour col) const
