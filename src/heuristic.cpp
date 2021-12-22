@@ -13,7 +13,7 @@
 // M = Mobility (the number of legal moves)
 
 
-ShannonHeuristic::ShannonHeuristic(const Board& board)
+ShannonHeuristic::ShannonHeuristic(const IBoard& board)
 {
     auto piece_fn = [&](const Piece& piece) {
         double mult = piece.get_colour() == Piece::WHITE ? 1 : -1;
@@ -22,7 +22,7 @@ ShannonHeuristic::ShannonHeuristic(const Board& board)
         {
             case Piece::PAWN:
                 accum += 1 * mult;
-                if(piece.get_all_valid_moves(board).size() == 0)
+                if(piece.get_all_valid_moves().size() == 0)
                 {
                     accum -= 0.5 * mult;
                 }

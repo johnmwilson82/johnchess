@@ -3,7 +3,7 @@
 #include <unordered_map>
 
 #include "move.h"
-#include "board.h"
+#include "iboard.h"
 #include "zobrist_hash.h"
 #include "heuristic.h"
 
@@ -14,7 +14,7 @@ public:
     using edge_t = std::pair<std::shared_ptr<BoardTreeNode>, Move>;
 
 private:
-    const Board m_board;
+    const std::unique_ptr<IBoard> m_board;
     const uint64_t m_hash;
 
     const ShannonHeuristic m_heuristic;
@@ -29,7 +29,7 @@ public:
 
     std::list<edge_t>& get_children() { return m_child_nodes; };
 
-    const Board& get_board() const;
+    const IBoard& get_board() const;
 
     uint64_t get_hash() const;
 
@@ -39,6 +39,6 @@ public:
 
     void set_check_for_mate() { m_check_for_mate = true; }
 
-    BoardTreeNode(const Board& board, const ZobristHash& hasher);
+    BoardTreeNode(const IBoard& board, const ZobristHash& hasher);
     BoardTreeNode(const BoardTreeNode& node, const Move& move, const ZobristHash& hasher);
 };

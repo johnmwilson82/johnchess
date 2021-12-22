@@ -68,7 +68,7 @@ void Board::populate_squares_properties()
     {
         if(piece->get_on_board())
         {
-            for(const auto& move : piece->get_all_valid_moves(*this))
+            for(const auto& move : piece->get_all_valid_moves())
             {
                 square(move.get_to_loc()).add_attacker(piece);
             }
@@ -98,12 +98,11 @@ bool Board::add_piece(Piece::Colour col, BoardLocation loc)
     if (!square(loc).is_empty())
         return false;
 
-    auto new_piece = m_pieces.emplace_back(std::make_shared<T>(col, loc));
+    auto new_piece = m_pieces.emplace_back(std::make_shared<T>(*this, col, loc));
 
     square(loc).set_piece(new_piece);
     return true;
 }
-
 
 template<>
 bool Board::add_piece<King>(Piece::Colour col, BoardLocation loc)
@@ -111,11 +110,42 @@ bool Board::add_piece<King>(Piece::Colour col, BoardLocation loc)
     if (!square(loc).is_empty())
         return false;
 
-    auto new_piece = std::make_shared<King>(col, loc);
+    auto new_piece = std::make_shared<King>(*this, col, loc);
     m_pieces[col == Piece::WHITE ? 0 : 1] = new_piece;
 
     square(loc).set_piece(new_piece);
     return true;
+}
+
+bool Board::add_piece(Piece::Type type, Piece::Colour col, BoardLocation loc)
+{
+    switch (type)
+    {
+    case Piece::PAWN:
+        return add_piece<Pawn>(col, loc);
+
+    case Piece::KNIGHT:
+        return add_piece<Knight>(col, loc);
+
+    case Piece::BISHOP:
+        return add_piece<Bishop>(col, loc);
+
+    case Piece::ROOK:
+        return add_piece<Rook>(col, loc);
+
+    case Piece::QUEEN:
+        return add_piece<Queen>(col, loc);
+
+    case Piece::KING:
+        return add_piece<King>(col, loc);
+    }
+
+    return false;
+}
+
+bool Board::add_piece(Piece::Type type, Piece::Colour col, std::string loc)
+{
+    return add_piece(type, col, BoardLocation(loc, *this));
 }
 
 bool Board::add_piece(const Piece& piece)
@@ -126,12 +156,12 @@ bool Board::add_piece(const Piece& piece)
     std::shared_ptr<Piece> new_piece;
     if(piece.get_type() == Piece::KING)
     {
-        new_piece = piece.clone();
+        new_piece = piece.clone(*this);
         m_pieces[piece.get_colour() == Piece::WHITE ? 0 : 1] = new_piece;
     }
     else
     {
-        new_piece = m_pieces.emplace_back(piece.clone());
+        new_piece = m_pieces.emplace_back(piece.clone(*this));
     }
 
     new_piece->set_has_moved(piece.has_moved());
@@ -352,7 +382,7 @@ std::list<Move> Board::get_all_legal_moves(Piece::Colour col) const
     {
         if (piece->get_colour() == col && piece->get_on_board())
         {
-            auto moves = piece->get_all_valid_moves(*this);
+            auto moves = piece->get_all_valid_moves();
             ret.splice(ret.end(), moves);
         }
     }
@@ -364,11 +394,6 @@ std::list<Move> Board::get_all_legal_moves(Piece::Colour col) const
     });
 
     return ret;
-}
-
-std::list<Move> Board::get_all_legal_moves() const
-{
-    return get_all_legal_moves(m_colour_to_move);
 }
 
 void Board::set_from_edit_mode(std::vector<std::string> in)
@@ -429,3 +454,17 @@ void Board::set_from_edit_mode(std::vector<std::string> in)
     }
 }
 
+std::shared_ptr<const Piece> Board::piece_on_square(int x, int y) const
+{
+    return square(x, y).get_piece();
+}
+
+std::unique_ptr<IBoard> Board::clone() const
+{
+    return std::make_unique<Board>(*this);
+}
+
+std::unique_ptr<IBoard> Board::clone_moved(const Move& move) const
+{
+    return std::make_unique<Board>(*this, move);
+}

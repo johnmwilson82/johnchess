@@ -5,7 +5,7 @@
 
 std::shared_ptr<BoardTreeNode> BoardTreeNode::child_node(const Move& move, hash_map_t& hash_map, const ZobristHash& hasher)
 {
-    auto hash = hasher.get_hash(m_board, move);
+    auto hash = hasher.get_hash(*m_board, move);
 
     if (hash_map.contains(hash))
     {
@@ -31,9 +31,9 @@ std::shared_ptr<BoardTreeNode> BoardTreeNode::child_node(const Move& move, hash_
 }
 
 
-const Board& BoardTreeNode::get_board() const
+const IBoard& BoardTreeNode::get_board() const
 {
-    return m_board;
+    return *m_board;
 }
 
 
@@ -52,7 +52,7 @@ const double BoardTreeNode::get_score(Piece::Colour ai_col, Piece::Colour colour
     {
         if (m_check_for_mate)
         {
-            switch (m_board.get_mate(colour_to_move))
+            switch (m_board->get_mate(colour_to_move))
             {
             case Board::CHECKMATE:
                 return 200;
@@ -84,19 +84,19 @@ const double BoardTreeNode::get_score(Piece::Colour ai_col, Piece::Colour colour
 
 
 // Root node
-BoardTreeNode::BoardTreeNode(const Board& board, const ZobristHash& hasher) :
-    m_board(board),
-    m_hash(hasher.get_hash(m_board)),
-    m_heuristic(m_board),
+BoardTreeNode::BoardTreeNode(const IBoard& board, const ZobristHash& hasher) :
+    m_board(board.clone()),
+    m_hash(hasher.get_hash(*m_board)),
+    m_heuristic(*m_board),
     m_ply(0)
 {
 }
 
 
 BoardTreeNode::BoardTreeNode(const BoardTreeNode& node, const Move& move, const ZobristHash& hasher) :
-    m_board(node.m_board, move),
-    m_hash(hasher.get_hash(m_board)),
-    m_heuristic(m_board),
+    m_board(node.m_board->clone_moved(move)),
+    m_hash(hasher.get_hash(*m_board)),
+    m_heuristic(*m_board),
     m_ply(node.m_ply + 1)
 {
 }

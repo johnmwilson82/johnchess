@@ -43,12 +43,12 @@ ZobristHash::ZobristHash()
     }
 }
 
-uint64_t ZobristHash::get_hash(const Board& board) const
+uint64_t ZobristHash::get_hash(const IBoard& board) const
 {
     uint64_t ret = 0;
     for(int i = 0; i < 64; ++i)
     {
-        auto piece = board.square(i & 0x7, i >> 3).get_piece();
+        auto piece = board.piece_on_square(i & 0x7, i >> 3);
         if(piece)
         {
             auto j = piece_to_index(*piece);
@@ -59,11 +59,11 @@ uint64_t ZobristHash::get_hash(const Board& board) const
     return ret;
 }
 
-uint64_t ZobristHash::get_hash(const Board& board, const Move& move) const
+uint64_t ZobristHash::get_hash(const IBoard& board, const Move& move) const
 {
-    Board new_board(board);
+    std::unique_ptr<IBoard> new_board = board.clone();
 
-    new_board.move_piece(move);
+    new_board->move_piece(move);
 
-    return get_hash(new_board);
+    return get_hash(*new_board);
 }

@@ -32,7 +32,7 @@ TEST_F(BoardTests, CheckKingMoves)
     EXPECT_EQ(piece->get_type(), Piece::KING);
 
     // There are two possible moves for the king (D8 and E7) but both result in check from the bishop on G5
-    auto moves = piece->get_all_valid_moves(board);
+    auto moves = piece->get_all_valid_moves();
     ASSERT_EQ(moves.size(), 2);
 
     EXPECT_FALSE(board.get_in_check(piece->get_colour()));

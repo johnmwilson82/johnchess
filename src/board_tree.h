@@ -20,9 +20,9 @@ private:
 
 public:
     void set_new_root_from_move(const Move& move);
-    void set_new_root_from_board(const Board& board);
+    void set_new_root_from_board(const IBoard& board);
     void populate_tree(uint8_t search_depth, std::list<std::shared_ptr<BoardTreeNode>> btns, Piece::Colour colour_to_move);
     Move search(uint8_t search_depth, Piece::Colour ai_colour);
 
-    BoardTree(const Board& board);
+    BoardTree(const IBoard& board);
 };

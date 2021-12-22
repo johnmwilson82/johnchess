@@ -12,7 +12,7 @@ class DynMove
 // DynMove: Describes the dynamics of a move (where a piece moves to 
 // relative to it's current position)
 public:
-    DynMove(int dx, int dy) :
+    constexpr DynMove(int dx, int dy) :
         m_dx(dx), m_dy(dy)
     {
     }

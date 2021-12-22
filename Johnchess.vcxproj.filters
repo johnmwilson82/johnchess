@@ -60,6 +60,9 @@
     <ClInclude Include="src\board_tree_node.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\iboard.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\board.cpp">

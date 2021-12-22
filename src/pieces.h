@@ -4,7 +4,8 @@
 #include <list>
 #include <string>
 #include <iostream>
-
+#include <array>
+#include <span>
 #include "board_location.h"
 
 #include "move.h"
@@ -31,7 +32,8 @@ public:
     static constexpr Colour opposite_colour(Colour col) { return col == WHITE ? BLACK : WHITE; }
 
 public: //ctor/dtor
-    Piece(const Colour& colour, const BoardLocation& loc, const Type& type) :
+    Piece(const Board& board, const Colour& colour, const BoardLocation& loc, const Type& type) :
+        m_board(board),
         m_colour(colour),
         m_loc(loc),
         m_type(type),
@@ -39,7 +41,8 @@ public: //ctor/dtor
     {
     }
 
-    Piece(const Piece& orig) :
+    Piece(const Board& board, const Piece& orig) :
+        m_board(board),
         m_colour(orig.m_colour),
         m_loc(orig.m_loc),
         m_type(orig.m_type),
@@ -50,9 +53,9 @@ public: //ctor/dtor
     virtual ~Piece();
 
 public: //public interface
-    virtual std::list<Move> get_all_valid_moves(const Board& board) const = 0;
-    virtual bool check_valid_move(const Board& board, const Move& move) const {
-        for (const auto valid_move : get_all_valid_moves(board))
+    virtual std::list<Move> get_all_valid_moves() const = 0;
+    virtual bool check_valid_move(const Move& move) const {
+        for (const auto valid_move : get_all_valid_moves())
         {
             if(valid_move == move)
                 return true;
@@ -61,7 +64,7 @@ public: //public interface
     }
     virtual std::vector<std::string> get_symbol_list() const = 0;
 
-    virtual std::shared_ptr<Piece> clone() const = 0;
+    virtual std::shared_ptr<Piece> clone(const Board& board) const = 0;
 
 public: // public methods
     inline Colour get_colour() const { return m_colour; }
@@ -90,13 +93,17 @@ public: // public methods
     inline bool capturable_en_passant() const { return m_capturable_en_passant; }
 
 protected:
-    std::list<Move> get_all_slide_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test=true) const;
-    std::list<Move> get_all_hop_moves(const std::vector<DynMove>& dms, const Board& board, bool check_test=true) const;
+    template<std::size_t SIZE>
+    std::list<Move> get_all_slide_moves(const std::array<DynMove, SIZE>& dms, bool check_test=true) const;
+
+    template<std::size_t SIZE>
+    std::list<Move> get_all_hop_moves(const std::array<DynMove, SIZE>& dms, bool check_test=true) const;
 
 protected:
     bool m_moved = false;
     bool m_capturable_en_passant = false;
     BoardLocation m_loc;
+    const Board& m_board;
     Piece::Colour m_colour;
     Piece::Type m_type;
 };
@@ -105,9 +112,9 @@ template<typename PieceType>
 class ClonablePiece : public Piece
 {
 public:
-    std::shared_ptr<Piece> clone() const override
+    std::shared_ptr<Piece> clone(const Board& board) const override
     {
-        return std::make_shared<PieceType>(*static_cast<const PieceType*>(this));
+        return std::make_shared<PieceType>(board, *static_cast<const PieceType*>(this));
     }
 
     using Piece::Piece;
@@ -116,72 +123,115 @@ public:
 class King : public ClonablePiece<King>
 {
 public:
-    King(Colour colour, BoardLocation loc);
-    King(const King&) = default;
+    King(const Board& board, Colour colour, BoardLocation loc);
+    King(const Board& board, const King& orig) : ClonablePiece(board, orig) {}
+    King(const King&) = delete;
     ~King() {}
-    std::list<Move> get_all_valid_moves(const Board& board) const override;
+    std::list<Move> get_all_valid_moves() const override;
     std::vector<std::string> get_symbol_list() const override;;
 private:
-    std::vector<DynMove> m_dm_list;
+    static constexpr std::array<DynMove, 8> m_dm_list = {
+        DynMove(-1, -1),
+        DynMove(-1, 0),
+        DynMove(-1, 1),
+        DynMove(0, 1),
+        DynMove(1, 1),
+        DynMove(1, 0),
+        DynMove(1, -1),
+        DynMove(0, -1) 
+    };
 };
 
 class Queen : public ClonablePiece<Queen>
 {
 public:
-    Queen(Colour colour, BoardLocation loc);
-    Queen(const Queen&) = default;
+    Queen(const Board& board, Colour colour, BoardLocation loc);
+    Queen(const Board& board, const Queen& orig) : ClonablePiece(board, orig) {}
+    Queen(const Queen&) = delete;
     ~Queen() {}
-    std::list<Move> get_all_valid_moves(const Board& board) const override;;
+    std::list<Move> get_all_valid_moves() const override;;
     std::vector<std::string> get_symbol_list() const override;;
 private:
-    std::vector<DynMove> m_dm_list;
+    static constexpr std::array<DynMove, 8> m_dm_list = {
+        DynMove(-1, -1),
+        DynMove(-1, 0),
+        DynMove(-1, 1),
+        DynMove(0, 1),
+        DynMove(1, 1),
+        DynMove(1, 0),
+        DynMove(1, -1),
+        DynMove(0, -1)
+    };
 };
 
 
 class Rook : public ClonablePiece<Rook>
 {
 public:
-    Rook(Colour colour, BoardLocation loc);
-    Rook(const Rook&) = default;
+    Rook(const Board& board, Colour colour, BoardLocation loc);
+    Rook(const Board& board, const Rook& orig) : ClonablePiece(board, orig) {}
+    Rook(const Rook&) = delete;
     ~Rook() {}
-    std::list<Move> get_all_valid_moves(const Board& board) const override;;
+    std::list<Move> get_all_valid_moves() const override;;
     std::vector<std::string> get_symbol_list() const override;;
 private:
-    std::vector<DynMove> m_dm_list;
+    static constexpr std::array<DynMove, 4> m_dm_list = {
+        DynMove(-1, 0),
+        DynMove(0, 1),
+        DynMove(1, 0),
+        DynMove(0, -1)
+    };
 };
 
 
 class Bishop : public ClonablePiece<Bishop>
 {
 public:
-    Bishop(Colour colour, BoardLocation loc);
-    Bishop(const Bishop&) = default;
+    Bishop(const Board& board, Colour colour, BoardLocation loc);
+    Bishop(const Board& board, const Bishop& orig) : ClonablePiece(board, orig) {}
+    Bishop(const Bishop&) = delete;
     ~Bishop() {}
-    std::list<Move> get_all_valid_moves(const Board& board) const override;;
+    std::list<Move> get_all_valid_moves() const override;;
     std::vector<std::string> get_symbol_list() const override;;
 private:
-    std::vector<DynMove> m_dm_list;
+    static constexpr std::array<DynMove, 4> m_dm_list = {
+        DynMove(-1, -1),
+        DynMove(-1, 1),
+        DynMove(1, 1),
+        DynMove(1, -1),
+    };
 };
 
 
 class Knight : public ClonablePiece<Knight>
 {
 public:
-    Knight(Colour colour, BoardLocation loc);
-    Knight(const Knight&) = default;
+    Knight(const Board& board, Colour colour, BoardLocation loc);
+    Knight(const Board& board, const Knight& orig) : ClonablePiece(board, orig) {}
+    Knight(const Knight&) = delete;
     ~Knight() {}
-    std::list<Move> get_all_valid_moves(const Board& board) const override;;
+    std::list<Move> get_all_valid_moves() const override;;
     std::vector<std::string> get_symbol_list() const override;;
 private:
-    std::vector<DynMove> m_dm_list;
+    static constexpr std::array<DynMove, 8> m_dm_list = {
+        DynMove(-1, 2),
+        DynMove(-1, -2),
+        DynMove(-2, 1),
+        DynMove(-2, -1),
+        DynMove(1, 2),
+        DynMove(1, -2),
+        DynMove(2, 1),
+        DynMove(2, -1)
+    };
 };
 
 class Pawn : public ClonablePiece<Pawn>
 {
 public:
-    Pawn(Colour colour, BoardLocation loc);
-    Pawn(const Pawn&) = default;
+    Pawn(const Board& board, Colour colour, BoardLocation loc);
+    Pawn(const Board& board, const Pawn& orig) : ClonablePiece(board, orig) {}
+    Pawn(const Pawn&) = delete;
     ~Pawn() {}
-    std::list<Move> get_all_valid_moves(const Board& board) const override;;
+    std::list<Move> get_all_valid_moves() const override;;
     std::vector<std::string> get_symbol_list() const override;;
 };

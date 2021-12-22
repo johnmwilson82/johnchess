@@ -19,7 +19,7 @@ private:
     double accum = 0.0;
 
 public:
-    ShannonHeuristic(const Board& board);
+    ShannonHeuristic(const IBoard& board);
     
     double get() const { return accum; };
 };
