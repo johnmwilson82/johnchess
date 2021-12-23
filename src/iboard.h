@@ -12,6 +12,13 @@ public:
         NO_MATE
     };
 
+    enum class CastlingRights : uint8_t {
+        WHITE_KINGSIDE = 0x1,
+        WHITE_QUEENSIDE = 0x2,
+        BLACK_KINGSIDE = 0x4,
+        BLACK_QUEENSIDE = 0x8
+    };
+
 public:
     //! Set the board to the starting position
     /*!
@@ -58,6 +65,9 @@ public:
     virtual std::list<Move> get_all_legal_moves(Piece::Colour col) const = 0;
 
     virtual bool add_piece(Piece::Type type, Piece::Colour col, BoardLocation loc) = 0;
+
+    virtual bool has_castling_rights(CastlingRights castling_rights) const = 0;
+    virtual std::optional<uint8_t> get_enpassant_column() const = 0;
 
     virtual bool move_piece(const Move& move) = 0;
 

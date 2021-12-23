@@ -10,6 +10,8 @@ Board::Board() :
 
 Board::Board(const Board& orig, const Move& move) :
     m_colour_to_move(orig.m_colour_to_move),
+    m_en_passant_column(orig.m_en_passant_column),
+    m_castling_rights(orig.m_castling_rights),
     m_pieces(2)
 {
     for(const auto& piece : orig.m_pieces)
@@ -28,6 +30,8 @@ Board::Board(const Board& orig, const Move& move) :
 
 Board::Board(const Board& orig) :
     m_colour_to_move(orig.m_colour_to_move),
+    m_en_passant_column(orig.m_en_passant_column),
+    m_castling_rights(orig.m_castling_rights),
     m_pieces(2),
     m_squares(orig.m_squares)
 {
@@ -47,6 +51,8 @@ Board::Board(const Board& orig) :
 
 Board::Board(const Board& orig, const std::string& move_str) :
     m_colour_to_move(orig.m_colour_to_move),
+    m_en_passant_column(orig.m_en_passant_column),
+    m_castling_rights(orig.m_castling_rights),
     m_pieces(2)
 {
     for(const auto& piece : orig.m_pieces)
@@ -164,8 +170,6 @@ bool Board::add_piece(const Piece& piece)
         new_piece = m_pieces.emplace_back(piece.clone(*this));
     }
 
-    new_piece->set_has_moved(piece.has_moved());
-
     square(piece.get_loc()).set_piece(new_piece);
     return true;
 }
@@ -233,6 +237,55 @@ bool Board::move_piece(std::string move_str)
     return move_piece(Move(*this, move_str));
 }
 
+uint8_t Board::get_castling_rights_to_remove(const Piece& moving_piece) const
+{
+    uint8_t castling_rights_to_remove = 0;
+
+    if (moving_piece.get_type() == Piece::KING)
+    {
+        if (moving_piece.get_colour() == Piece::WHITE)
+        {
+            castling_rights_to_remove |= static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE);
+            castling_rights_to_remove |= static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE);
+        }
+        else
+        {
+            castling_rights_to_remove |= static_cast<uint8_t>(CastlingRights::BLACK_KINGSIDE);
+            castling_rights_to_remove |= static_cast<uint8_t>(CastlingRights::BLACK_QUEENSIDE);
+        }
+    }
+
+    if (moving_piece.get_type() == Piece::ROOK)
+    {
+        const auto& curr_loc = moving_piece.get_loc();
+
+        if (curr_loc.get_x() == 0)
+        {
+            if (moving_piece.get_colour() == Piece::WHITE)
+            {
+                castling_rights_to_remove |= static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE);
+            }
+            else
+            {
+                castling_rights_to_remove |= static_cast<uint8_t>(CastlingRights::BLACK_QUEENSIDE);
+            }
+        }
+        else if (curr_loc.get_x() == 7)
+        {
+            if (moving_piece.get_colour() == Piece::WHITE)
+            {
+                castling_rights_to_remove |= static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE);
+            }
+            else
+            {
+                castling_rights_to_remove |= static_cast<uint8_t>(CastlingRights::BLACK_KINGSIDE);
+            }
+        }
+    }
+
+    return castling_rights_to_remove;
+}
+
 bool Board::move_piece(const Move& move)
 {
     const auto& new_loc = move.get_to_loc();
@@ -257,11 +310,18 @@ bool Board::move_piece(const Move& move)
         ((curr_loc.get_y() == 1 && new_loc.get_y() == 3) ||
          (curr_loc.get_y() == 6 && new_loc.get_y() == 4)))
     {
-        moving_piece->set_capturable_en_passant(true);
+        m_en_passant_column = curr_loc.get_x();
+    }
+    else
+    {
+        m_en_passant_column = std::nullopt;
     }
 
     // Check castling
     auto castling_rook_move = check_castling_rook_move(*moving_piece, new_loc);
+
+    uint8_t castling_rights_to_remove = get_castling_rights_to_remove(*moving_piece);
+    m_castling_rights &= ~castling_rights_to_remove;
 
     if(captured_piece)
     {
@@ -269,6 +329,7 @@ bool Board::move_piece(const Move& move)
         square(new_loc).remove_piece();
     }
 
+    // Check promotion
     if(move.get_promotion_type().has_value())
     {
         switch(*move.get_promotion_type())

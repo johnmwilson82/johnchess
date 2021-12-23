@@ -118,25 +118,16 @@ std::list<Move> Pawn::get_all_valid_moves() const
     }
 
     // Check en passant
-    if((m_colour == Piece::WHITE && m_loc.get_y() == 4) ||
-       (m_colour == Piece::BLACK && m_loc.get_y() == 3))
+    const auto& ep_col = m_board.get_enpassant_column();
+    if(ep_col.has_value() &&
+       ((m_colour == Piece::WHITE && m_loc.get_y() == 4) ||
+        (m_colour == Piece::BLACK && m_loc.get_y() == 3)))
     {
-        BoardLocation enpassant_tr_loc = m_loc.apply_move(1, 0);
-        if (tr_loc.get_valid() && 
-            !m_board.square(enpassant_tr_loc).is_empty() &&
-            m_board.square(enpassant_tr_loc).get_piece()->get_colour() != m_colour &&
-            m_board.square(enpassant_tr_loc).get_piece()->capturable_en_passant())
-        {
-            emplace_pawn_move(tr_loc);
-        }
+        auto col_diff = *ep_col - m_loc.get_x();
 
-        BoardLocation enpassant_tl_loc = m_loc.apply_move(-1, 0);
-        if (tl_loc.get_valid() && 
-            !m_board.square(enpassant_tl_loc).is_empty() &&
-            m_board.square(enpassant_tl_loc).get_piece()->get_colour() != m_colour &&
-            m_board.square(enpassant_tl_loc).get_piece()->capturable_en_passant())
+        if (std::abs(col_diff) == 1)
         {
-            emplace_pawn_move(tl_loc);
+            emplace_pawn_move(m_loc.apply_move(col_diff, dir));
         }
     }
     
@@ -163,19 +154,23 @@ std::list<Move> King::get_all_valid_moves() const
     bool can_castle_ks = false;
     bool can_castle_qs = false;
 
-    if(!m_moved)
+    if ((m_colour == WHITE) && (m_board.has_castling_rights(IBoard::CastlingRights::WHITE_KINGSIDE)) ||
+        (m_colour == BLACK) && (m_board.has_castling_rights(IBoard::CastlingRights::BLACK_KINGSIDE)))
     {
         const auto& right_sq1 = m_board.square(m_loc.apply_move(1, 0));
         const auto& right_sq2 = m_board.square(m_loc.apply_move(2, 0));
         const auto& right_rook_sq = m_board.square(m_loc.apply_move(3, 0));
 
-        if(right_sq1.is_empty() && right_sq1.get_attackers(opposite_colour(m_colour)) == 0 &&
-           right_sq2.is_empty() && right_sq2.get_attackers(opposite_colour(m_colour)) == 0 &&
-           !right_rook_sq.is_empty() && !right_rook_sq.get_piece()->has_moved())
+        if (right_sq1.is_empty() && right_sq1.get_attackers(opposite_colour(m_colour)) == 0 &&
+            right_sq2.is_empty() && right_sq2.get_attackers(opposite_colour(m_colour)) == 0)
         {
             can_castle_ks = true;
         }
+    }
 
+    if ((m_colour == WHITE) && (m_board.has_castling_rights(IBoard::CastlingRights::WHITE_QUEENSIDE)) ||
+        (m_colour == BLACK) && (m_board.has_castling_rights(IBoard::CastlingRights::BLACK_QUEENSIDE)))
+    {
         const auto& left_sq1 = m_board.square(m_loc.apply_move(-1, 0));
         const auto& left_sq2 = m_board.square(m_loc.apply_move(-2, 0));
         const auto& left_sq3 = m_board.square(m_loc.apply_move(-3, 0));
@@ -183,8 +178,7 @@ std::list<Move> King::get_all_valid_moves() const
 
         if(left_sq1.is_empty() && left_sq1.get_attackers(opposite_colour(m_colour)) == 0 &&
            left_sq2.is_empty() && left_sq2.get_attackers(opposite_colour(m_colour)) == 0 &&
-           left_sq3.is_empty() && left_sq3.get_attackers(opposite_colour(m_colour)) == 0 &&
-           !left_rook_sq.is_empty() && !left_rook_sq.get_piece()->has_moved())
+           left_sq3.is_empty() && left_sq3.get_attackers(opposite_colour(m_colour)) == 0)
         {
             can_castle_qs = true;
         }

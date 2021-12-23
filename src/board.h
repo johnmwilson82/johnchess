@@ -23,12 +23,18 @@ class DynMove;
  */
 class Board : public IBoard
 {
-
-    
 private:
+    static constexpr uint8_t INIT_CASTLING_RIGHTS =
+        static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE) |
+        static_cast<uint8_t>(CastlingRights::BLACK_KINGSIDE) |
+        static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE) |
+        static_cast<uint8_t>(CastlingRights::BLACK_QUEENSIDE);
+
     std::array<Square, BOARD_DIM*BOARD_DIM> m_squares; //!< board squares
     boost::container::static_vector<std::shared_ptr<Piece>, 32> m_pieces;  //!< pieces on the board
     Piece::Colour m_colour_to_move;
+    uint8_t m_castling_rights = INIT_CASTLING_RIGHTS;
+    std::optional<uint8_t> m_en_passant_column = std::nullopt;
 
 public:
     Board();
@@ -147,6 +153,12 @@ public: // IBoard
     //! Return the number of available moves for a given colour
     std::list<Move> get_all_legal_moves(Piece::Colour col) const override;
 
+    bool has_castling_rights(CastlingRights castling_rights) const { 
+        return m_castling_rights & static_cast<uint8_t>(castling_rights); 
+    };
+
+    std::optional<uint8_t> get_enpassant_column() const { return m_en_passant_column; };
+
     bool add_piece(Piece::Type type, Piece::Colour col, BoardLocation loc) override;
 
     bool move_piece(const Move& move) override;
@@ -181,4 +193,6 @@ private:
     bool remove_piece(BoardLocation loc);
 
     bool add_piece(Piece::Type type, Piece::Colour col, std::string loc);
+
+    uint8_t get_castling_rights_to_remove(const Piece& moving_piece) const;
 };

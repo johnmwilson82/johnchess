@@ -36,8 +36,7 @@ public: //ctor/dtor
         m_board(board),
         m_colour(colour),
         m_loc(loc),
-        m_type(type),
-        m_moved(false)
+        m_type(type)
     {
     }
 
@@ -45,8 +44,7 @@ public: //ctor/dtor
         m_board(board),
         m_colour(orig.m_colour),
         m_loc(orig.m_loc),
-        m_type(orig.m_type),
-        m_moved(orig.m_moved)
+        m_type(orig.m_type)
     {}
 
 
@@ -79,18 +77,8 @@ public: // public methods
     inline void set_on_board(bool val) { m_loc.set_on_board(val); }
 
     inline void move(const BoardLocation& new_loc) {
-        m_moved = true;
         m_loc = new_loc;
     }
-
-    inline void set_capturable_en_passant(bool val)
-    {
-        m_capturable_en_passant = val;
-    }
-    
-    inline void set_has_moved(bool has_moved) { m_moved = has_moved; }
-    inline bool has_moved() const { return m_moved; }
-    inline bool capturable_en_passant() const { return m_capturable_en_passant; }
 
 protected:
     template<std::size_t SIZE>
@@ -100,8 +88,6 @@ protected:
     std::list<Move> get_all_hop_moves(const std::array<DynMove, SIZE>& dms, bool check_test=true) const;
 
 protected:
-    bool m_moved = false;
-    bool m_capturable_en_passant = false;
     BoardLocation m_loc;
     const Board& m_board;
     Piece::Colour m_colour;

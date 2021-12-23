@@ -4,7 +4,6 @@
 class ZobristHash
 {
 private:
-    uint64_t table[64][18];
 
     enum class PieceIndex : size_t
     {
@@ -14,9 +13,6 @@ private:
         WHITE_BISHOP,
         WHITE_KNIGHT,
         WHITE_PAWN,
-        WHITE_PAWN_EN_PASSANT_CAPTURABLE,
-        WHITE_KING_CAN_CASTLE,
-        WHITE_ROOK_CAN_CASTLE,
 
         BLACK_KING,
         BLACK_QUEEN,
@@ -24,10 +20,34 @@ private:
         BLACK_BISHOP,
         BLACK_KNIGHT,
         BLACK_PAWN,
-        BLACK_PAWN_EN_PASSANT_CAPTURABLE,
-        BLACK_KING_CAN_CASTLE,
-        BLACK_ROOK_CAN_CASTLE,
+
+        SIZE
     };
+
+    uint64_t piece_table[64][static_cast<size_t>(PieceIndex::SIZE)];
+
+    enum class BoardPropsIndex : size_t
+    {
+        BLACK_TO_MOVE,
+
+        WHITE_CAN_CASTLE_KINGSIDE,
+        WHITE_CAN_CASTLE_QUEENSIDE,
+        BLACK_CAN_CASTLE_KINGSIDE,
+        BLACK_CAN_CASTLE_QUEENSIDE,
+
+        EN_PASSANT_POSSIBLE_FILE_A,
+        EN_PASSANT_POSSIBLE_FILE_B,
+        EN_PASSANT_POSSIBLE_FILE_C,
+        EN_PASSANT_POSSIBLE_FILE_D,
+        EN_PASSANT_POSSIBLE_FILE_E,
+        EN_PASSANT_POSSIBLE_FILE_F,
+        EN_PASSANT_POSSIBLE_FILE_G,
+        EN_PASSANT_POSSIBLE_FILE_H,
+
+        SIZE
+    };
+
+    uint64_t props_table[static_cast<size_t>(BoardPropsIndex::SIZE)];
 
     size_t piece_to_index(const Piece& piece) const;
     
