@@ -3,7 +3,7 @@
 #include "board.h"
 
 Board::Board() :
-    m_colour_to_move(Piece::WHITE),
+    m_colour_to_move(PieceColour::WHITE),
     m_pieces(2)
 {
 }
@@ -22,7 +22,7 @@ Board::Board(const Board& orig, const Move& move) :
         }
     }
 
-    move_piece(move);
+    make_move(move);
 
     populate_squares_properties();
 }
@@ -63,7 +63,7 @@ Board::Board(const Board& orig, const std::string& move_str) :
         }
     }
 
-    move_piece(move_str);
+    make_move(move_str);
 
     populate_squares_properties();
 }
@@ -93,13 +93,13 @@ void Board::delete_all_pieces()
 }
 
 template<typename T>
-bool Board::add_piece(Piece::Colour col, std::string loc)
+bool Board::add_piece(PieceColour col, std::string loc)
 {
     return add_piece<T>(col, BoardLocation(loc, *this));
 }
 
 template<typename T>
-bool Board::add_piece(Piece::Colour col, BoardLocation loc)
+bool Board::add_piece(PieceColour col, BoardLocation loc)
 {
     if (!square(loc).is_empty())
         return false;
@@ -111,45 +111,45 @@ bool Board::add_piece(Piece::Colour col, BoardLocation loc)
 }
 
 template<>
-bool Board::add_piece<King>(Piece::Colour col, BoardLocation loc)
+bool Board::add_piece<King>(PieceColour col, BoardLocation loc)
 {
     if (!square(loc).is_empty())
         return false;
 
     auto new_piece = std::make_shared<King>(*this, col, loc);
-    m_pieces[col == Piece::WHITE ? 0 : 1] = new_piece;
+    m_pieces[col == PieceColour::WHITE ? 0 : 1] = new_piece;
 
     square(loc).set_piece(new_piece);
     return true;
 }
 
-bool Board::add_piece(Piece::Type type, Piece::Colour col, BoardLocation loc)
+bool Board::add_piece(PieceType type, PieceColour col, BoardLocation loc)
 {
     switch (type)
     {
-    case Piece::PAWN:
+    case PieceType::PAWN:
         return add_piece<Pawn>(col, loc);
 
-    case Piece::KNIGHT:
+    case PieceType::KNIGHT:
         return add_piece<Knight>(col, loc);
 
-    case Piece::BISHOP:
+    case PieceType::BISHOP:
         return add_piece<Bishop>(col, loc);
 
-    case Piece::ROOK:
+    case PieceType::ROOK:
         return add_piece<Rook>(col, loc);
 
-    case Piece::QUEEN:
+    case PieceType::QUEEN:
         return add_piece<Queen>(col, loc);
 
-    case Piece::KING:
+    case PieceType::KING:
         return add_piece<King>(col, loc);
     }
 
     return false;
 }
 
-bool Board::add_piece(Piece::Type type, Piece::Colour col, std::string loc)
+bool Board::add_piece(PieceType type, PieceColour col, std::string loc)
 {
     return add_piece(type, col, BoardLocation(loc, *this));
 }
@@ -160,10 +160,10 @@ bool Board::add_piece(const Piece& piece)
         return false;
 
     std::shared_ptr<Piece> new_piece;
-    if(piece.get_type() == Piece::KING)
+    if(piece.get_type() == PieceType::KING)
     {
         new_piece = piece.clone(*this);
-        m_pieces[piece.get_colour() == Piece::WHITE ? 0 : 1] = new_piece;
+        m_pieces[piece.get_colour() == PieceColour::WHITE ? 0 : 1] = new_piece;
     }
     else
     {
@@ -191,7 +191,7 @@ bool Board::remove_piece(BoardLocation loc)
 
 std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> Board::check_castling_rook_move(const Piece& moving_piece, const BoardLocation& new_loc)
 {
-    if(moving_piece.get_type() != Piece::KING)
+    if(moving_piece.get_type() != PieceType::KING)
     {
         // Not a king move
         return {};
@@ -232,18 +232,18 @@ std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> Board::check_cas
     return {};
 }
 
-bool Board::move_piece(std::string move_str)
+bool Board::make_move(std::string move_str)
 {
-    return move_piece(Move(*this, move_str));
+    return make_move(Move(*this, move_str));
 }
 
 uint8_t Board::get_castling_rights_to_remove(const Piece& moving_piece) const
 {
     uint8_t castling_rights_to_remove = 0;
 
-    if (moving_piece.get_type() == Piece::KING)
+    if (moving_piece.get_type() == PieceType::KING)
     {
-        if (moving_piece.get_colour() == Piece::WHITE)
+        if (moving_piece.get_colour() == PieceColour::WHITE)
         {
             castling_rights_to_remove |= static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE);
             castling_rights_to_remove |= static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE);
@@ -255,13 +255,13 @@ uint8_t Board::get_castling_rights_to_remove(const Piece& moving_piece) const
         }
     }
 
-    if (moving_piece.get_type() == Piece::ROOK)
+    if (moving_piece.get_type() == PieceType::ROOK)
     {
         const auto& curr_loc = moving_piece.get_loc();
 
         if (curr_loc.get_x() == 0)
         {
-            if (moving_piece.get_colour() == Piece::WHITE)
+            if (moving_piece.get_colour() == PieceColour::WHITE)
             {
                 castling_rights_to_remove |= static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE);
             }
@@ -272,7 +272,7 @@ uint8_t Board::get_castling_rights_to_remove(const Piece& moving_piece) const
         }
         else if (curr_loc.get_x() == 7)
         {
-            if (moving_piece.get_colour() == Piece::WHITE)
+            if (moving_piece.get_colour() == PieceColour::WHITE)
             {
                 castling_rights_to_remove |= static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE);
             }
@@ -286,7 +286,7 @@ uint8_t Board::get_castling_rights_to_remove(const Piece& moving_piece) const
     return castling_rights_to_remove;
 }
 
-bool Board::move_piece(const Move& move)
+bool Board::make_move(const Move& move)
 {
     const auto& new_loc = move.get_to_loc();
     const auto& curr_loc = move.get_from_loc();
@@ -298,15 +298,15 @@ bool Board::move_piece(const Move& move)
         return false;
 
     // en passant rules
-    if((!captured_piece && moving_piece->get_type() == Piece::PAWN) &&
+    if((!captured_piece && moving_piece->get_type() == PieceType::PAWN) &&
         (curr_loc.get_x() != new_loc.get_x()))
     {
         captured_piece = square(
-                new_loc.apply_move(DynMove(0, moving_piece->get_colour() == Piece::WHITE ? -1 : 1))
+                new_loc.apply_move(DynMove(0, moving_piece->get_colour() == PieceColour::WHITE ? -1 : 1))
             ).get_piece();
     }
 
-    if((moving_piece->get_type() == Piece::PAWN) &&
+    if((moving_piece->get_type() == PieceType::PAWN) &&
         ((curr_loc.get_y() == 1 && new_loc.get_y() == 3) ||
          (curr_loc.get_y() == 6 && new_loc.get_y() == 4)))
     {
@@ -374,9 +374,14 @@ bool Board::move_piece(const Move& move)
         square(rook_curr_loc).remove_piece();
     }
 
-    m_colour_to_move = Piece::opposite_colour(m_colour_to_move);
+    m_colour_to_move = opposite_colour(m_colour_to_move);
 
     return true;
+}
+
+bool Board::unmake_move(const Move& move)
+{
+    return false;
 }
 
 void Board::set_to_start_position()
@@ -384,58 +389,59 @@ void Board::set_to_start_position()
     delete_all_pieces();
     // Kings will occupy the first two elements of m_pieces for
     // quick lookup
-    add_piece<King>(Piece::WHITE, "e1");
-    add_piece<King>(Piece::BLACK, "e8");
+    add_piece<King>(PieceColour::WHITE, "e1");
+    add_piece<King>(PieceColour::BLACK, "e8");
 
-    add_piece<Pawn>(Piece::WHITE, "a2");
-    add_piece<Pawn>(Piece::WHITE, "b2");
-    add_piece<Pawn>(Piece::WHITE, "c2");
-    add_piece<Pawn>(Piece::WHITE, "d2");
-    add_piece<Pawn>(Piece::WHITE, "e2");
-    add_piece<Pawn>(Piece::WHITE, "f2");
-    add_piece<Pawn>(Piece::WHITE, "g2");
-    add_piece<Pawn>(Piece::WHITE, "h2");
-    add_piece<Rook>(Piece::WHITE, "a1");
-    add_piece<Knight>(Piece::WHITE, "b1");
-    add_piece<Bishop>(Piece::WHITE, "c1");
-    add_piece<Queen>(Piece::WHITE, "d1");
-    add_piece<Bishop>(Piece::WHITE, "f1");
-    add_piece<Knight>(Piece::WHITE, "g1");
-    add_piece<Rook>(Piece::WHITE, "h1");
+    add_piece<Pawn>(PieceColour::WHITE, "a2");
+    add_piece<Pawn>(PieceColour::WHITE, "b2");
+    add_piece<Pawn>(PieceColour::WHITE, "c2");
+    add_piece<Pawn>(PieceColour::WHITE, "d2");
+    add_piece<Pawn>(PieceColour::WHITE, "e2");
+    add_piece<Pawn>(PieceColour::WHITE, "f2");
+    add_piece<Pawn>(PieceColour::WHITE, "g2");
+    add_piece<Pawn>(PieceColour::WHITE, "h2");
+    add_piece<Rook>(PieceColour::WHITE, "a1");
+    add_piece<Knight>(PieceColour::WHITE, "b1");
+    add_piece<Bishop>(PieceColour::WHITE, "c1");
+    add_piece<Queen>(PieceColour::WHITE, "d1");
+    add_piece<Bishop>(PieceColour::WHITE, "f1");
+    add_piece<Knight>(PieceColour::WHITE, "g1");
+    add_piece<Rook>(PieceColour::WHITE, "h1");
 
-    add_piece<Pawn>(Piece::BLACK, "a7");
-    add_piece<Pawn>(Piece::BLACK, "b7");
-    add_piece<Pawn>(Piece::BLACK, "c7");
-    add_piece<Pawn>(Piece::BLACK, "d7");
-    add_piece<Pawn>(Piece::BLACK, "e7");
-    add_piece<Pawn>(Piece::BLACK, "f7");
-    add_piece<Pawn>(Piece::BLACK, "g7");
-    add_piece<Pawn>(Piece::BLACK, "h7");
-    add_piece<Rook>(Piece::BLACK, "a8");
-    add_piece<Knight>(Piece::BLACK, "b8");
-    add_piece<Bishop>(Piece::BLACK, "c8");
-    add_piece<Queen>(Piece::BLACK, "d8");
-    add_piece<Bishop>(Piece::BLACK, "f8");
-    add_piece<Knight>(Piece::BLACK, "g8");
-    add_piece<Rook>(Piece::BLACK, "h8");
+    add_piece<Pawn>(PieceColour::BLACK, "a7");
+    add_piece<Pawn>(PieceColour::BLACK, "b7");
+    add_piece<Pawn>(PieceColour::BLACK, "c7");
+    add_piece<Pawn>(PieceColour::BLACK, "d7");
+    add_piece<Pawn>(PieceColour::BLACK, "e7");
+    add_piece<Pawn>(PieceColour::BLACK, "f7");
+    add_piece<Pawn>(PieceColour::BLACK, "g7");
+    add_piece<Pawn>(PieceColour::BLACK, "h7");
+    add_piece<Rook>(PieceColour::BLACK, "a8");
+    add_piece<Knight>(PieceColour::BLACK, "b8");
+    add_piece<Bishop>(PieceColour::BLACK, "c8");
+    add_piece<Queen>(PieceColour::BLACK, "d8");
+    add_piece<Bishop>(PieceColour::BLACK, "f8");
+    add_piece<Knight>(PieceColour::BLACK, "g8");
+    add_piece<Rook>(PieceColour::BLACK, "h8");
 
-    m_colour_to_move = Piece::WHITE;
+    m_colour_to_move = PieceColour::WHITE;
+    m_castling_rights = INIT_CASTLING_RIGHTS;
 
     populate_squares_properties();
 }
 
-bool Board::get_in_check(Piece::Colour col) const
+bool Board::get_in_check(PieceColour col) const
 {
-    Piece::Colour opp_col = col == Piece::WHITE ? Piece::BLACK : Piece::WHITE;
+    PieceColour opp_col = col == PieceColour::WHITE ? PieceColour::BLACK : PieceColour::WHITE;
 
     // Optimisation based on fact that white king is always m_pieces[0]
     // and black king is always m_pieces[1]
-    auto king = m_pieces[col == Piece::WHITE ? 0 : 1];
+    auto king = m_pieces[col == PieceColour::WHITE ? 0 : 1];
 
     return square(king->get_loc()).get_attackers(opp_col) > 0;
 }
 
-std::list<Move> Board::get_all_legal_moves(Piece::Colour col) const
+std::list<Move> Board::get_all_legal_moves(PieceColour col) const
 {
     std::list<Move> ret;
 
@@ -459,7 +465,7 @@ std::list<Move> Board::get_all_legal_moves(Piece::Colour col) const
 
 void Board::set_from_edit_mode(std::vector<std::string> in)
 {
-    Piece::Colour col = Piece::WHITE;
+    PieceColour col = PieceColour::WHITE;
     std::shared_ptr<Piece> black_king;
     std::shared_ptr<Piece> white_king;
 
@@ -477,10 +483,10 @@ void Board::set_from_edit_mode(std::vector<std::string> in)
         }
         else if (!it->compare("c"))
         {
-        	if (col == Piece::WHITE)
-        		col = Piece::BLACK;
+        	if (col == PieceColour::WHITE)
+        		col = PieceColour::BLACK;
         	else
-        		col = Piece::WHITE;
+        		col = PieceColour::WHITE;
         	continue;
         }
 

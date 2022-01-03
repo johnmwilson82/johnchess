@@ -44,9 +44,9 @@ uint64_t BoardTreeNode::get_hash() const
 
 
 
-const double BoardTreeNode::get_score(Piece::Colour ai_col, Piece::Colour colour_to_move) const
+const double BoardTreeNode::get_score(PieceColour ai_col, PieceColour colour_to_move) const
 {
-    double return_multiplier = ai_col == Piece::WHITE ? 1.0 : -1.0;
+    double return_multiplier = ai_col == PieceColour::WHITE ? 1.0 : -1.0;
 
     if (m_child_nodes.empty())
     {
@@ -70,7 +70,7 @@ const double BoardTreeNode::get_score(Piece::Colour ai_col, Piece::Colour colour
     }
 
     auto child_scores = m_child_nodes |
-        std::views::transform([&](edge_t edge) { return edge.first->get_score(ai_col, Piece::opposite_colour(colour_to_move)); });
+        std::views::transform([&](edge_t edge) { return edge.first->get_score(ai_col, opposite_colour(colour_to_move)); });
 
     if (ai_col == colour_to_move)
     {

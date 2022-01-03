@@ -16,11 +16,11 @@
 ShannonHeuristic::ShannonHeuristic(const IBoard& board)
 {
     auto piece_fn = [&](const Piece& piece) {
-        double mult = piece.get_colour() == Piece::WHITE ? 1 : -1;
+        double mult = piece.get_colour() == PieceColour::WHITE ? 1 : -1;
 
         switch(piece.get_type())
         {
-            case Piece::PAWN:
+            case PieceType::PAWN:
                 accum += 1 * mult;
                 if(piece.get_all_valid_moves().size() == 0)
                 {
@@ -29,20 +29,20 @@ ShannonHeuristic::ShannonHeuristic(const IBoard& board)
                 // TODO: check isolated pawns and doubled pawns
                 break;
             
-            case Piece::BISHOP:
-            case Piece::KNIGHT:
+            case PieceType::BISHOP:
+            case PieceType::KNIGHT:
                 accum += 3 * mult;
                 break;
 
-            case Piece::ROOK:
+            case PieceType::ROOK:
                 accum += 5 * mult;
                 break;
 
-            case Piece::QUEEN:
+            case PieceType::QUEEN:
                 accum += 9 * mult;
                 break;
 
-            case Piece::KING:
+            case PieceType::KING:
                 accum += 200 * mult;
                 break;
             

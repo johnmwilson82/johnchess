@@ -32,8 +32,8 @@ private:
 
     std::array<Square, BOARD_DIM*BOARD_DIM> m_squares; //!< board squares
     boost::container::static_vector<std::shared_ptr<Piece>, 32> m_pieces;  //!< pieces on the board
-    Piece::Colour m_colour_to_move;
-    uint8_t m_castling_rights = INIT_CASTLING_RIGHTS;
+    PieceColour m_colour_to_move;
+    uint8_t m_castling_rights = 0;
     std::optional<uint8_t> m_en_passant_column = std::nullopt;
 
 public:
@@ -77,10 +77,10 @@ public:
     }
 
     template<typename T>
-    bool add_piece(Piece::Colour col, BoardLocation loc);
+    bool add_piece(PieceColour col, BoardLocation loc);
 
     template<typename T>
-    bool add_piece(Piece::Colour col, std::string loc);
+    bool add_piece(PieceColour col, std::string loc);
 
 public: // IBoard
 
@@ -102,14 +102,14 @@ public: // IBoard
      * \param col colour to test for check
      * \return true if parameter colour is in check, false otherwise
      */
-    bool get_in_check(Piece::Colour col) const override;
+    bool get_in_check(PieceColour col) const override;
 
     //! Return if/what type of mate the board it in
     /*!
      * \param col colour to test for being in mate
      * \return CHECKMATE, STALEMATE or NO_MATE
      */
-    Mate get_mate(Piece::Colour col) const override
+    Mate get_mate(PieceColour col) const override
     {
         if(get_all_legal_moves(col).size() == 0)
         {
@@ -134,12 +134,12 @@ public: // IBoard
     } 
 
     //! Return the colour whose move it is
-    Piece::Colour get_colour_to_move() const override
+    PieceColour get_colour_to_move() const override
     {
         return m_colour_to_move;
     }
 
-    void set_colour_to_move(Piece::Colour colour) override
+    void set_colour_to_move(PieceColour colour) override
     {
         m_colour_to_move = colour;
     }
@@ -151,17 +151,26 @@ public: // IBoard
     void populate_squares_properties() override;
 
     //! Return the number of available moves for a given colour
-    std::list<Move> get_all_legal_moves(Piece::Colour col) const override;
+    std::list<Move> get_all_legal_moves(PieceColour col) const override;
 
     bool has_castling_rights(CastlingRights castling_rights) const { 
         return m_castling_rights & static_cast<uint8_t>(castling_rights); 
     };
 
+    void set_castling_rights(const std::vector<CastlingRights>& castling_rights)
+    {
+        for (const auto cr : castling_rights)
+        {
+            m_castling_rights |= static_cast<uint8_t>(cr);
+        }
+    }
+
     std::optional<uint8_t> get_enpassant_column() const { return m_en_passant_column; };
 
-    bool add_piece(Piece::Type type, Piece::Colour col, BoardLocation loc) override;
+    bool add_piece(PieceType type, PieceColour col, BoardLocation loc) override;
 
-    bool move_piece(const Move& move) override;
+    bool make_move(const Move& move) override;
+    bool unmake_move(const Move& move) override;
 
     std::unique_ptr<IBoard> clone() const override;
 
@@ -176,7 +185,7 @@ private:
     /*!
      * \return true on success and if there was a piece to remove
      */
-    bool move_piece(std::string move_str);
+    bool make_move(std::string move_str);
 
     //! Remove a piece from the board where location is given as a string in standard notation
     /*!
@@ -192,7 +201,7 @@ private:
      */
     bool remove_piece(BoardLocation loc);
 
-    bool add_piece(Piece::Type type, Piece::Colour col, std::string loc);
+    bool add_piece(PieceType type, PieceColour col, std::string loc);
 
     uint8_t get_castling_rights_to_remove(const Piece& moving_piece) const;
 };

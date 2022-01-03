@@ -19,7 +19,7 @@ JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
     m_board = std::make_unique<Board>();
     m_board->set_to_start_position();
 
-    m_ai = std::make_unique<BasicAI>(Piece::BLACK, 2);
+    m_ai = std::make_unique<BasicAI>(PieceColour::BLACK, 2);
 }
 
 JohnchessApp::~JohnchessApp()
@@ -51,13 +51,13 @@ void JohnchessApp::make_ai_move()
 
     ofs << utils::board_to_string_repr(*m_board);
 
-    ofs << std::endl << (m_board->get_colour_to_move() == Piece::WHITE ? "White" : "Black") << " to move" << std::endl;
+    ofs << std::endl << (m_board->get_colour_to_move() == PieceColour::WHITE ? "White" : "Black") << " to move" << std::endl;
     ofs.flush();
 }
 
 bool JohnchessApp::check_game_end()
 {
-    Piece::Colour colour_to_move = m_board->get_colour_to_move();
+    PieceColour colour_to_move = m_board->get_colour_to_move();
 
     // Check whether AI player is in mate
     Board::Mate mate = m_board->get_mate(colour_to_move);
@@ -71,7 +71,7 @@ bool JohnchessApp::check_game_end()
         {
             // Do something for checkmate
             m_xboard_interface->reply_result(
-                colour_to_move == Piece::BLACK ? 
+                colour_to_move == PieceColour::BLACK ? 
                 XBoardInterface::Result::WHITE_WIN :
                 XBoardInterface::Result::BLACK_WIN);
         }
@@ -96,7 +96,7 @@ void JohnchessApp::main_loop()
         {
             case XBoardInterface::CommandReceived::MOVE:
             {
-                Piece::Colour colour_to_move = m_board->get_colour_to_move();
+                PieceColour colour_to_move = m_board->get_colour_to_move();
 
                 const auto rcvd_move = rcvd.get_move_string();
                 auto new_board = std::make_unique<Board>(*m_board, rcvd_move);

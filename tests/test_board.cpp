@@ -29,7 +29,7 @@ TEST_F(BoardTests, CheckKingMoves)
 
     Board board = board_from_string_repr(board_str);
     auto piece = board.square(4, 7).get_piece();
-    EXPECT_EQ(piece->get_type(), Piece::KING);
+    EXPECT_EQ(piece->get_type(), PieceType::KING);
 
     // There are two possible moves for the king (D8 and E7) but both result in check from the bishop on G5
     auto moves = piece->get_all_valid_moves();
@@ -114,8 +114,8 @@ TEST_F(BoardTests, CheckWhiteMate)
 
     Board board = board_from_string_repr(board_str);
 
-    EXPECT_EQ(board.get_mate(Piece::BLACK), Board::CHECKMATE);
-    EXPECT_EQ(board.get_mate(Piece::WHITE), Board::NO_MATE);
+    EXPECT_EQ(board.get_mate(PieceColour::BLACK), Board::CHECKMATE);
+    EXPECT_EQ(board.get_mate(PieceColour::WHITE), Board::NO_MATE);
 }
 
 TEST_F(BoardTests, CheckCastling)
@@ -168,8 +168,9 @@ TEST_F(BoardTests, CheckCastlingInLegalMoves)
     );
 
     Board board = board_from_string_repr(board_str);
+    board.set_castling_rights({ Board::CastlingRights::WHITE_KINGSIDE });
 
-    const auto moves = board.get_all_legal_moves(Piece::WHITE);
+    const auto moves = board.get_all_legal_moves(PieceColour::WHITE);
 
     bool found = false;
 

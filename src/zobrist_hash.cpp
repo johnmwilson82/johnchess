@@ -4,9 +4,9 @@
 
 size_t ZobristHash::piece_to_index(const Piece& piece) const
 {
-    size_t piece_idx = piece.get_type();
+    size_t piece_idx = static_cast<size_t>(piece.get_type());
 
-    if(piece.get_colour() == Piece::BLACK)
+    if(piece.get_colour() == PieceColour::BLACK)
     {
         piece_idx += static_cast<size_t>(PieceIndex::BLACK_KING);
     }
@@ -49,7 +49,7 @@ uint64_t ZobristHash::get_hash(const IBoard& board) const
         }
     }
 
-    if (board.get_colour_to_move() == Piece::BLACK)
+    if (board.get_colour_to_move() == PieceColour::BLACK)
     {
         ret ^= props_table[static_cast<size_t>(BoardPropsIndex::BLACK_TO_MOVE)];
     }
@@ -88,7 +88,7 @@ uint64_t ZobristHash::get_hash(const IBoard& board, const Move& move) const
 {
     std::unique_ptr<IBoard> new_board = board.clone();
 
-    new_board->move_piece(move);
+    new_board->make_move(move);
 
     return get_hash(*new_board);
 }

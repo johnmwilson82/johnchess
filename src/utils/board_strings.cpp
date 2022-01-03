@@ -38,51 +38,51 @@ Board board_from_string_repr(const std::string& board_str)
 
             if(sq == "p")
             {
-                ret.add_piece(Piece::PAWN, Piece::BLACK, bl);
+                ret.add_piece(PieceType::PAWN, PieceColour::BLACK, bl);
             }
             else if(sq == "r")
             {
-                ret.add_piece(Piece::ROOK, Piece::BLACK, bl);
+                ret.add_piece(PieceType::ROOK, PieceColour::BLACK, bl);
             }
             else if(sq == "n")
             {
-                ret.add_piece(Piece::KNIGHT, Piece::BLACK, bl);
+                ret.add_piece(PieceType::KNIGHT, PieceColour::BLACK, bl);
             }
             else if(sq == "b")
             {
-                ret.add_piece(Piece::BISHOP, Piece::BLACK, bl);
+                ret.add_piece(PieceType::BISHOP, PieceColour::BLACK, bl);
             }
             else if(sq == "q")
             {
-                ret.add_piece(Piece::QUEEN, Piece::BLACK, bl);
+                ret.add_piece(PieceType::QUEEN, PieceColour::BLACK, bl);
             }
             else if(sq == "k")
             {
-                ret.add_piece(Piece::KING, Piece::BLACK, bl);
+                ret.add_piece(PieceType::KING, PieceColour::BLACK, bl);
             }
             else if(sq == "P")
             {
-                ret.add_piece(Piece::PAWN, Piece::WHITE, bl);
+                ret.add_piece(PieceType::PAWN, PieceColour::WHITE, bl);
             }
             else if(sq == "R")
             {
-                ret.add_piece(Piece::ROOK, Piece::WHITE, bl);
+                ret.add_piece(PieceType::ROOK, PieceColour::WHITE, bl);
             }
             else if(sq == "N")
             {
-                ret.add_piece(Piece::KNIGHT, Piece::WHITE, bl);
+                ret.add_piece(PieceType::KNIGHT, PieceColour::WHITE, bl);
             }
             else if(sq == "B")
             {
-                ret.add_piece(Piece::BISHOP, Piece::WHITE, bl);
+                ret.add_piece(PieceType::BISHOP, PieceColour::WHITE, bl);
             }
             else if(sq == "Q")
             {
-                ret.add_piece(Piece::QUEEN, Piece::WHITE, bl);
+                ret.add_piece(PieceType::QUEEN, PieceColour::WHITE, bl);
             }
             else if(sq == "K")
             {
-                ret.add_piece(Piece::KING, Piece::WHITE, bl);
+                ret.add_piece(PieceType::KING, PieceColour::WHITE, bl);
             }
 
             line.erase(0, pos + 2);
@@ -114,28 +114,28 @@ std::string board_to_string_repr(const Board& board)
             {
                 switch(sq.get_piece()->get_type())
                 {
-                    case Piece::KING:
-                        oss << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " K" : " k");
+                    case PieceType::KING:
+                        oss << ((sq.get_piece()->get_colour() == PieceColour::WHITE) ? " K" : " k");
                         break;
 
-                    case Piece::QUEEN:
-                        oss << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " Q" : " q");
+                    case PieceType::QUEEN:
+                        oss << ((sq.get_piece()->get_colour() == PieceColour::WHITE) ? " Q" : " q");
                         break;
 
-                    case Piece::ROOK:
-                        oss << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " R" : " r");
+                    case PieceType::ROOK:
+                        oss << ((sq.get_piece()->get_colour() == PieceColour::WHITE) ? " R" : " r");
                         break;
 
-                    case Piece::BISHOP:
-                        oss << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " B" : " b");
+                    case PieceType::BISHOP:
+                        oss << ((sq.get_piece()->get_colour() == PieceColour::WHITE) ? " B" : " b");
                         break;
 
-                    case Piece::KNIGHT:
-                        oss << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " N" : " n");
+                    case PieceType::KNIGHT:
+                        oss << ((sq.get_piece()->get_colour() == PieceColour::WHITE) ? " N" : " n");
                         break;
 
-                    case Piece::PAWN:
-                        oss << ((sq.get_piece()->get_colour() == Piece::WHITE) ? " P" : " p");
+                    case PieceType::PAWN:
+                        oss << ((sq.get_piece()->get_colour() == PieceColour::WHITE) ? " P" : " p");
                         break;
                 }
             }

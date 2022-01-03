@@ -47,7 +47,7 @@ TEST_F(ZobristHashTests, CheckHashWithRemovedPawn)
     
     Board board_only_e4;
 
-    board_only_e4.add_piece<Pawn>(Piece::WHITE, "e4");
+    board_only_e4.add_piece<Pawn>(PieceColour::WHITE, "e4");
 
     auto board_hash = hasher->get_hash(board);
 
@@ -77,6 +77,8 @@ TEST_F(ZobristHashTests, CheckHashThroughCastling)
     );
 
     Board pre_castle_board = board_from_string_repr(board_str_pre_castle);
+    pre_castle_board.set_castling_rights({ Board::CastlingRights::WHITE_KINGSIDE, Board::CastlingRights::WHITE_QUEENSIDE,
+                                           Board::CastlingRights::BLACK_KINGSIDE, Board::CastlingRights::BLACK_QUEENSIDE });
 
     std::string board_str_post_castle(
         " r n b q k b _ r\n"
@@ -90,8 +92,8 @@ TEST_F(ZobristHashTests, CheckHashThroughCastling)
     );
 
     Board post_castle_board = board_from_string_repr(board_str_post_castle);
-    post_castle_board.square(5, 0).get_piece()->set_has_moved(true);
-    post_castle_board.square(6, 0).get_piece()->set_has_moved(true);
+    post_castle_board.set_castling_rights({ Board::CastlingRights::BLACK_KINGSIDE, Board::CastlingRights::BLACK_QUEENSIDE });
+    post_castle_board.set_colour_to_move(PieceColour::BLACK);
 
     Move castle_move(pre_castle_board, "e1g1");
 
@@ -134,6 +136,7 @@ TEST_F(ZobristHashTests, CheckMoveHash)
     );
 
     Board post_move_board = board_from_string_repr(board_str_post_move);
+    post_move_board.set_colour_to_move(PieceColour::BLACK);
 
     auto test_hash = hasher->get_hash(pre_move_board, move);
 

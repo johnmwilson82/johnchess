@@ -46,7 +46,7 @@ public:
 
     inline void add_attacker(std::shared_ptr<Piece> attacker)
     {
-        if(attacker->get_colour() == Piece::WHITE)
+        if(attacker->get_colour() == PieceColour::WHITE)
         {
             ++m_white_attackers;
         }
@@ -56,9 +56,9 @@ public:
         }
     }
 
-    inline uint8_t get_attackers(Piece::Colour col) const
+    inline uint8_t get_attackers(PieceColour col) const
     {
-        return (col == Piece::WHITE) ? m_white_attackers : m_black_attackers;
+        return (col == PieceColour::WHITE) ? m_white_attackers : m_black_attackers;
     }
     
 private:

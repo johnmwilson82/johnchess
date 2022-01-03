@@ -9,30 +9,16 @@
 #include "board_location.h"
 
 #include "move.h"
+#include "piece_types.h"
 
 class Piece
 {
 // Piece: Describes a chess piece, including its colour and location
 // Subclass this class to implement individual pieces with their different rules
-public:
-    enum Type {
-        KING,
-        QUEEN,
-        ROOK,
-        BISHOP,
-        KNIGHT,
-        PAWN
-    };
 
-    enum Colour {
-        WHITE,
-        BLACK
-    };
-
-    static constexpr Colour opposite_colour(Colour col) { return col == WHITE ? BLACK : WHITE; }
 
 public: //ctor/dtor
-    Piece(const Board& board, const Colour& colour, const BoardLocation& loc, const Type& type) :
+    Piece(const Board& board, const PieceColour& colour, const BoardLocation& loc, const PieceType& type) :
         m_board(board),
         m_colour(colour),
         m_loc(loc),
@@ -65,9 +51,9 @@ public: //public interface
     virtual std::shared_ptr<Piece> clone(const Board& board) const = 0;
 
 public: // public methods
-    inline Colour get_colour() const { return m_colour; }
+    inline PieceColour get_colour() const { return m_colour; }
 
-    inline Type get_type() const { return m_type; }
+    inline PieceType get_type() const { return m_type; }
 
     inline BoardLocation get_loc() const { return m_loc; }
 
@@ -90,8 +76,8 @@ protected:
 protected:
     BoardLocation m_loc;
     const Board& m_board;
-    Piece::Colour m_colour;
-    Piece::Type m_type;
+    PieceColour m_colour;
+    PieceType m_type;
 };
 
 template<typename PieceType>
@@ -109,7 +95,7 @@ public:
 class King : public ClonablePiece<King>
 {
 public:
-    King(const Board& board, Colour colour, BoardLocation loc);
+    King(const Board& board, PieceColour colour, BoardLocation loc);
     King(const Board& board, const King& orig) : ClonablePiece(board, orig) {}
     King(const King&) = delete;
     ~King() {}
@@ -131,7 +117,7 @@ private:
 class Queen : public ClonablePiece<Queen>
 {
 public:
-    Queen(const Board& board, Colour colour, BoardLocation loc);
+    Queen(const Board& board, PieceColour colour, BoardLocation loc);
     Queen(const Board& board, const Queen& orig) : ClonablePiece(board, orig) {}
     Queen(const Queen&) = delete;
     ~Queen() {}
@@ -154,7 +140,7 @@ private:
 class Rook : public ClonablePiece<Rook>
 {
 public:
-    Rook(const Board& board, Colour colour, BoardLocation loc);
+    Rook(const Board& board, PieceColour colour, BoardLocation loc);
     Rook(const Board& board, const Rook& orig) : ClonablePiece(board, orig) {}
     Rook(const Rook&) = delete;
     ~Rook() {}
@@ -173,7 +159,7 @@ private:
 class Bishop : public ClonablePiece<Bishop>
 {
 public:
-    Bishop(const Board& board, Colour colour, BoardLocation loc);
+    Bishop(const Board& board, PieceColour colour, BoardLocation loc);
     Bishop(const Board& board, const Bishop& orig) : ClonablePiece(board, orig) {}
     Bishop(const Bishop&) = delete;
     ~Bishop() {}
@@ -192,7 +178,7 @@ private:
 class Knight : public ClonablePiece<Knight>
 {
 public:
-    Knight(const Board& board, Colour colour, BoardLocation loc);
+    Knight(const Board& board, PieceColour colour, BoardLocation loc);
     Knight(const Board& board, const Knight& orig) : ClonablePiece(board, orig) {}
     Knight(const Knight&) = delete;
     ~Knight() {}
@@ -214,7 +200,7 @@ private:
 class Pawn : public ClonablePiece<Pawn>
 {
 public:
-    Pawn(const Board& board, Colour colour, BoardLocation loc);
+    Pawn(const Board& board, PieceColour colour, BoardLocation loc);
     Pawn(const Board& board, const Pawn& orig) : ClonablePiece(board, orig) {}
     Pawn(const Pawn&) = delete;
     ~Pawn() {}

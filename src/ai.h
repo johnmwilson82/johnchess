@@ -14,7 +14,7 @@
 class AI
 {
 public:
-    AI(Piece::Colour colour) :
+    AI(PieceColour colour) :
         m_colour(colour)
     {}
     virtual ~AI() {}
@@ -27,10 +27,10 @@ public:
     virtual Move make_move(const IBoard& board) = 0;
 
     //! Set the colour of the AI side
-    void set_colour(Piece::Colour colour) { m_colour = colour; }
+    void set_colour(PieceColour colour) { m_colour = colour; }
 
 protected:
-    Piece::Colour m_colour;
+    PieceColour m_colour;
 };
 
 class BasicAI : public AI
@@ -41,7 +41,7 @@ private:
     uint8_t m_search_depth;
 
 public:
-    BasicAI(Piece::Colour colour, uint8_t search_depth) :
+    BasicAI(PieceColour colour, uint8_t search_depth) :
         AI(colour),
         m_search_depth(search_depth),
         m_ofs("ai.txt")

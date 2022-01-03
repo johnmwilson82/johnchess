@@ -38,22 +38,22 @@ public:
      * \param col colour to test for check
      * \return true if parameter colour is in check, false otherwise
      */
-    virtual bool get_in_check(Piece::Colour col) const = 0;
+    virtual bool get_in_check(PieceColour col) const = 0;
 
     //! Return if/what type of mate the board it in
     /*!
      * \param col colour to test for being in mate
      * \return CHECKMATE, STALEMATE or NO_MATE
      */
-    virtual Mate get_mate(Piece::Colour col) const = 0;
+    virtual Mate get_mate(PieceColour col) const = 0;
 
     //!< pieces on the board
     virtual void for_all_pieces(std::function<void(const Piece& piece)> fn) const = 0;
 
     //! Return the colour whose move it is
-    virtual Piece::Colour get_colour_to_move() const = 0;
+    virtual PieceColour get_colour_to_move() const = 0;
 
-    virtual void set_colour_to_move(Piece::Colour colour) = 0;
+    virtual void set_colour_to_move(PieceColour colour) = 0;
 
     //! Delete all the pieces from the board
     virtual void delete_all_pieces() = 0;
@@ -62,14 +62,15 @@ public:
     virtual void populate_squares_properties() = 0;
 
     //! Return the number of available moves for a given colour
-    virtual std::list<Move> get_all_legal_moves(Piece::Colour col) const = 0;
+    virtual std::list<Move> get_all_legal_moves(PieceColour col) const = 0;
 
-    virtual bool add_piece(Piece::Type type, Piece::Colour col, BoardLocation loc) = 0;
+    virtual bool add_piece(PieceType type, PieceColour col, BoardLocation loc) = 0;
 
     virtual bool has_castling_rights(CastlingRights castling_rights) const = 0;
     virtual std::optional<uint8_t> get_enpassant_column() const = 0;
 
-    virtual bool move_piece(const Move& move) = 0;
+    virtual bool make_move(const Move& move) = 0;
+    virtual bool unmake_move(const Move& move) = 0;
 
     virtual std::unique_ptr<IBoard> clone() const = 0;
     virtual std::unique_ptr<IBoard> clone_moved(const Move& move) const = 0;

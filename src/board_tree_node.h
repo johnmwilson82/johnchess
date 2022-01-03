@@ -35,7 +35,7 @@ public:
 
     uint32_t get_ply() const { return m_ply; }
 
-    const double get_score(Piece::Colour ai_col, Piece::Colour colour_to_move) const;
+    const double get_score(PieceColour ai_col, PieceColour colour_to_move) const;
 
     void set_check_for_mate() { m_check_for_mate = true; }
 

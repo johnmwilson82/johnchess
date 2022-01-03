@@ -29,9 +29,9 @@ TEST_F(AiTests, CheckFindBackRankMateWhite)
     );
 
     Board board = board_from_string_repr(board_str);
-    board.set_colour_to_move(Piece::WHITE);
+    board.set_colour_to_move(PieceColour::WHITE);
 
-    BasicAI ai(Piece::WHITE, 1);
+    BasicAI ai(PieceColour::WHITE, 1);
 
     auto move = ai.make_move(board);
 
@@ -52,9 +52,9 @@ TEST_F(AiTests, CheckFindBackRankMateBlack)
     );
 
     Board board = board_from_string_repr(board_str);
-    board.set_colour_to_move(Piece::BLACK);
+    board.set_colour_to_move(PieceColour::BLACK);
 
-    BasicAI ai(Piece::BLACK, 1);
+    BasicAI ai(PieceColour::BLACK, 1);
 
     auto move = ai.make_move(board);
 
@@ -76,9 +76,9 @@ TEST_F(AiTests, CheckMoveQueenFromDangerBlack)
     );
 
     Board board = board_from_string_repr(board_str);
-    board.set_colour_to_move(Piece::BLACK);
+    board.set_colour_to_move(PieceColour::BLACK);
 
-    BasicAI ai(Piece::BLACK, 1);
+    BasicAI ai(PieceColour::BLACK, 1);
 
     auto move = ai.make_move(board);
 
@@ -99,9 +99,9 @@ TEST_F(AiTests, CheckMoveQueenFromDangerWhite)
     );
 
     Board board = board_from_string_repr(board_str);
-    board.set_colour_to_move(Piece::WHITE);
+    board.set_colour_to_move(PieceColour::WHITE);
 
-    BasicAI ai(Piece::WHITE, 1);
+    BasicAI ai(PieceColour::WHITE, 1);
 
     auto move = ai.make_move(board);
 
@@ -122,9 +122,9 @@ TEST_F(AiTests, CheckWillForkWhite)
     );
 
     Board board = board_from_string_repr(board_str);
-    board.set_colour_to_move(Piece::WHITE);
+    board.set_colour_to_move(PieceColour::WHITE);
 
-    BasicAI ai(Piece::WHITE, 2);
+    BasicAI ai(PieceColour::WHITE, 2);
 
     auto move = ai.make_move(board);
 
@@ -145,9 +145,9 @@ TEST_F(AiTests, CheckWillForkBlack)
     );
 
     Board board = board_from_string_repr(board_str);
-    board.set_colour_to_move(Piece::BLACK);
+    board.set_colour_to_move(PieceColour::BLACK);
 
-    BasicAI ai(Piece::BLACK, 2);
+    BasicAI ai(PieceColour::BLACK, 2);
 
     auto move = ai.make_move(board);
 

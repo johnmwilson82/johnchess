@@ -157,6 +157,7 @@
     <ClInclude Include="src\johnchess_app.h" />
     <ClInclude Include="src\move.h" />
     <ClInclude Include="src\pieces.h" />
+    <ClInclude Include="src\piece_types.h" />
     <ClInclude Include="src\square.h" />
     <ClInclude Include="src\utils\board_strings.h" />
     <ClInclude Include="src\xboard_interface.h" />

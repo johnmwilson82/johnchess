@@ -46,6 +46,9 @@
     <ClCompile Include="..\src\board_tree_node.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="perft.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ai.h">

@@ -4,19 +4,19 @@
 #include "board.h"
 
 Move::Move(const Piece &piece, const DynMove& dm) :
-    m_piece(piece),
-    m_new_loc(piece.get_loc().apply_move(dm))
+    m_from_loc(piece.get_loc()),
+    m_to_loc(piece.get_loc().apply_move(dm))
 {}
 
 Move::Move(const Piece &piece, const BoardLocation& new_loc) :
-    m_piece(piece),
-    m_new_loc(new_loc)
+    m_from_loc(piece.get_loc()),
+    m_to_loc(new_loc)
 {
 }
 
 Move::Move(const Board& board, const std::string& move_str) :
-    m_piece(*board.square(BoardLocation(move_str.substr(0, 2), board)).get_piece()),
-    m_new_loc(move_str.substr(2, 2), board)
+    m_from_loc(move_str.substr(0, 2), board),
+    m_to_loc(move_str.substr(2, 2), board)
 {
     if(move_str.length() == 5)
     {
@@ -24,22 +24,22 @@ Move::Move(const Board& board, const std::string& move_str) :
         {
             case 'q':
             case 'Q':
-                m_promotion_type = PromotionType::QUEEN;
+                set_promotion_type(PromotionType::QUEEN);
                 break;
 
             case 'R':
             case 'r':
-                m_promotion_type = PromotionType::ROOK;
+                set_promotion_type(PromotionType::ROOK);
                 break;
 
             case 'B':
             case 'b':
-                m_promotion_type = PromotionType::BISHOP;
+                set_promotion_type(PromotionType::BISHOP);
                 break;
 
             case 'N':
             case 'n':
-                m_promotion_type = PromotionType::KNIGHT;
+                set_promotion_type(PromotionType::KNIGHT);
                 break;
         }
     }
@@ -47,16 +47,18 @@ Move::Move(const Board& board, const std::string& move_str) :
 
 bool Move::operator== (const Move& m) const
 {
-    return (std::addressof(m_piece) == std::addressof(m.m_piece)) && (m_new_loc == m.m_new_loc);
+    return (m_from_loc == m.m_from_loc) && (m_to_loc == m.m_to_loc);
 }
 
 std::string Move::to_string() const
 {
-    std::string move_str = m_piece.get_loc().to_string() + m_new_loc.to_string();
+    std::string move_str = m_from_loc.to_string() + m_to_loc.to_string();
 
-    if(m_promotion_type.has_value())
+    auto promotion_type = get_promotion_type();
+
+    if(promotion_type.has_value())
     {
-        switch (*m_promotion_type)
+        switch (*promotion_type)
         {
         case PromotionType::BISHOP:
             move_str += "b";
@@ -81,10 +83,10 @@ std::string Move::to_string() const
 
 const BoardLocation& Move::get_to_loc() const
 {
-    return m_new_loc;
+    return m_to_loc;
 }
 
 const BoardLocation Move::get_from_loc() const
 {
-    return m_piece.get_loc();
+    return m_from_loc;
 }
