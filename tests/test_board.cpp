@@ -185,3 +185,57 @@ TEST_F(BoardTests, CheckCastlingInLegalMoves)
 
     EXPECT_TRUE(found);
 }
+
+TEST_F(BoardTests, CheckUndoMove)
+{
+    std::string board_str(
+        " r _ b q k b n r\n"
+        " p p p p p p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ n B _ P _ _ _\n"
+        " _ _ _ _ _ N _ _\n"
+        " P P P P _ P P P\n"
+        " R N B Q K _ _ R\n"
+    );
+
+    Board board = board_from_string_repr(board_str);
+    board.set_colour_to_move(PieceColour::WHITE);
+
+    const auto moves = board.get_all_legal_moves(PieceColour::WHITE);
+
+    std::unique_ptr<Move> king_move;
+    for (const auto& move : moves)
+    {
+        if (move.get_to_loc() == BoardLocation(5, 0, board) &&
+            move.get_from_loc() == BoardLocation(4, 0, board))
+        {
+            king_move = std::make_unique<Move>(move);
+        }
+    }
+    ASSERT_TRUE(king_move);
+
+    board.make_move(*king_move);
+
+    std::string expected_board_str_post_move(
+        " r _ b q k b n r\n"
+        " p p p p p p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ n B _ P _ _ _\n"
+        " _ _ _ _ _ N _ _\n"
+        " P P P P _ P P P\n"
+        " R N B Q _ K _ R\n"
+    );
+
+    auto board_str_post_move = board_to_string_repr(board);
+
+    EXPECT_EQ(board_str_post_move, expected_board_str_post_move);
+
+    board.unmake_move(*king_move);
+
+    auto board_str_unmade_move = board_to_string_repr(board);
+
+    EXPECT_EQ(board_str_unmade_move, board_str);
+
+}

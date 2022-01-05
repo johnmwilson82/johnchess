@@ -232,6 +232,49 @@ std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> Board::check_cas
     return {};
 }
 
+std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> Board::check_unmake_castling_rook_move(const Piece& moving_piece, const BoardLocation& prev_loc)
+{
+    if (moving_piece.get_type() != PieceType::KING)
+    {
+        // Not a king move
+        return {};
+    }
+
+    // White king
+    if (prev_loc == BoardLocation("e1", *this))
+    {
+        if (moving_piece.get_loc() == BoardLocation("g1", *this))
+        {
+            // King's side castling
+            return std::make_pair(square(5, 0).get_piece(), BoardLocation("h1", *this));
+        }
+
+        if (moving_piece.get_loc() == BoardLocation("c1", *this))
+        {
+            // Queens's side castling
+            return std::make_pair(square(3, 0).get_piece(), BoardLocation("a1", *this));
+        }
+    }
+
+    // Black king
+    if (prev_loc == BoardLocation("e8", *this))
+    {
+        if (moving_piece.get_loc() == BoardLocation("g8", *this))
+        {
+            // King's side castling
+            return std::make_pair(square(5, 7).get_piece(), BoardLocation("h8", *this));
+        }
+
+        if (moving_piece.get_loc() == BoardLocation("c8", *this))
+        {
+            // Queens's side castling
+            return std::make_pair(square(3, 7).get_piece(), BoardLocation("a8", *this));
+        }
+    }
+
+    return {};
+}
+
 bool Board::make_move(std::string move_str)
 {
     return make_move(Move(*this, move_str));
@@ -284,6 +327,22 @@ uint8_t Board::get_castling_rights_to_remove(const Piece& moving_piece) const
     }
 
     return castling_rights_to_remove;
+}
+
+void Board::process_castling_rook_move(std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> castling_rook_move)
+{
+    // Implement castling
+    if (castling_rook_move.has_value())
+    {
+        // Move is a castle move
+        auto rook = castling_rook_move->first;
+        auto rook_new_loc = castling_rook_move->second;
+        auto rook_curr_loc = rook->get_loc();
+
+        rook->move(rook_new_loc);
+        square(rook_new_loc).set_piece(rook);
+        square(rook_curr_loc).remove_piece();
+    }
 }
 
 bool Board::make_move(const Move& move)
@@ -362,17 +421,7 @@ bool Board::make_move(const Move& move)
     square(curr_loc).remove_piece();
 
     // Implement castling
-    if(castling_rook_move.has_value())
-    {
-        // Move is a castle move
-        auto rook = castling_rook_move->first;
-        auto rook_new_loc = castling_rook_move->second;
-        auto rook_curr_loc = rook->get_loc();
-
-        rook->move(rook_new_loc);
-        square(rook_new_loc).set_piece(rook);
-        square(rook_curr_loc).remove_piece();
-    }
+    process_castling_rook_move(castling_rook_move);
 
     m_colour_to_move = opposite_colour(m_colour_to_move);
 
@@ -381,7 +430,79 @@ bool Board::make_move(const Move& move)
 
 bool Board::unmake_move(const Move& move)
 {
-    return false;
+    const auto& curr_loc = move.get_to_loc();
+    const auto& new_loc = move.get_from_loc();
+
+    auto moving_piece = square(curr_loc).get_piece();
+
+    if (!moving_piece)
+        return false;
+
+    // en passant rules
+    if (move.is_en_passant_capture())
+    {
+        auto ep_capture_sq = curr_loc.apply_move(DynMove(0, moving_piece->get_colour() == PieceColour::WHITE ? -1 : 1));
+        add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), ep_capture_sq);
+        m_en_passant_column = curr_loc.get_x();
+    }
+    else
+    {
+        m_en_passant_column = std::nullopt;
+    }
+
+    
+    // Check castling
+    auto castling_rook_move = check_unmake_castling_rook_move(*moving_piece, new_loc);
+
+    m_castling_rights = move.get_old_castling_rights();
+
+    // Move piece back
+    if (move.get_promotion_type() != std::nullopt)
+    {
+        remove_piece(moving_piece->get_loc());
+        add_piece<Pawn>(moving_piece->get_colour(), new_loc);
+    }
+    else
+    {
+        moving_piece->move(new_loc);
+        square(new_loc).set_piece(moving_piece);
+    }
+
+    square(curr_loc).remove_piece();
+
+    // Replace captured piece
+    auto captured_piece_type = move.get_captured_piece_type();
+    // For en passant captures we've already replaced the captured piece
+    if (captured_piece_type && !move.is_en_passant_capture())
+    {
+        switch (captured_piece_type.value())
+        {
+        case PieceType::PAWN:
+            add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), curr_loc);
+            break;
+        case PieceType::KNIGHT:
+            add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), curr_loc);
+            break;
+        case PieceType::BISHOP:
+            add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), curr_loc);
+            break;
+        case PieceType::ROOK:
+            add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), curr_loc);
+            break;
+        case PieceType::QUEEN:
+            add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), curr_loc);
+            break;
+        default:
+            break;
+        }
+    }
+
+    // Implement castling
+    process_castling_rook_move(castling_rook_move);
+
+    m_colour_to_move = opposite_colour(m_colour_to_move);
+
+    return true;
 }
 
 void Board::set_to_start_position()

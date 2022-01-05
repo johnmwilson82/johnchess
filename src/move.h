@@ -70,6 +70,10 @@ public:
         m_type |= EN_PASSANT_CAPTURE_MASK;
     }
 
+    bool is_en_passant_capture() const {
+        return m_type & EN_PASSANT_CAPTURE_MASK;
+    }
+
     void set_promotion_type(PromotionType promotion_type) { 
         m_promotion_type = promotion_type;
     }

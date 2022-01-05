@@ -193,7 +193,9 @@ private:
      */
     bool remove_piece(std::string loc);
 
+    void process_castling_rook_move(std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> castling_rook_move);
     std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> check_castling_rook_move(const Piece& moving_piece, const BoardLocation& new_loc);
+    std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> check_unmake_castling_rook_move(const Piece& moving_piece, const BoardLocation& prev_loc);
 
     //! Remove a piece from the board where location is given as a BoardLocation
     /*!
