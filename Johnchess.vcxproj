@@ -160,6 +160,7 @@
     <ClInclude Include="src\piece_types.h" />
     <ClInclude Include="src\square.h" />
     <ClInclude Include="src\utils\board_strings.h" />
+    <ClInclude Include="src\utils\perft.h" />
     <ClInclude Include="src\xboard_interface.h" />
     <ClInclude Include="src\zobrist_hash.h" />
   </ItemGroup>

@@ -82,11 +82,11 @@ public:
         return m_promotion_type;
     }
 
-    void set_captured_piece_type(PieceType pt) {
-        m_captured_piece = pt;
+    void set_captured_piece(std::shared_ptr<Piece> piece) {
+        m_captured_piece = piece;
     }
 
-    const std::optional<PieceType> get_captured_piece_type() const {
+    const std::shared_ptr<Piece> get_captured_piece() const {
         return m_captured_piece;
     }
 
@@ -102,7 +102,7 @@ private:
     BoardLocation m_from_loc;
     BoardLocation m_to_loc;
     uint8_t m_old_castling_rights = 0;
-    std::optional<PieceType> m_captured_piece = std::nullopt;
+    std::shared_ptr<Piece> m_captured_piece;
     std::optional<PromotionType> m_promotion_type = std::nullopt;
 
     uint8_t m_type = 0;

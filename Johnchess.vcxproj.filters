@@ -66,6 +66,9 @@
     <ClInclude Include="src\piece_types.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\utils\perft.h">
+      <Filter>Source Files\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\board.cpp">

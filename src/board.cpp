@@ -186,6 +186,7 @@ bool Board::remove_piece(BoardLocation loc)
 
     auto piece = square(loc).get_piece();
     piece->set_on_board(false);
+
     return true;
 }
 
@@ -384,9 +385,12 @@ bool Board::make_move(const Move& move)
 
     if(captured_piece)
     {
-        remove_piece(captured_piece->get_loc());
+        captured_piece->set_on_board(false);
         square(new_loc).remove_piece();
     }
+
+    moving_piece->move(new_loc);
+    square(new_loc).set_piece(moving_piece);
 
     // Check promotion
     if(move.get_promotion_type().has_value())
@@ -394,28 +398,23 @@ bool Board::make_move(const Move& move)
         switch(*move.get_promotion_type())
         {
             case Move::PromotionType::QUEEN:
-                add_piece<Queen>(moving_piece->get_colour(), new_loc);
+                moving_piece = std::make_shared<Queen>(*this, moving_piece->get_colour(), new_loc);
                 break;
 
             case Move::PromotionType::ROOK:
-                add_piece<Rook>(moving_piece->get_colour(), new_loc);
+                moving_piece = std::make_shared<Rook>(*this, moving_piece->get_colour(), new_loc);
                 break;
 
             case Move::PromotionType::BISHOP:
-                add_piece<Bishop>(moving_piece->get_colour(), new_loc);
+                moving_piece = std::make_shared<Bishop>(*this, moving_piece->get_colour(), new_loc);
                 break;
 
             case Move::PromotionType::KNIGHT:
-                add_piece<Knight>(moving_piece->get_colour(), new_loc);
+                moving_piece = std::make_shared<Knight>(*this, moving_piece->get_colour(), new_loc);
                 break;
         }
 
         remove_piece(moving_piece->get_loc());
-    }
-    else
-    {
-        moving_piece->move(new_loc);
-        square(new_loc).set_piece(moving_piece);
     }
     
     square(curr_loc).remove_piece();
@@ -441,8 +440,8 @@ bool Board::unmake_move(const Move& move)
     // en passant rules
     if (move.is_en_passant_capture())
     {
-        auto ep_capture_sq = curr_loc.apply_move(DynMove(0, moving_piece->get_colour() == PieceColour::WHITE ? -1 : 1));
-        add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), ep_capture_sq);
+        //auto ep_capture_sq = curr_loc.apply_move(DynMove(0, moving_piece->get_colour() == PieceColour::WHITE ? -1 : 1));
+        //add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), ep_capture_sq);
         m_en_passant_column = curr_loc.get_x();
     }
     else
@@ -457,25 +456,24 @@ bool Board::unmake_move(const Move& move)
     m_castling_rights = move.get_old_castling_rights();
 
     // Move piece back
+    moving_piece->move(new_loc);
+    square(new_loc).set_piece(moving_piece);
+
     if (move.get_promotion_type() != std::nullopt)
     {
-        remove_piece(moving_piece->get_loc());
-        add_piece<Pawn>(moving_piece->get_colour(), new_loc);
-    }
-    else
-    {
-        moving_piece->move(new_loc);
-        square(new_loc).set_piece(moving_piece);
+        moving_piece = std::make_shared<Pawn>(*this, moving_piece->get_colour(), new_loc);
     }
 
     square(curr_loc).remove_piece();
 
     // Replace captured piece
-    auto captured_piece_type = move.get_captured_piece_type();
+    auto captured_piece = move.get_captured_piece();
     // For en passant captures we've already replaced the captured piece
-    if (captured_piece_type && !move.is_en_passant_capture())
+    if (captured_piece && !move.is_en_passant_capture())
     {
-        switch (captured_piece_type.value())
+        captured_piece->set_on_board(true);
+        square(captured_piece->get_loc()).set_piece(captured_piece);
+        /*switch (captured_piece_type.value())
         {
         case PieceType::PAWN:
             add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), curr_loc);
@@ -494,7 +492,7 @@ bool Board::unmake_move(const Move& move)
             break;
         default:
             break;
-        }
+        }*/
     }
 
     // Implement castling

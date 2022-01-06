@@ -30,7 +30,7 @@ std::list<Move> Piece::get_all_slide_moves(const std::array<DynMove, SIZE>& dms,
                     if (occupying_piece->get_colour() != m_colour)
                     {
                         // Capture
-                        ret.emplace_back(*this, curr_loc).set_captured_piece_type(occupying_piece->get_type());
+                        ret.emplace_back(*this, curr_loc).set_captured_piece(occupying_piece);
                         break;
                     }                
                     else // Can't move in given direction
@@ -63,7 +63,7 @@ std::list<Move> Piece::get_all_hop_moves(const std::array<DynMove, SIZE>& dms, b
                 const auto& occupying_piece = m_board.square(curr_loc).get_piece();
                 if (occupying_piece->get_colour() != m_colour)
                 {
-                    ret.emplace_back(*this, curr_loc).set_captured_piece_type(occupying_piece->get_type());
+                    ret.emplace_back(*this, curr_loc).set_captured_piece(occupying_piece);
                 }
             }
         }
@@ -97,7 +97,7 @@ std::list<Move> Pawn::get_all_valid_moves() const
                 move.set_promotion_type(promote_to);
                 if (capture_piece)
                 {
-                    move.set_captured_piece_type(capture_piece->get_type());
+                    move.set_captured_piece(capture_piece);
                 }
             }
         }
@@ -106,7 +106,7 @@ std::list<Move> Pawn::get_all_valid_moves() const
             auto& move = ret.emplace_back(*this, adv_loc);
             if (capture_piece)
             {
-                move.set_captured_piece_type(capture_piece->get_type());
+                move.set_captured_piece(capture_piece);
             }
         }
     };

@@ -31,7 +31,7 @@ private:
         static_cast<uint8_t>(CastlingRights::BLACK_QUEENSIDE);
 
     std::array<Square, BOARD_DIM*BOARD_DIM> m_squares; //!< board squares
-    boost::container::static_vector<std::shared_ptr<Piece>, 32> m_pieces;  //!< pieces on the board
+    boost::container::static_vector<std::shared_ptr<Piece>, 40> m_pieces;  //!< pieces on the board
     PieceColour m_colour_to_move;
     uint8_t m_castling_rights = 0;
     std::optional<uint8_t> m_en_passant_column = std::nullopt;
