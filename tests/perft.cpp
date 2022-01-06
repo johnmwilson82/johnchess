@@ -50,3 +50,11 @@ TEST_F(PerftTests, CheckStartDepth4)
     EXPECT_EQ(perft(board, 4), 197281);
 }
 
+TEST_F(PerftTests, CheckStartDepth5)
+{
+    Board board;
+    board.set_to_start_position();
+
+    EXPECT_EQ(perft(board, 5), 4865609);
+}
+
