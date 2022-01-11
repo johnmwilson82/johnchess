@@ -473,26 +473,6 @@ bool Board::unmake_move(const Move& move)
     {
         captured_piece->set_on_board(true);
         square(captured_piece->get_loc()).set_piece(captured_piece);
-        /*switch (captured_piece_type.value())
-        {
-        case PieceType::PAWN:
-            add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), curr_loc);
-            break;
-        case PieceType::KNIGHT:
-            add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), curr_loc);
-            break;
-        case PieceType::BISHOP:
-            add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), curr_loc);
-            break;
-        case PieceType::ROOK:
-            add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), curr_loc);
-            break;
-        case PieceType::QUEEN:
-            add_piece<Pawn>(opposite_colour(moving_piece->get_colour()), curr_loc);
-            break;
-        default:
-            break;
-        }*/
     }
 
     // Implement castling
@@ -578,6 +558,11 @@ std::list<Move> Board::get_all_legal_moves(PieceColour col) const
         Board test_board(*this, move);
         return test_board.get_in_check(col);
     });
+
+    for (auto& move : ret)
+    {
+        move.set_old_castling_rights(m_castling_rights);
+    }
 
     return ret;
 }

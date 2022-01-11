@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
 
-#include "pieces.h"
+#include "piece_types.h"
 
 class IBoard
 {

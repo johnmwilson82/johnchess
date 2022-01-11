@@ -72,6 +72,7 @@ TEST_F(BoardTests, CheckBlackRookCaptureWhitePawn)
         " _ _ _ _ _ _ _ _\n"
         " P P P _ _ _ P P\n"
         " R N _ _ K _ N R\n"
+        "w - - 0 0\n"
     );
 
     Board board2a(board, "b5c6");
@@ -90,6 +91,7 @@ TEST_F(BoardTests, CheckBlackRookCaptureWhitePawn)
         " P _ _ _ _ _ _ _\n"
         " _ P P _ _ _ P P\n"
         " R N _ _ K _ N R\n"
+        "w - - 0 0\n"
     );
     Board board3a(board2, "a2a3");
     Board board3(board3a, "h7h6");
@@ -129,6 +131,7 @@ TEST_F(BoardTests, CheckCastling)
         " _ _ _ B P N _ _\n"
         " P P P P _ P P P\n"
         " R N B Q K _ _ R\n"
+        "w KQkq - 0 0\n"
     );
 
     Board pre_castle_board = board_from_string_repr(board_str_pre_castle);
@@ -142,6 +145,7 @@ TEST_F(BoardTests, CheckCastling)
         " _ _ _ B P N _ _\n"
         " P P P P _ P P P\n"
         " R N B Q _ R K _\n"
+        "b kq - 0 0\n"
     );
 
 
@@ -197,6 +201,7 @@ TEST_F(BoardTests, CheckUndoMove)
         " _ _ _ _ _ N _ _\n"
         " P P P P _ P P P\n"
         " R N B Q K _ _ R\n"
+        "w KQkq - 0 0\n"
     );
 
     Board board = board_from_string_repr(board_str);
@@ -226,6 +231,7 @@ TEST_F(BoardTests, CheckUndoMove)
         " _ _ _ _ _ N _ _\n"
         " P P P P _ P P P\n"
         " R N B Q _ K _ R\n"
+        "b kq - 0 0\n"
     );
 
     auto board_str_post_move = board_to_string_repr(board);

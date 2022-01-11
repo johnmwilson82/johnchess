@@ -5,7 +5,7 @@
 #include <fstream>
 
 #include "board_tree.h"
-#include "board.h"
+#include "iboard.h"
 
 /*! /brief Base AI class
  *

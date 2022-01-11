@@ -119,7 +119,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -136,7 +136,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,6 +147,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="bitboards\bitboard.h" />
+    <ClInclude Include="bitboards\bitboard_knight.h" />
     <ClInclude Include="src\ai.h" />
     <ClInclude Include="src\board.h" />
     <ClInclude Include="src\board_location.h" />
@@ -166,6 +168,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app\main.cpp" />
+    <ClCompile Include="bitboards\bitboard.cpp" />
+    <ClCompile Include="bitboards\bitboard_knight.cpp" />
     <ClCompile Include="src\board.cpp" />
     <ClCompile Include="src\board_location.cpp" />
     <ClCompile Include="src\board_tree.cpp" />

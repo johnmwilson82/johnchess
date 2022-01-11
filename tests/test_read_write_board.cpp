@@ -51,6 +51,7 @@ TEST_F(BoardReadWriteTests, CheckWriteToString)
         " _ _ _ _ _ _ _ _\n"
         " P P P P P P P P\n"
         " R N B Q K B N R\n"
+        "w KQkq - 0 0\n"
     );
 
     Board board;
@@ -72,6 +73,7 @@ TEST_F(BoardReadWriteTests, CheckWriteToString2)
         " _ _ _ _ _ N _ Q\n"
         " _ _ _ _ _ P P P\n"
         " R N _ _ K _ _ R\n"
+        "b KQk - 0 0\n"
     );
 
     Board board;
@@ -111,6 +113,8 @@ TEST_F(BoardReadWriteTests, CheckWriteToString2)
     board.add_piece<Bishop>(PieceColour::BLACK, "f8");
     board.add_piece<Rook>(PieceColour::BLACK, "g8");
 
+    board.set_castling_rights({ IBoard::CastlingRights::WHITE_KINGSIDE, IBoard::CastlingRights::WHITE_QUEENSIDE, IBoard::CastlingRights::BLACK_KINGSIDE });
+    board.set_colour_to_move(PieceColour::BLACK);
     auto out_str = board_to_string_repr(board);
 
     EXPECT_EQ(board_str, out_str);

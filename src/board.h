@@ -166,6 +166,7 @@ public: // IBoard
     }
 
     std::optional<uint8_t> get_enpassant_column() const { return m_en_passant_column; };
+    void set_enpassant_column(std::optional<uint8_t> col) { m_en_passant_column = col; }
 
     bool add_piece(PieceType type, PieceColour col, BoardLocation loc) override;
 

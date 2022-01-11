@@ -19,15 +19,15 @@
     <Filter Include="Source Files\app">
       <UniqueIdentifier>{1f596336-b4df-4c80-a69f-31b45881cfff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\naive_board_impl">
+      <UniqueIdentifier>{8caee736-5f09-4173-8ef6-71e588128284}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bitboards">
+      <UniqueIdentifier>{3718de2e-f32d-4ea7-a78b-128a337010a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ai.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\board.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\board_location.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\board_tree.h">
@@ -37,15 +37,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\johnchess_app.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\move.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pieces.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\square.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\xboard_interface.h">
@@ -69,14 +60,29 @@
     <ClInclude Include="src\utils\perft.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\board.h">
+      <Filter>Source Files\naive_board_impl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\board_location.h">
+      <Filter>Source Files\naive_board_impl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pieces.h">
+      <Filter>Source Files\naive_board_impl</Filter>
+    </ClInclude>
+    <ClInclude Include="src\square.h">
+      <Filter>Source Files\naive_board_impl</Filter>
+    </ClInclude>
+    <ClInclude Include="bitboards\bitboard.h">
+      <Filter>Source Files\bitboards</Filter>
+    </ClInclude>
+    <ClInclude Include="src\move.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bitboards\bitboard_knight.h">
+      <Filter>Source Files\bitboards</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\board.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\board_location.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\board_tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,12 +90,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\johnchess_app.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\move.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pieces.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\xboard_interface.cpp">
@@ -106,6 +106,24 @@
     </ClCompile>
     <ClCompile Include="src\board_tree_node.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\board.cpp">
+      <Filter>Source Files\naive_board_impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\board_location.cpp">
+      <Filter>Source Files\naive_board_impl</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pieces.cpp">
+      <Filter>Source Files\naive_board_impl</Filter>
+    </ClCompile>
+    <ClCompile Include="bitboards\bitboard.cpp">
+      <Filter>Source Files\bitboards</Filter>
+    </ClCompile>
+    <ClCompile Include="src\move.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bitboards\bitboard_knight.cpp">
+      <Filter>Source Files\bitboards</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
