@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -147,9 +147,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="bitboards\bitboard.h" />
-    <ClInclude Include="bitboards\bitboard_knight.h" />
     <ClInclude Include="src\ai.h" />
+    <ClInclude Include="src\bitboards\bitboard.h" />
+    <ClInclude Include="src\bitboards\bitboard_utils.h" />
     <ClInclude Include="src\board.h" />
     <ClInclude Include="src\board_location.h" />
     <ClInclude Include="src\board_tree.h" />
@@ -168,8 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app\main.cpp" />
-    <ClCompile Include="bitboards\bitboard.cpp" />
-    <ClCompile Include="bitboards\bitboard_knight.cpp" />
+    <ClCompile Include="src\bitboards\bitboard.cpp" />
     <ClCompile Include="src\board.cpp" />
     <ClCompile Include="src\board_location.cpp" />
     <ClCompile Include="src\board_tree.cpp" />
@@ -178,7 +177,6 @@
     <ClCompile Include="src\johnchess_app.cpp" />
     <ClCompile Include="src\move.cpp" />
     <ClCompile Include="src\pieces.cpp" />
-    <ClCompile Include="src\utils\board_strings.cpp" />
     <ClCompile Include="src\xboard_interface.cpp" />
     <ClCompile Include="src\zobrist_hash.cpp" />
   </ItemGroup>

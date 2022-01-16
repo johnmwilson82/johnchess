@@ -4,7 +4,8 @@
 #include <string>
 #include <iostream>
 
-class Board;
+
+class IBoard;
 class DynMove;
 class Piece;
 
@@ -22,8 +23,10 @@ class BoardLocation
 {
 public: //ctor + dtor
     BoardLocation(const BoardLocation& boardloc);
-    BoardLocation(const std::string& loc_str, const Board& board);
-    BoardLocation(int x, int y, const Board& board);
+    BoardLocation(uint8_t bitboard_sq);
+
+    BoardLocation(const std::string& loc_str);
+    BoardLocation(int x, int y);
     ~BoardLocation();
 
     BoardLocation& operator=(const BoardLocation& other)
@@ -82,6 +85,11 @@ public: // methods
         return ret;
     }
 
+    uint64_t to_bitboard_mask() const
+    {
+        return 1ULL << (m_y * 8 + m_x);
+    }
+
 public: // inlines
 
     //! Get board column
@@ -106,7 +114,7 @@ public: // inlines
     inline void set_on_board(bool val) { m_on_board = val; }
 
     //! Set whether the BoardLocation is on the board or not (e.g. captured piece)
-    inline bool get_on_board() {return m_on_board; }
+    inline bool get_on_board() { return m_on_board; }
 
 private:
     void register_captured(Piece* piece);
@@ -114,5 +122,4 @@ private:
 private: // properties
     int m_x, m_y;
     bool m_on_board, m_valid;
-    const Board& m_board;
 };

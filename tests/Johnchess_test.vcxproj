@@ -36,6 +36,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <ItemGroup>
     <ClInclude Include="..\src\ai.h" />
+    <ClInclude Include="..\src\bitboards\bitboard.h" />
+    <ClInclude Include="..\src\bitboards\bitboard_utils.h" />
     <ClInclude Include="..\src\board.h" />
     <ClInclude Include="..\src\board_location.h" />
     <ClInclude Include="..\src\board_tree.h" />
@@ -50,6 +52,7 @@
     <ClInclude Include="..\src\zobrist_hash.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\bitboards\bitboard.cpp" />
     <ClCompile Include="..\src\board.cpp" />
     <ClCompile Include="..\src\board_location.cpp" />
     <ClCompile Include="..\src\board_tree.cpp" />
@@ -58,11 +61,11 @@
     <ClCompile Include="..\src\johnchess_app.cpp" />
     <ClCompile Include="..\src\move.cpp" />
     <ClCompile Include="..\src\pieces.cpp" />
-    <ClCompile Include="..\src\utils\board_strings.cpp" />
     <ClCompile Include="..\src\xboard_interface.cpp" />
     <ClCompile Include="..\src\zobrist_hash.cpp" />
     <ClCompile Include="perft.cpp" />
     <ClCompile Include="test_ai.cpp" />
+    <ClCompile Include="test_bitboard.cpp" />
     <ClCompile Include="test_board.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>

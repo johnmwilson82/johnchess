@@ -37,9 +37,6 @@
     <ClCompile Include="..\src\zobrist_hash.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\utils\board_strings.cpp">
-      <Filter>src\utils</Filter>
-    </ClCompile>
     <ClCompile Include="test_ai.cpp">
       <Filter>tests</Filter>
     </ClCompile>
@@ -48,6 +45,12 @@
     </ClCompile>
     <ClCompile Include="perft.cpp">
       <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="test_bitboard.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bitboards\bitboard.cpp">
+      <Filter>src\bitboards</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +93,12 @@
     <ClInclude Include="..\src\board_tree_node.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\bitboards\bitboard.h">
+      <Filter>src\bitboards</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bitboards\bitboard_utils.h">
+      <Filter>src\bitboards</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -103,6 +112,9 @@
     </Filter>
     <Filter Include="src\utils">
       <UniqueIdentifier>{f7b4e3f7-881c-45dc-97bd-1527e64fa7a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\bitboards">
+      <UniqueIdentifier>{443bdb76-8d2f-4bb2-8f8d-f757ffdd7ac8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

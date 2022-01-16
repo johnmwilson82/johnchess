@@ -11,6 +11,8 @@
 #include "move.h"
 #include "piece_types.h"
 
+class Board;
+
 class Piece
 {
 // Piece: Describes a chess piece, including its colour and location

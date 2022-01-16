@@ -153,11 +153,11 @@ public: // IBoard
     //! Return the number of available moves for a given colour
     std::list<Move> get_all_legal_moves(PieceColour col) const override;
 
-    bool has_castling_rights(CastlingRights castling_rights) const { 
+    bool has_castling_rights(CastlingRights castling_rights) const override { 
         return m_castling_rights & static_cast<uint8_t>(castling_rights); 
     };
 
-    void set_castling_rights(const std::vector<CastlingRights>& castling_rights)
+    void set_castling_rights(const std::vector<CastlingRights>& castling_rights) override
     {
         for (const auto cr : castling_rights)
         {
@@ -165,8 +165,8 @@ public: // IBoard
         }
     }
 
-    std::optional<uint8_t> get_enpassant_column() const { return m_en_passant_column; };
-    void set_enpassant_column(std::optional<uint8_t> col) { m_en_passant_column = col; }
+    std::optional<uint8_t> get_enpassant_column() const override { return m_en_passant_column; };
+    void set_enpassant_column(std::optional<uint8_t> col) override { m_en_passant_column = col; }
 
     bool add_piece(PieceType type, PieceColour col, BoardLocation loc) override;
 

@@ -22,7 +22,7 @@ std::list<Move> Piece::get_all_slide_moves(const std::array<DynMove, SIZE>& dms,
                 if (m_board.square(curr_loc).is_empty())
                 {
                     // Move
-                    ret.emplace_back(*this, curr_loc);
+                    ret.emplace_back(m_loc, curr_loc);
                 }
                 else
                 { 
@@ -30,7 +30,7 @@ std::list<Move> Piece::get_all_slide_moves(const std::array<DynMove, SIZE>& dms,
                     if (occupying_piece->get_colour() != m_colour)
                     {
                         // Capture
-                        ret.emplace_back(*this, curr_loc).set_captured_piece(occupying_piece);
+                        ret.emplace_back(m_loc, curr_loc).set_captured_piece(occupying_piece);
                         break;
                     }                
                     else // Can't move in given direction
@@ -56,14 +56,14 @@ std::list<Move> Piece::get_all_hop_moves(const std::array<DynMove, SIZE>& dms, b
         {
             if (m_board.square(curr_loc).is_empty())
             {
-                ret.emplace_back(*this, curr_loc);
+                ret.emplace_back(m_loc, curr_loc);
             }
             else
             {
                 const auto& occupying_piece = m_board.square(curr_loc).get_piece();
                 if (occupying_piece->get_colour() != m_colour)
                 {
-                    ret.emplace_back(*this, curr_loc).set_captured_piece(occupying_piece);
+                    ret.emplace_back(m_loc, curr_loc).set_captured_piece(occupying_piece);
                 }
             }
         }
@@ -93,7 +93,7 @@ std::list<Move> Pawn::get_all_valid_moves() const
         {
             for(auto promote_to : { Move::PromotionType::QUEEN, Move::PromotionType::ROOK, Move::PromotionType::BISHOP, Move::PromotionType::KNIGHT })
             {
-                auto& move = ret.emplace_back(*this, adv_loc);
+                auto& move = ret.emplace_back(m_loc, adv_loc);
                 move.set_promotion_type(promote_to);
                 if (capture_piece)
                 {
@@ -103,7 +103,7 @@ std::list<Move> Pawn::get_all_valid_moves() const
         }
         else
         {
-            auto& move = ret.emplace_back(*this, adv_loc);
+            auto& move = ret.emplace_back(m_loc, adv_loc);
             if (capture_piece)
             {
                 move.set_captured_piece(capture_piece);
@@ -221,11 +221,11 @@ std::list<Move> King::get_all_valid_moves() const
     {
         if(m_colour == PieceColour::WHITE)
         {
-            ret.emplace_back(*this, BoardLocation("c1", m_board));
+            ret.emplace_back(m_loc, BoardLocation("c1"));
         }
         else
         {
-            ret.emplace_back(*this, BoardLocation("c8", m_board));
+            ret.emplace_back(m_loc, BoardLocation("c8"));
         }
     }
 
@@ -233,11 +233,11 @@ std::list<Move> King::get_all_valid_moves() const
     {
         if(m_colour == PieceColour::WHITE)
         {
-            ret.emplace_back(*this, BoardLocation("g1", m_board));
+            ret.emplace_back(m_loc, BoardLocation("g1"));
         }
         else
         {
-            ret.emplace_back(*this, BoardLocation("g8", m_board));
+            ret.emplace_back(m_loc, BoardLocation("g8"));
         }
     }
 

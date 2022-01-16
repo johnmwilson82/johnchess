@@ -95,7 +95,7 @@ void Board::delete_all_pieces()
 template<typename T>
 bool Board::add_piece(PieceColour col, std::string loc)
 {
-    return add_piece<T>(col, BoardLocation(loc, *this));
+    return add_piece<T>(col, BoardLocation(loc));
 }
 
 template<typename T>
@@ -151,7 +151,7 @@ bool Board::add_piece(PieceType type, PieceColour col, BoardLocation loc)
 
 bool Board::add_piece(PieceType type, PieceColour col, std::string loc)
 {
-    return add_piece(type, col, BoardLocation(loc, *this));
+    return add_piece(type, col, BoardLocation(loc));
 }
 
 bool Board::add_piece(const Piece& piece)
@@ -176,7 +176,7 @@ bool Board::add_piece(const Piece& piece)
 
 bool Board::remove_piece(std::string loc)
 {
-    return remove_piece(BoardLocation(loc, *this));
+    return remove_piece(BoardLocation(loc));
 }
 
 bool Board::remove_piece(BoardLocation loc)
@@ -199,34 +199,34 @@ std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> Board::check_cas
     }
 
     // White king
-    if(moving_piece.get_loc() == BoardLocation("e1", *this))
+    if(moving_piece.get_loc() == BoardLocation("e1"))
     {
-        if(new_loc == BoardLocation("g1", *this))
+        if(new_loc == BoardLocation("g1"))
         {
             // King's side castling
-            return std::make_pair(square(7, 0).get_piece(), BoardLocation("f1", *this));
+            return std::make_pair(square(7, 0).get_piece(), BoardLocation("f1"));
         }
 
-        if(new_loc == BoardLocation("c1", *this))
+        if(new_loc == BoardLocation("c1"))
         {
             // Queens's side castling
-            return std::make_pair(square(0, 0).get_piece(), BoardLocation("d1", *this));
+            return std::make_pair(square(0, 0).get_piece(), BoardLocation("d1"));
         }
     }
 
     // Black king
-    if(moving_piece.get_loc() == BoardLocation("e8", *this))
+    if(moving_piece.get_loc() == BoardLocation("e8"))
     {
-        if(new_loc == BoardLocation("g8", *this))
+        if(new_loc == BoardLocation("g8"))
         {
             // King's side castling
-            return std::make_pair(square(7, 7).get_piece(), BoardLocation("f8", *this));
+            return std::make_pair(square(7, 7).get_piece(), BoardLocation("f8"));
         }
 
-        if(new_loc == BoardLocation("c8", *this))
+        if(new_loc == BoardLocation("c8"))
         {
             // Queens's side castling
-            return std::make_pair(square(0, 7).get_piece(), BoardLocation("d8", *this));
+            return std::make_pair(square(0, 7).get_piece(), BoardLocation("d8"));
         }
     }
 
@@ -242,34 +242,34 @@ std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> Board::check_unm
     }
 
     // White king
-    if (prev_loc == BoardLocation("e1", *this))
+    if (prev_loc == BoardLocation("e1"))
     {
-        if (moving_piece.get_loc() == BoardLocation("g1", *this))
+        if (moving_piece.get_loc() == BoardLocation("g1"))
         {
             // King's side castling
-            return std::make_pair(square(5, 0).get_piece(), BoardLocation("h1", *this));
+            return std::make_pair(square(5, 0).get_piece(), BoardLocation("h1"));
         }
 
-        if (moving_piece.get_loc() == BoardLocation("c1", *this))
+        if (moving_piece.get_loc() == BoardLocation("c1"))
         {
             // Queens's side castling
-            return std::make_pair(square(3, 0).get_piece(), BoardLocation("a1", *this));
+            return std::make_pair(square(3, 0).get_piece(), BoardLocation("a1"));
         }
     }
 
     // Black king
-    if (prev_loc == BoardLocation("e8", *this))
+    if (prev_loc == BoardLocation("e8"))
     {
-        if (moving_piece.get_loc() == BoardLocation("g8", *this))
+        if (moving_piece.get_loc() == BoardLocation("g8"))
         {
             // King's side castling
-            return std::make_pair(square(5, 7).get_piece(), BoardLocation("h8", *this));
+            return std::make_pair(square(5, 7).get_piece(), BoardLocation("h8"));
         }
 
-        if (moving_piece.get_loc() == BoardLocation("c8", *this))
+        if (moving_piece.get_loc() == BoardLocation("c8"))
         {
             // Queens's side castling
-            return std::make_pair(square(3, 7).get_piece(), BoardLocation("a8", *this));
+            return std::make_pair(square(3, 7).get_piece(), BoardLocation("a8"));
         }
     }
 

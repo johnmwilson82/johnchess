@@ -1,22 +1,24 @@
 #include "move.h"
 
 #include "pieces.h"
-#include "board.h"
+#include "iboard.h"
 
-Move::Move(const Piece &piece, const DynMove& dm) :
-    m_from_loc(piece.get_loc()),
-    m_to_loc(piece.get_loc().apply_move(dm))
-{}
 
-Move::Move(const Piece &piece, const BoardLocation& new_loc) :
-    m_from_loc(piece.get_loc()),
-    m_to_loc(new_loc)
+Move::Move(const BoardLocation& from_loc, const DynMove& dm) :
+    m_from_loc(from_loc),
+    m_to_loc(from_loc.apply_move(dm))
 {
 }
 
-Move::Move(const Board& board, const std::string& move_str) :
-    m_from_loc(move_str.substr(0, 2), board),
-    m_to_loc(move_str.substr(2, 2), board)
+Move::Move(const BoardLocation& from_loc, const BoardLocation& to_loc) :
+    m_from_loc(from_loc),
+    m_to_loc(to_loc)
+{
+}
+
+Move::Move(const IBoard& board, const std::string& move_str) :
+    m_from_loc(move_str.substr(0, 2)),
+    m_to_loc(move_str.substr(2, 2))
 {
     if(move_str.length() == 5)
     {

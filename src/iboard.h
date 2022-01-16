@@ -2,6 +2,8 @@
 #include <functional>
 
 #include "piece_types.h"
+#include <optional>
+#include <move.h>
 
 class IBoard
 {
@@ -67,7 +69,10 @@ public:
     virtual bool add_piece(PieceType type, PieceColour col, BoardLocation loc) = 0;
 
     virtual bool has_castling_rights(CastlingRights castling_rights) const = 0;
+    virtual void set_castling_rights(const std::vector<CastlingRights>& castling_rights) = 0;
+
     virtual std::optional<uint8_t> get_enpassant_column() const = 0;
+    virtual void set_enpassant_column(std::optional<uint8_t> col) = 0;
 
     virtual bool make_move(const Move& move) = 0;
     virtual bool unmake_move(const Move& move) = 0;

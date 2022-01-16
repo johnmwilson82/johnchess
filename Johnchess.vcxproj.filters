@@ -72,13 +72,13 @@
     <ClInclude Include="src\square.h">
       <Filter>Source Files\naive_board_impl</Filter>
     </ClInclude>
-    <ClInclude Include="bitboards\bitboard.h">
-      <Filter>Source Files\bitboards</Filter>
-    </ClInclude>
     <ClInclude Include="src\move.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="bitboards\bitboard_knight.h">
+    <ClInclude Include="src\bitboards\bitboard.h">
+      <Filter>Source Files\bitboards</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bitboards\bitboard_utils.h">
       <Filter>Source Files\bitboards</Filter>
     </ClInclude>
   </ItemGroup>
@@ -98,9 +98,6 @@
     <ClCompile Include="src\zobrist_hash.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\board_strings.cpp">
-      <Filter>Source Files\utils</Filter>
-    </ClCompile>
     <ClCompile Include="app\main.cpp">
       <Filter>Source Files\app</Filter>
     </ClCompile>
@@ -116,13 +113,10 @@
     <ClCompile Include="src\pieces.cpp">
       <Filter>Source Files\naive_board_impl</Filter>
     </ClCompile>
-    <ClCompile Include="bitboards\bitboard.cpp">
-      <Filter>Source Files\bitboards</Filter>
-    </ClCompile>
     <ClCompile Include="src\move.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bitboards\bitboard_knight.cpp">
+    <ClCompile Include="src\bitboards\bitboard.cpp">
       <Filter>Source Files\bitboards</Filter>
     </ClCompile>
   </ItemGroup>

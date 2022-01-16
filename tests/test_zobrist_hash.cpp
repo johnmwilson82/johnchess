@@ -30,7 +30,7 @@ TEST_F(ZobristHashTests, CheckHashWithRemovedPawn)
         " R N B _ K _ N R\n"
     );
 
-    Board board = board_from_string_repr(board_str);
+    Board board = board_from_string_repr<Board>(board_str);
 
     std::string board_str_no_e4(
         " r n b q k b _ r\n"
@@ -43,7 +43,7 @@ TEST_F(ZobristHashTests, CheckHashWithRemovedPawn)
         " R N B _ K _ N R\n"
     );
 
-    Board board_no_e4 = board_from_string_repr(board_str_no_e4);
+    Board board_no_e4 = board_from_string_repr<Board>(board_str_no_e4);
     
     Board board_only_e4;
 
@@ -76,7 +76,7 @@ TEST_F(ZobristHashTests, CheckHashThroughCastling)
         " R N B Q K _ _ R\n"
     );
 
-    Board pre_castle_board = board_from_string_repr(board_str_pre_castle);
+    Board pre_castle_board = board_from_string_repr<Board>(board_str_pre_castle);
     pre_castle_board.set_castling_rights({ Board::CastlingRights::WHITE_KINGSIDE, Board::CastlingRights::WHITE_QUEENSIDE,
                                            Board::CastlingRights::BLACK_KINGSIDE, Board::CastlingRights::BLACK_QUEENSIDE });
 
@@ -91,7 +91,7 @@ TEST_F(ZobristHashTests, CheckHashThroughCastling)
         " R N B Q _ R K _\n"
     );
 
-    Board post_castle_board = board_from_string_repr(board_str_post_castle);
+    Board post_castle_board = board_from_string_repr<Board>(board_str_post_castle);
     post_castle_board.set_castling_rights({ Board::CastlingRights::BLACK_KINGSIDE, Board::CastlingRights::BLACK_QUEENSIDE });
     post_castle_board.set_colour_to_move(PieceColour::BLACK);
 
@@ -120,7 +120,7 @@ TEST_F(ZobristHashTests, CheckMoveHash)
         " R N B Q _ R K _\n"
     );
 
-    Board pre_move_board = board_from_string_repr(board_str_pre_move);
+    Board pre_move_board = board_from_string_repr<Board>(board_str_pre_move);
 
     Move move(pre_move_board, "c1a3");
 
@@ -135,7 +135,7 @@ TEST_F(ZobristHashTests, CheckMoveHash)
         " R N _ Q _ R K _\n"
     );
 
-    Board post_move_board = board_from_string_repr(board_str_post_move);
+    Board post_move_board = board_from_string_repr<Board>(board_str_post_move);
     post_move_board.set_colour_to_move(PieceColour::BLACK);
 
     auto test_hash = hasher->get_hash(pre_move_board, move);

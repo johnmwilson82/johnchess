@@ -27,16 +27,16 @@ TEST_F(BoardReadWriteTests, CheckReadFromString)
         " R _ _ _ K _ _ R\n"
     );
 
-    Board board = board_from_string_repr(board_str);
+    Board board = board_from_string_repr<Board>(board_str);
 
-    EXPECT_EQ(board.square(BoardLocation("a8", board)).get_piece()->get_type(), PieceType::ROOK);
-    EXPECT_EQ(board.square(BoardLocation("a8", board)).get_piece()->get_colour(), PieceColour::BLACK);
+    EXPECT_EQ(board.square(BoardLocation("a8")).get_piece()->get_type(), PieceType::ROOK);
+    EXPECT_EQ(board.square(BoardLocation("a8")).get_piece()->get_colour(), PieceColour::BLACK);
 
-    EXPECT_EQ(board.square(BoardLocation("e1", board)).get_piece()->get_type(), PieceType::KING);
-    EXPECT_EQ(board.square(BoardLocation("e1", board)).get_piece()->get_colour(), PieceColour::WHITE);
+    EXPECT_EQ(board.square(BoardLocation("e1")).get_piece()->get_type(), PieceType::KING);
+    EXPECT_EQ(board.square(BoardLocation("e1")).get_piece()->get_colour(), PieceColour::WHITE);
 
-    EXPECT_EQ(board.square(BoardLocation("e4", board)).get_piece()->get_type(), PieceType::PAWN);
-    EXPECT_EQ(board.square(BoardLocation("e4", board)).get_piece()->get_colour(), PieceColour::WHITE);
+    EXPECT_EQ(board.square(BoardLocation("e4")).get_piece()->get_type(), PieceType::PAWN);
+    EXPECT_EQ(board.square(BoardLocation("e4")).get_piece()->get_colour(), PieceColour::WHITE);
 }
 
 

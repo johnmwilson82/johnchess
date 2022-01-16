@@ -6,6 +6,7 @@
 #include "board_location.h"
 #include "piece_types.h"
 
+class IBoard;
 class Piece;
 
 class DynMove
@@ -55,10 +56,10 @@ public:
         KNIGHT
     };
 
-    Move(const Piece& piece, const DynMove& dm);
-    Move(const Piece& piece, const BoardLocation& new_loc);
-    Move(const Board& board, const std::string& move_str);
-
+    Move(const BoardLocation& from_loc, const DynMove& dm);
+    Move(const IBoard& board, const std::string& move_str);
+    Move(const BoardLocation& from_loc, const BoardLocation& to_loc);
+    
     bool operator== (const Move& m) const;
     
     std::string to_string() const;

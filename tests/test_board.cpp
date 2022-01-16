@@ -27,7 +27,7 @@ TEST_F(BoardTests, CheckKingMoves)
         " R N _ _ K _ _ R\n"
     );
 
-    Board board = board_from_string_repr(board_str);
+    Board board = board_from_string_repr<Board>(board_str);
     auto piece = board.square(4, 7).get_piece();
     EXPECT_EQ(piece->get_type(), PieceType::KING);
 
@@ -61,7 +61,7 @@ TEST_F(BoardTests, CheckBlackRookCaptureWhitePawn)
         " R N _ _ K _ N R\n"
     );
 
-    Board board = board_from_string_repr(board_str);
+    Board board = board_from_string_repr<Board>(board_str);
 
     std::string board_str2(
         " _ _ b _ _ b r _\n"
@@ -78,7 +78,7 @@ TEST_F(BoardTests, CheckBlackRookCaptureWhitePawn)
     Board board2a(board, "b5c6");
     Board board2(board2a, "a7b7");
 
-    auto out_str2 = board_to_string_repr(board2);
+    auto out_str2 = board_to_string_repr<Board>(board2);
 
     EXPECT_EQ(board_str2, out_str2);
 
@@ -96,7 +96,7 @@ TEST_F(BoardTests, CheckBlackRookCaptureWhitePawn)
     Board board3a(board2, "a2a3");
     Board board3(board3a, "h7h6");
 
-    auto out_str3 = board_to_string_repr(board3);
+    auto out_str3 = board_to_string_repr<Board>(board3);
 
     EXPECT_EQ(board_str3, out_str3);
 }
@@ -114,7 +114,7 @@ TEST_F(BoardTests, CheckWhiteMate)
         " R N B _ K _ N R\n"
     );
 
-    Board board = board_from_string_repr(board_str);
+    Board board = board_from_string_repr<Board>(board_str);
 
     EXPECT_EQ(board.get_mate(PieceColour::BLACK), Board::CHECKMATE);
     EXPECT_EQ(board.get_mate(PieceColour::WHITE), Board::NO_MATE);
@@ -134,7 +134,7 @@ TEST_F(BoardTests, CheckCastling)
         "w KQkq - 0 0\n"
     );
 
-    Board pre_castle_board = board_from_string_repr(board_str_pre_castle);
+    Board pre_castle_board = board_from_string_repr<Board>(board_str_pre_castle);
 
     std::string expected_board_str_post_castle(
         " r n b q k b _ r\n"
@@ -171,7 +171,7 @@ TEST_F(BoardTests, CheckCastlingInLegalMoves)
         " R N B Q K _ _ R\n"
     );
 
-    Board board = board_from_string_repr(board_str);
+    Board board = board_from_string_repr<Board>(board_str);
     board.set_castling_rights({ Board::CastlingRights::WHITE_KINGSIDE });
 
     const auto moves = board.get_all_legal_moves(PieceColour::WHITE);
@@ -180,8 +180,8 @@ TEST_F(BoardTests, CheckCastlingInLegalMoves)
 
     for (const auto& move : moves)
     {
-        if (move.get_to_loc() == BoardLocation(6, 0, board) &&
-            move.get_from_loc() == BoardLocation(4, 0, board))
+        if (move.get_to_loc() == BoardLocation(6, 0) &&
+            move.get_from_loc() == BoardLocation(4, 0))
         {
             found = true;
         }
@@ -204,7 +204,7 @@ TEST_F(BoardTests, CheckUndoMove)
         "w KQkq - 0 0\n"
     );
 
-    Board board = board_from_string_repr(board_str);
+    Board board = board_from_string_repr<Board>(board_str);
     board.set_colour_to_move(PieceColour::WHITE);
 
     const auto moves = board.get_all_legal_moves(PieceColour::WHITE);
@@ -212,8 +212,8 @@ TEST_F(BoardTests, CheckUndoMove)
     std::unique_ptr<Move> king_move;
     for (const auto& move : moves)
     {
-        if (move.get_to_loc() == BoardLocation(5, 0, board) &&
-            move.get_from_loc() == BoardLocation(4, 0, board))
+        if (move.get_to_loc() == BoardLocation(5, 0) &&
+            move.get_from_loc() == BoardLocation(4, 0))
         {
             king_move = std::make_unique<Move>(move);
         }

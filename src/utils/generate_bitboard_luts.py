@@ -11,5 +11,5 @@ def knight_moves_from_square(sq):
 
     return np.sum(legal_attacks)
 
-for i in range(64):
-    print("0x%016x," % knight_moves_from_square(i))
+for i in range(8):
+    print(" ".join(["0x%016x," % knight_moves_from_square(j) for j in range(i*8, (i+1)*8)]))
