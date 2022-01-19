@@ -149,7 +149,7 @@ TEST_F(BoardTests, CheckCastling)
     );
 
 
-    Move castle_move(pre_castle_board, "e1g1");
+    Move castle_move("e1g1");
 
     Board new_board(pre_castle_board, castle_move);
 

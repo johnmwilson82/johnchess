@@ -182,12 +182,6 @@ public: // IBoard
 private:
     bool add_piece(const Piece& piece);
 
-    //! Move a piece on the board where move is given as a string in standard notation (e.g. a2a4)
-    /*!
-     * \return true on success and if there was a piece to remove
-     */
-    bool make_move(std::string move_str);
-
     //! Remove a piece from the board where location is given as a string in standard notation
     /*!
      * \return true on success and if there was a piece to remove

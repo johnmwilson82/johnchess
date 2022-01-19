@@ -16,7 +16,7 @@ Move::Move(const BoardLocation& from_loc, const BoardLocation& to_loc) :
 {
 }
 
-Move::Move(const IBoard& board, const std::string& move_str) :
+Move::Move(const std::string& move_str) :
     m_from_loc(move_str.substr(0, 2)),
     m_to_loc(move_str.substr(2, 2))
 {

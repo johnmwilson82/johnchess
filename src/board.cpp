@@ -276,11 +276,6 @@ std::optional<std::pair<std::shared_ptr<Piece>, BoardLocation>> Board::check_unm
     return {};
 }
 
-bool Board::make_move(std::string move_str)
-{
-    return make_move(Move(*this, move_str));
-}
-
 uint8_t Board::get_castling_rights_to_remove(const Piece& moving_piece) const
 {
     uint8_t castling_rights_to_remove = 0;

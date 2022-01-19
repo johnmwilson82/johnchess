@@ -52,7 +52,7 @@ namespace utils
 
         if (tokens[2] != "-")
         {
-            board.set_enpassant_column(tokens[2][1] - '0');
+            board.set_enpassant_column(tokens[2][0] - '0');
         }
 
         // fullmove clock and halfmove clock are tokens[3] and tokens[4] respectively

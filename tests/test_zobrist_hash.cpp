@@ -95,7 +95,7 @@ TEST_F(ZobristHashTests, CheckHashThroughCastling)
     post_castle_board.set_castling_rights({ Board::CastlingRights::BLACK_KINGSIDE, Board::CastlingRights::BLACK_QUEENSIDE });
     post_castle_board.set_colour_to_move(PieceColour::BLACK);
 
-    Move castle_move(pre_castle_board, "e1g1");
+    Move castle_move("e1g1");
 
     Board new_board(pre_castle_board, castle_move);
 
@@ -122,7 +122,7 @@ TEST_F(ZobristHashTests, CheckMoveHash)
 
     Board pre_move_board = board_from_string_repr<Board>(board_str_pre_move);
 
-    Move move(pre_move_board, "c1a3");
+    Move move("c1a3");
 
     std::string board_str_post_move(
         " r n b q k b _ r\n"
