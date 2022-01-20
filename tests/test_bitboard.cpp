@@ -367,3 +367,27 @@ TEST_F(BitboardTests, CheckPawnEnPassantEdgeMoves)
     EXPECT_TRUE(find_fn(black_moves, "h4h3"));
     EXPECT_TRUE(find_fn(black_moves, "h4g3"));
 }
+
+TEST_F(BitboardTests, CheckPawnPromotionMoves)
+{
+    std::string board_str(
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ P _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        "w KQkq 6 0 0\n"
+    );
+
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 4);
+    EXPECT_TRUE(find_fn(white_moves, "e7e8n"));
+    EXPECT_TRUE(find_fn(white_moves, "e7e8b"));
+    EXPECT_TRUE(find_fn(white_moves, "e7e8r"));
+    EXPECT_TRUE(find_fn(white_moves, "e7e8q"));
+}

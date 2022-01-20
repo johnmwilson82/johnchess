@@ -18,13 +18,13 @@ namespace bitboard_utils
     static constexpr uint64_t debruijn64 = 0x03f79d71b4cb0a89;
 
     // from https://www.chessprogramming.org/BitScan
-    inline uint8_t bit_scan_forward(uint64_t bb) {
+    static constexpr inline uint8_t bit_scan_forward(uint64_t bb) {
         assert(bb != 0);
 
         return debruijn_index64[((bb ^ (bb - 1)) * debruijn64) >> 58];
     }
 
-    inline uint8_t bit_scan_reverse(uint64_t bb) {
+    static constexpr inline uint8_t bit_scan_reverse(uint64_t bb) {
         assert(bb != 0);
 
         bb |= bb >> 1;
@@ -35,5 +35,9 @@ namespace bitboard_utils
         bb |= bb >> 32;
 
         return debruijn_index64[(bb * debruijn64) >> 58];
+    }
+
+    static inline uint64_t mirror_vertical(uint64_t bb) {
+        return _byteswap_uint64(bb);
     }
 }

@@ -110,27 +110,33 @@ void BitBoard::get_moves(std::list<Move>& move_list, uint64_t pieces, bool white
 
 void BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move) const
 {
-    uint64_t friendly_pieces = pieces_to_move(white_to_move);
-    uint64_t enemy_pieces = pieces_to_move(!white_to_move);
+    // Flip the board vertically to calculate the black moves
+    uint64_t friendly_pieces = white_to_move ? pieces_to_move(white_to_move) : mirror_vertical(pieces_to_move(white_to_move));
+    uint64_t occupied = white_to_move ? m_occupied : mirror_vertical(m_occupied);
+    uint64_t enemy_pieces = occupied ^ friendly_pieces;
 
-    uint64_t moving_pieces = m_pawns & friendly_pieces;
+    uint64_t moving_pieces = (white_to_move ? m_pawns : mirror_vertical(m_pawns)) & friendly_pieces;
     
-    uint64_t first_rank = white_to_move ? 0x00000000'0000ff00 : 0x00ff0000'00000000;
-    uint64_t last_rank = white_to_move ? 0xff000000'00000000 : 0x00000000'000000ff;
+    uint64_t first_rank = 0x00000000'0000ff00;
 
-    int8_t forward = white_to_move ? 8 : -8;
+    int8_t forward = 8;
 
-    uint64_t en_passant_from_row = white_to_move ? 0x000000ff'00000000 : 0x00000000'ff000000;
+    uint64_t en_passant_from_row = 0x000000ff'00000000;
     uint64_t en_passant_from_sqs = m_en_passant_col.has_value() ?
-        en_passant_from_row & ((white_to_move ? 0x00000002'80000000 : 0x00000000'02800000) << *m_en_passant_col) : 0;
+        en_passant_from_row & (0x00000002'80000000 << *m_en_passant_col) : 0;
 
     while (moving_pieces)
     {
         auto piece_sq = bit_scan_forward(moving_pieces);
 
-        //forward_moves
-        uint64_t attacks = 1ULL << (piece_sq + forward) | ((first_rank & (1ULL << piece_sq)) << (2 * forward));
-        attacks &= ~(m_occupied | ((m_occupied & ~(1ULL << piece_sq)) << forward));
+        // one square forward
+        uint64_t attacks = 1ULL << (piece_sq + forward);
+        
+        // two squares forward
+        attacks |= ((first_rank & (1ULL << piece_sq)) << (2 * forward));
+
+        // remove blocked forward moves 
+        attacks &= ~(occupied | ((occupied & ~(1ULL << piece_sq)) << forward));
 
         // capture left
         uint64_t left_attack = ((1ULL << piece_sq) & 0x00010101'01010100) ? 0 : 1ULL << (piece_sq + forward - 1);
@@ -141,20 +147,33 @@ void BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move) co
         attacks |= enemy_pieces & right_attack;
 
         // en passant capture
-        /*uint64_t test = ((1ULL << piece_sq) & en_passant_from_sqs);
-        uint64_t test3 = (en_passant_from_row << forward);
-        uint64_t test2 = (en_passant_from_row << forward) & (0x00000100'00010000 << *m_en_passant_col);*/
-
         attacks |= ((1ULL << piece_sq) & en_passant_from_sqs) ?
             (en_passant_from_row << forward) & (0x00000100'00010000 << *m_en_passant_col) : 0;
 
         attacks &= ~friendly_pieces;
 
+        attacks = white_to_move ? attacks : mirror_vertical(attacks);
+
+        // Scalar square vertical mirror
+        piece_sq = white_to_move ? piece_sq : piece_sq ^ 56;
+
         while (attacks)
         {
             auto attack_sq = bit_scan_forward(attacks);
             attacks &= attacks - 1;
-            move_list.emplace_back(BoardLocation(piece_sq), BoardLocation(attack_sq));
+            
+            if ((1ULL << attack_sq) & 0xff000000'000000ff)
+            {
+                for (auto promote_to : { Move::PromotionType::QUEEN, Move::PromotionType::ROOK, Move::PromotionType::BISHOP, Move::PromotionType::KNIGHT })
+                {
+                    auto& move = move_list.emplace_back(BoardLocation(piece_sq), BoardLocation(attack_sq));
+                    move.set_promotion_type(promote_to);
+                }
+            }
+            else
+            {
+                move_list.emplace_back(BoardLocation(piece_sq), BoardLocation(attack_sq));
+            }
         }
 
         moving_pieces &= moving_pieces - 1;
