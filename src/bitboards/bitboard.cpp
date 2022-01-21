@@ -2,6 +2,8 @@
 
 #include "bitboard_utils.h"
 
+#include "bitboard_ray_attacks.h"
+
 using namespace bitboard_utils;
 
 BitBoard::BitBoard() :
@@ -46,69 +48,36 @@ uint64_t BitBoard::pieces_to_move(bool white_to_move) const
     return m_white_pieces * white_to_move | m_black_pieces * !white_to_move;
 }
 
-uint64_t BitBoard::get_ray_mask(uint8_t sq, RayDir dir) const
-{
-    return ray_masks[static_cast<size_t>(dir)][sq];
-}
-
-uint64_t BitBoard::get_positive_ray_attacks(uint8_t sq, RayDir dir, bool white_to_move) const
-{
-    uint64_t blocked_ray = m_occupied & get_ray_mask(sq, dir);
-    return get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(bit_scan_forward(blocked_ray), dir));
-}
-
-uint64_t BitBoard::get_negative_ray_attacks(uint8_t sq, RayDir dir, bool white_to_move) const
-{
-    uint64_t blocked_ray = m_occupied & get_ray_mask(sq, dir);
-    return get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(bit_scan_reverse(blocked_ray), dir));
-}
-
-uint64_t BitBoard::get_ray_attacks(uint8_t sq, RayDir dir, bool white_to_move) const
-{
-    uint64_t ret;
-
-    switch (dir)
-    {
-    case RayDir::NE:
-    case RayDir::N:
-    case RayDir::NW:
-    case RayDir::W:
-        ret = get_positive_ray_attacks(sq, dir, white_to_move);
-        break;
-
-    default:
-        ret = get_negative_ray_attacks(sq, dir, white_to_move);
-        break;
-    }
-
-    return ret & ~pieces_to_move(white_to_move);
-}
-
-void BitBoard::get_moves(std::list<Move>& move_list, uint64_t pieces, bool white_to_move, std::function<uint64_t(uint8_t)> attacks_fn) const
+uint64_t BitBoard::get_moves(std::list<Move>& move_list, uint64_t pieces, bool white_to_move, std::function<uint64_t(uint8_t)> attacks_fn) const
 {
     uint64_t friendly_pieces = pieces_to_move(white_to_move);
     uint64_t moving_pieces = pieces & friendly_pieces;
+    uint64_t attacks = 0;
 
     while (moving_pieces)
     {
         auto piece_sq = bit_scan_forward(moving_pieces);
 
-        uint64_t attacks = attacks_fn(piece_sq);
+        attacks |= attacks_fn(piece_sq);
 
         attacks &= ~friendly_pieces;
 
-        while (attacks)
+        uint64_t attacks_to_add = attacks;
+
+        while (attacks_to_add)
         {
-            auto attack_sq = bit_scan_forward(attacks);
-            attacks &= attacks - 1;
+            auto attack_sq = bit_scan_forward(attacks_to_add);
+            attacks_to_add &= attacks_to_add - 1;
             move_list.emplace_back(BoardLocation(piece_sq), BoardLocation(attack_sq));
         }
 
         moving_pieces &= moving_pieces - 1;
     }
+
+    return attacks;
 }
 
-void BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move) const
+uint64_t BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned) const
 {
     // Flip the board vertically to calculate the black moves
     uint64_t friendly_pieces = white_to_move ? pieces_to_move(white_to_move) : mirror_vertical(pieces_to_move(white_to_move));
@@ -116,7 +85,8 @@ void BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move) co
     uint64_t enemy_pieces = occupied ^ friendly_pieces;
 
     uint64_t moving_pieces = (white_to_move ? m_pawns : mirror_vertical(m_pawns)) & friendly_pieces;
-    
+    moving_pieces &= ~pinned;
+
     uint64_t first_rank = 0x00000000'0000ff00;
 
     int8_t forward = 8;
@@ -124,6 +94,8 @@ void BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move) co
     uint64_t en_passant_from_row = 0x000000ff'00000000;
     uint64_t en_passant_from_sqs = m_en_passant_col.has_value() ?
         en_passant_from_row & (0x00000002'80000000 << *m_en_passant_col) : 0;
+
+    uint64_t attacks = 0;
 
     while (moving_pieces)
     {
@@ -150,17 +122,21 @@ void BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move) co
         attacks |= ((1ULL << piece_sq) & en_passant_from_sqs) ?
             (en_passant_from_row << forward) & (0x00000100'00010000 << *m_en_passant_col) : 0;
 
+        // attacks can't move into friendly pieces
         attacks &= ~friendly_pieces;
 
+        // flip back attacks
         attacks = white_to_move ? attacks : mirror_vertical(attacks);
 
         // Scalar square vertical mirror
         piece_sq = white_to_move ? piece_sq : piece_sq ^ 56;
 
-        while (attacks)
+        uint64_t attacks_to_add = attacks;
+
+        while (attacks_to_add)
         {
-            auto attack_sq = bit_scan_forward(attacks);
-            attacks &= attacks - 1;
+            auto attack_sq = bit_scan_forward(attacks_to_add);
+            attacks_to_add &= attacks_to_add - 1;
             
             if ((1ULL << attack_sq) & 0xff000000'000000ff)
             {
@@ -178,51 +154,52 @@ void BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move) co
 
         moving_pieces &= moving_pieces - 1;
     }
+
+    return attacks;
 }
 
-void BitBoard::get_knight_moves(std::list<Move>& move_list, bool white_to_move) const
+uint64_t BitBoard::get_knight_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned) const
 {
-    return get_moves(move_list, m_knights, white_to_move, [](uint8_t sq) { return knight_attack_lut[sq]; });
+    return get_moves(move_list, m_knights & ~pinned, white_to_move, [](uint8_t sq) { return knight_attack_lut[sq]; });
 }
 
-void BitBoard::get_king_moves(std::list<Move>& move_list, bool white_to_move) const
+uint64_t BitBoard::get_king_moves(std::list<Move>& move_list, bool white_to_move, uint64_t opposite_attacks) const
 {
-    return get_moves(move_list, m_kings, white_to_move, [](uint8_t sq) { return king_attack_lut[sq]; });
+    return get_moves(move_list, m_kings, white_to_move, [opposite_attacks](uint8_t sq) { return king_attack_lut[sq] & ~opposite_attacks; });
 }
 
-void BitBoard::get_bishop_moves(std::list<Move>& move_list, bool white_to_move) const
+void BitBoard::get_castling_moves(std::list<Move>& move_list, bool white_to_move, uint64_t opposite_attacks) const
 {
-    return get_moves(move_list, m_bishops, white_to_move, [&](uint8_t sq) { 
-        return get_ray_attacks(sq, RayDir::NE, white_to_move) |
-               get_ray_attacks(sq, RayDir::SE, white_to_move) |
-               get_ray_attacks(sq, RayDir::NW, white_to_move) |
-               get_ray_attacks(sq, RayDir::SW, white_to_move);
-    });
+    // Todo: check for pieces attacking given squares
+    if (white_to_move)
+    {
+        if (has_castling_rights(CastlingRights::WHITE_KINGSIDE) && 
+            !((m_occupied | opposite_attacks) & 0x00000000'00000060))
+        {
+            move_list.emplace_back(BoardLocation(4, 0), BoardLocation(6, 0));
+        }
+        if (has_castling_rights(CastlingRights::WHITE_QUEENSIDE) &&
+            !((m_occupied | opposite_attacks) & 0x00000000'0000000e))
+        {
+            move_list.emplace_back(BoardLocation(4, 0), BoardLocation(2, 0));
+        }
+    }
+    else
+    {
+        
+        if (has_castling_rights(CastlingRights::BLACK_KINGSIDE) &&
+            !((m_occupied | opposite_attacks) & 0x60000000'00000000))
+        {
+            move_list.emplace_back(BoardLocation(4, 7), BoardLocation(6, 7));
+        }
+        if (has_castling_rights(CastlingRights::BLACK_QUEENSIDE) &&
+            !((m_occupied | opposite_attacks) & 0x0e000000'00000000))
+        {
+            move_list.emplace_back(BoardLocation(4, 7), BoardLocation(2, 7));
+        }
+    }
 }
 
-void BitBoard::get_rook_moves(std::list<Move>& move_list, bool white_to_move) const
-{
-    return get_moves(move_list, m_rooks, white_to_move, [&](uint8_t sq) {
-        return get_ray_attacks(sq, RayDir::N, white_to_move) |
-               get_ray_attacks(sq, RayDir::S, white_to_move) |
-               get_ray_attacks(sq, RayDir::E, white_to_move) |
-               get_ray_attacks(sq, RayDir::W, white_to_move);
-    });
-}
-
-void BitBoard::get_queen_moves(std::list<Move>& move_list, bool white_to_move) const
-{
-    return get_moves(move_list, m_queens, white_to_move, [&](uint8_t sq) {
-        return get_ray_attacks(sq, RayDir::NE, white_to_move) |
-               get_ray_attacks(sq, RayDir::SE, white_to_move) |
-               get_ray_attacks(sq, RayDir::NW, white_to_move) |
-               get_ray_attacks(sq, RayDir::SW, white_to_move) |
-               get_ray_attacks(sq, RayDir::N, white_to_move) |
-               get_ray_attacks(sq, RayDir::S, white_to_move) |
-               get_ray_attacks(sq, RayDir::E, white_to_move) |
-               get_ray_attacks(sq, RayDir::W, white_to_move);
-    });
-}
 
 
 IBoard::Mate BitBoard::get_mate(PieceColour col) const
@@ -251,12 +228,33 @@ void BitBoard::populate_squares_properties()
 std::list<Move> BitBoard::get_all_legal_moves(PieceColour col) const
 {
     std::list<Move> ret;
-    get_knight_moves(ret, col == PieceColour::WHITE);
-    get_king_moves(ret, col == PieceColour::WHITE);
-    get_bishop_moves(ret, col == PieceColour::WHITE);
-    get_rook_moves(ret, col == PieceColour::WHITE);
-    get_queen_moves(ret, col == PieceColour::WHITE);
-    get_pawn_moves(ret, col == PieceColour::WHITE);
+
+    bool white_to_move = col == PieceColour::WHITE;
+
+    BitboardRayAttacks enemy_ray_attacks(*this);
+
+    uint64_t opp_attacks = 0;
+    opp_attacks |= get_knight_moves(ret, !white_to_move, 0);
+    opp_attacks |= get_king_moves(ret, !white_to_move, 0);
+    opp_attacks |= enemy_ray_attacks.get_bishop_moves(ret, !white_to_move, 0);
+    opp_attacks |= enemy_ray_attacks.get_rook_moves(ret, !white_to_move, 0);
+    opp_attacks |= enemy_ray_attacks.get_queen_moves(ret, !white_to_move, 0);
+    opp_attacks |= get_pawn_moves(ret, !white_to_move, 0);
+
+    ret.clear();
+
+    uint64_t pinned = enemy_ray_attacks.get_pinned();
+
+    BitboardRayAttacks friendly_ray_attacks(*this);
+
+    get_knight_moves(ret, white_to_move, pinned);
+    get_king_moves(ret, white_to_move, opp_attacks);
+    friendly_ray_attacks.get_bishop_moves(ret, white_to_move, pinned);
+    friendly_ray_attacks.get_rook_moves(ret, white_to_move, pinned);
+    friendly_ray_attacks.get_queen_moves(ret, white_to_move, pinned);
+    get_pawn_moves(ret, white_to_move, pinned);
+    get_castling_moves(ret, white_to_move, opp_attacks);
+
     return ret;
 }
 
@@ -312,11 +310,15 @@ bool BitBoard::add_piece(PieceType type, PieceColour col, BoardLocation loc)
 
 bool BitBoard::has_castling_rights(CastlingRights castling_rights) const
 {
-    return false;
-}
+    return m_castling_rights & static_cast<uint8_t>(castling_rights);
+};
 
 void BitBoard::set_castling_rights(const std::vector<CastlingRights>& castling_rights)
-{
+{    
+    for (const auto cr : castling_rights)
+    {
+        m_castling_rights |= static_cast<uint8_t>(cr);
+    }
 }
 
 std::optional<uint8_t> BitBoard::get_enpassant_column() const

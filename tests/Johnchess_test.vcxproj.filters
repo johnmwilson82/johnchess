@@ -52,6 +52,9 @@
     <ClCompile Include="..\src\bitboards\bitboard.cpp">
       <Filter>src\bitboards</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\bitboards\bitboard_ray_attacks.cpp">
+      <Filter>src\bitboards</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ai.h">
@@ -97,6 +100,9 @@
       <Filter>src\bitboards</Filter>
     </ClInclude>
     <ClInclude Include="..\src\bitboards\bitboard_utils.h">
+      <Filter>src\bitboards</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bitboards\bitboard_ray_attacks.h">
       <Filter>src\bitboards</Filter>
     </ClInclude>
   </ItemGroup>
