@@ -231,27 +231,28 @@ std::list<Move> BitBoard::get_all_legal_moves(PieceColour col) const
 
     bool white_to_move = col == PieceColour::WHITE;
 
-    BitboardRayAttacks enemy_ray_attacks(*this);
+    std::unordered_map<uint8_t, uint64_t> dummy;
+    BitboardRayAttacks enemy_ray_attacks(*this, !white_to_move, dummy);
 
     uint64_t opp_attacks = 0;
     opp_attacks |= get_knight_moves(ret, !white_to_move, 0);
     opp_attacks |= get_king_moves(ret, !white_to_move, 0);
-    opp_attacks |= enemy_ray_attacks.get_bishop_moves(ret, !white_to_move, 0);
-    opp_attacks |= enemy_ray_attacks.get_rook_moves(ret, !white_to_move, 0);
-    opp_attacks |= enemy_ray_attacks.get_queen_moves(ret, !white_to_move, 0);
+    opp_attacks |= enemy_ray_attacks.get_bishop_moves(ret);
+    opp_attacks |= enemy_ray_attacks.get_rook_moves(ret);
+    opp_attacks |= enemy_ray_attacks.get_queen_moves(ret);
     opp_attacks |= get_pawn_moves(ret, !white_to_move, 0);
 
     ret.clear();
 
     uint64_t pinned = enemy_ray_attacks.get_pinned();
 
-    BitboardRayAttacks friendly_ray_attacks(*this);
+    BitboardRayAttacks friendly_ray_attacks(*this, white_to_move, enemy_ray_attacks.get_pinned_allowed());
 
     get_knight_moves(ret, white_to_move, pinned);
     get_king_moves(ret, white_to_move, opp_attacks);
-    friendly_ray_attacks.get_bishop_moves(ret, white_to_move, pinned);
-    friendly_ray_attacks.get_rook_moves(ret, white_to_move, pinned);
-    friendly_ray_attacks.get_queen_moves(ret, white_to_move, pinned);
+    friendly_ray_attacks.get_bishop_moves(ret);
+    friendly_ray_attacks.get_rook_moves(ret);
+    friendly_ray_attacks.get_queen_moves(ret);
     get_pawn_moves(ret, white_to_move, pinned);
     get_castling_moves(ret, white_to_move, opp_attacks);
 

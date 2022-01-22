@@ -8,7 +8,11 @@
 class BitboardRayAttacks
 {
 private:
-    uint64_t m_pinned;
+    uint64_t m_attacked_pinned;
+    std::unordered_map<uint8_t, uint64_t> m_attacked_pinned_allowed;
+    const std::unordered_map<uint8_t, uint64_t>& m_moving_pinned_allowed;
+
+    bool m_white_to_move;
 
     enum class RayDir : size_t
     {
@@ -107,19 +111,24 @@ private:
     };
 
     uint64_t get_ray_mask(uint8_t sq, RayDir dir) const;
-    uint64_t get_positive_ray_attacks(uint8_t sq, RayDir dir, bool white_to_move);
-    uint64_t get_negative_ray_attacks(uint8_t sq, RayDir dir, bool white_to_move);
-    uint64_t get_ray_attacks(uint8_t sq, RayDir dir, bool white_to_move);
+    uint64_t get_positive_ray_attacks(uint8_t sq, RayDir dir);
+    uint64_t get_negative_ray_attacks(uint8_t sq, RayDir dir);
+    uint64_t get_ray_attacks(uint8_t sq, RayDir dir);
 
-    void check_king_pin(uint64_t blocked_ray, bool white_to_move);
+    uint64_t check_king_pin(uint64_t blocked_ray, uint64_t allowed_in_pin_moves);
+    uint64_t get_pinned_piece_moves(std::list<Move>& move_list, uint64_t& pieces, std::function<uint64_t(uint8_t)> attacks_fn) const;
 
     const BitBoard& m_bitboard;
 
 public:    
-    uint64_t get_bishop_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned);
-    uint64_t get_rook_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned);
-    uint64_t get_queen_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned);
+    uint64_t get_bishop_moves(std::list<Move>& move_list);
+    uint64_t get_rook_moves(std::list<Move>& move_list);
+    uint64_t get_queen_moves(std::list<Move>& move_list);
 
-    uint64_t get_pinned() const{ return m_pinned; }
-    BitboardRayAttacks(const BitBoard& bitboard);
+    uint64_t get_pinned() const{ return m_attacked_pinned; }
+    const std::unordered_map<uint8_t, uint64_t>& get_pinned_allowed() const { return m_attacked_pinned_allowed; }
+
+    BitboardRayAttacks(const BitBoard& bitboard, 
+                       bool white_to_move, 
+                       const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves);
 };

@@ -448,8 +448,8 @@ TEST_F(BitboardTests, CheckPawnPromotionMoves)
 TEST_F(BitboardTests, CheckPinnedMoves)
 {
     std::string board_str(
-        " b _ _ _ _ _ _ _\n"
         " _ _ _ _ _ _ _ _\n"
+        " _ b _ _ _ _ _ _\n"
         " _ _ _ _ _ _ _ _\n"
         " _ _ _ _ _ _ _ _\n"
         " _ _ _ _ _ _ _ _\n"
@@ -462,9 +462,14 @@ TEST_F(BitboardTests, CheckPinnedMoves)
     BitBoard board = board_from_string_repr<BitBoard>(board_str);
 
     auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
-    EXPECT_EQ(white_moves.size(), 2);
-    EXPECT_TRUE(find_fn(white_moves, "h1g1"));
-    EXPECT_TRUE(find_fn(white_moves, "g2a1"));
+    EXPECT_EQ(white_moves.size(), 6);
+    EXPECT_TRUE(find_fn(white_moves, "h1g1")); // King move
+
+    EXPECT_TRUE(find_fn(white_moves, "g2b7"));
+    EXPECT_TRUE(find_fn(white_moves, "g2c6"));
+    EXPECT_TRUE(find_fn(white_moves, "g2d5"));
+    EXPECT_TRUE(find_fn(white_moves, "g2e4"));
+    EXPECT_TRUE(find_fn(white_moves, "g2f3"));
 
 }
 
