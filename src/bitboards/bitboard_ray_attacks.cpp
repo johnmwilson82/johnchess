@@ -73,6 +73,20 @@ uint64_t BitboardRayAttacks::check_king_pin(uint64_t blocked_ray, uint64_t allow
         return blocked_ray;
     }
 
+    // check for en passant rank pin, where the capturing pawn and pawn to be captured are on
+    // the same rank as a pinned king (en passant capture is illegal)
+    auto ep_col = m_bitboard.get_enpassant_column();
+    if (king_pinned && ep_col.has_value())
+    {
+        uint64_t ep_square = (!m_white_to_move ? 0x00000001'00000000 : 0x00000000'01000000) << *ep_col;
+        
+        uint64_t blocked_ray_less_ep = blocked_ray & ~(ep_square);
+        if ((blocked_ray_less_ep & (blocked_ray_less_ep - 1)) == 0)
+        {
+            m_en_passant_pinned = true;
+        }
+    }
+    
     return 0;
 }
 
@@ -171,11 +185,12 @@ uint64_t BitboardRayAttacks::get_queen_moves(std::list<Move>& move_list)
 }
 
 
-BitboardRayAttacks::BitboardRayAttacks(const BitBoard& bitboard, 
+BitboardRayAttacks::BitboardRayAttacks(const BitBoard& bitboard,
                                        bool white_to_move,
                                        const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) :
     m_bitboard(bitboard),
     m_attacked_pinned(0),
     m_white_to_move(white_to_move),
-    m_moving_pinned_allowed(pinned_piece_allowed_moves)
+    m_moving_pinned_allowed(pinned_piece_allowed_moves),
+    m_en_passant_pinned(false)
 {}

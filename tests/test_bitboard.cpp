@@ -425,7 +425,7 @@ TEST_F(BitboardTests, CheckPawnPromotionMoves)
         " _ _ _ _ _ _ _ _\n"
         " p _ _ _ _ _ _ _\n"
         " _ _ _ _ _ _ _ _\n"
-        "w - 6 0 0\n"
+        "w - - 0 0\n"
     );
 
     BitBoard board = board_from_string_repr<BitBoard>(board_str);
@@ -456,7 +456,7 @@ TEST_F(BitboardTests, CheckPinnedMoves)
         " _ _ _ _ _ _ _ p\n"
         " _ _ _ _ _ _ B P\n"
         " _ _ _ _ _ _ _ K\n"
-        "w - 6 0 0\n"
+        "w - - 0 0\n"
     );
 
     BitBoard board = board_from_string_repr<BitBoard>(board_str);
@@ -472,7 +472,69 @@ TEST_F(BitboardTests, CheckPinnedMoves)
     EXPECT_TRUE(find_fn(white_moves, "g2f3"));
 
 }
+TEST_F(BitboardTests, CheckTargetPinnedEnPassantMoves)
+{
+    std::string board_str(
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ b _ _ _ _ _\n"
+        " _ _ P p _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ K\n"
+        "w - 3 0 0\n"
+    );
 
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 3);
+    EXPECT_FALSE(find_fn(white_moves, "c5d6")); // en passant not allowed
+}
+
+TEST_F(BitboardTests, CheckMovingPinnedEnPassantMoves)
+{
+    std::string board_str(
+        " _ _ _ _ _ _ _ _\n"
+        " _ b _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ p P _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ K\n"
+        "w - 2 0 0\n"
+    );
+
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 4);
+    EXPECT_TRUE(find_fn(white_moves, "d5c6")); // en passant not allowed
+}
+
+TEST_F(BitboardTests, CheckPinnedEnPassantMovesRank)
+{
+    std::string board_str(
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " r _ P p _ _ _ K\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        "w - 3 0 0\n"
+    );
+
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 6);
+
+    EXPECT_FALSE(find_fn(white_moves, "c5d6")); // en_passant_not_allowed
+}
 TEST_F(BitboardTests, CheckKingCheckMoves)
 {
     std::string board_str(
@@ -484,7 +546,7 @@ TEST_F(BitboardTests, CheckKingCheckMoves)
         " _ _ _ _ K _ _ _\n"
         " _ _ _ _ _ _ _ _\n"
         " _ _ _ _ _ _ _ _\n"
-        "w - 6 0 0\n"
+        "w - - 0 0\n"
     );
 
     BitBoard board = board_from_string_repr<BitBoard>(board_str);

@@ -43,6 +43,7 @@ private:
     };
 
     uint64_t get_pawn_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned) const;
+    uint64_t get_en_passant_pawn_moves(std::list<Move>& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const;
     uint64_t get_knight_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned) const;
     uint64_t get_king_moves(std::list<Move>& move_list, bool white_to_move, uint64_t opp_attacks) const;
 

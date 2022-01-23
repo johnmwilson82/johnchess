@@ -12,7 +12,7 @@ private:
     std::unordered_map<uint8_t, uint64_t> m_attacked_pinned_allowed;
     const std::unordered_map<uint8_t, uint64_t>& m_moving_pinned_allowed;
 
-    bool m_white_to_move;
+    bool m_white_to_move, m_en_passant_pinned;
 
     enum class RayDir : size_t
     {
@@ -126,6 +126,8 @@ public:
     uint64_t get_queen_moves(std::list<Move>& move_list);
 
     uint64_t get_pinned() const{ return m_attacked_pinned; }
+    bool is_enpassant_pinned() const { return m_en_passant_pinned; }
+
     const std::unordered_map<uint8_t, uint64_t>& get_pinned_allowed() const { return m_attacked_pinned_allowed; }
 
     BitboardRayAttacks(const BitBoard& bitboard, 
