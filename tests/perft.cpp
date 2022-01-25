@@ -2,7 +2,7 @@
 
 #include "ai.h"
 
-#include <board.h>
+#include <bitboards/bitboard.h>
 #include <utils/board_strings.h>
 #include <utils/perft.h>
 
@@ -20,7 +20,7 @@ protected:
 
 TEST_F(PerftTests, CheckStartDepth1)
 {
-    Board board;
+    BitBoard board;
     board.set_to_start_position();
 
     EXPECT_EQ(perft(board, 1), 20);
@@ -28,7 +28,7 @@ TEST_F(PerftTests, CheckStartDepth1)
 
 TEST_F(PerftTests, CheckStartDepth2)
 {
-    Board board;
+    BitBoard board;
     board.set_to_start_position();
 
     EXPECT_EQ(perft(board, 2), 400);
@@ -36,23 +36,23 @@ TEST_F(PerftTests, CheckStartDepth2)
 
 TEST_F(PerftTests, CheckStartDepth3)
 {
-    Board board;
+    BitBoard board;
     board.set_to_start_position();
 
     EXPECT_EQ(perft(board, 3), 8902);
 }
-/*
+
 TEST_F(PerftTests, CheckStartDepth4)
 {
-    Board board;
+    BitBoard board;
     board.set_to_start_position();
 
     EXPECT_EQ(perft(board, 4), 197281);
 }
-
+/*
 TEST_F(PerftTests, CheckStartDepth5)
 {
-    Board board;
+    BitBoard board;
     board.set_to_start_position();
 
     EXPECT_EQ(perft(board, 5), 4865609);

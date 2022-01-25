@@ -1,7 +1,7 @@
 #pragma once
-#include "../board.h"
+#include "../iboard.h"
 
-uint64_t perft(Board& board, int depth)
+uint64_t perft(IBoard& board, int depth)
 {
     uint64_t nodes = 0;
 

@@ -17,6 +17,11 @@ uint64_t BitboardRayAttacks::get_positive_ray_attacks(uint8_t sq, RayDir dir)
 
     check_king_pin(blocked_ray, ret | (1ULL << sq));
 
+    if (ret & (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!m_white_to_move)))
+    {
+        m_allowed_next_moves &= ret | (1ULL << sq);
+    }
+
     return ret;
 }
 
@@ -27,6 +32,11 @@ uint64_t BitboardRayAttacks::get_negative_ray_attacks(uint8_t sq, RayDir dir)
     uint64_t ret = get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(bit_scan_reverse(blocked_ray), dir));
         
     check_king_pin(blocked_ray, ret | (1ULL << sq));
+
+    if (ret & (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!m_white_to_move)))
+    {
+        m_allowed_next_moves &= ret | (1ULL << sq);
+    }
 
     return ret;
 }
@@ -50,6 +60,8 @@ uint64_t BitboardRayAttacks::get_ray_attacks(uint8_t sq, RayDir dir)
         break;
     }
 
+
+
     return ret & ~m_bitboard.pieces_to_move(m_white_to_move);
 }
 
@@ -63,7 +75,7 @@ uint64_t BitboardRayAttacks::check_king_pin(uint64_t blocked_ray, uint64_t allow
     blocked_ray ^= king_pinned;
 
     // check for single bit
-    if (king_pinned && (blocked_ray & (blocked_ray - 1)) == 0)
+    if (king_pinned && blocked_ray && (blocked_ray & (blocked_ray - 1)) == 0)
     {
         // at this point blocked_ray has one bit on it which is the location of the
         // piece which is blocked by the king.
@@ -192,5 +204,6 @@ BitboardRayAttacks::BitboardRayAttacks(const BitBoard& bitboard,
     m_attacked_pinned(0),
     m_white_to_move(white_to_move),
     m_moving_pinned_allowed(pinned_piece_allowed_moves),
+    m_allowed_next_moves(0xffffffff'ffffffff),
     m_en_passant_pinned(false)
 {}

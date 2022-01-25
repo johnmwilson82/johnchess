@@ -148,7 +148,33 @@ TEST_F(BitboardTests, CheckKingCastleMoves)
 
 }
 
+TEST_F(BitboardTests, CheckKingNoCastleThroughCheck)
+{
+    std::string board_str(
+        " r _ _ _ k _ _ _\n"
+        " b _ _ _ _ _ _ _\n"
+        " P _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ p\n"
+        " _ _ _ _ _ _ _ B\n"
+        " _ _ _ _ K _ _ R\n"
+        "w Kq - 0 0\n"
+    );
 
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 13);
+
+    EXPECT_FALSE(find_fn(white_moves, "e1g1")); // KS castle
+
+    auto black_moves = board.get_all_legal_moves(PieceColour::BLACK);
+    EXPECT_EQ(black_moves.size(), 15);
+
+    EXPECT_FALSE(find_fn(black_moves, "e8c8")); // QS castle
+
+}
 TEST_F(BitboardTests, CheckSimpleBishopMoves)
 {
     std::string board_str(
@@ -472,6 +498,26 @@ TEST_F(BitboardTests, CheckPinnedMoves)
     EXPECT_TRUE(find_fn(white_moves, "g2f3"));
 
 }
+
+TEST_F(BitboardTests, CheckBishopNextToKingMoves)
+{
+    std::string board_str(
+        " _ _ _ _ k _ _ _\n"
+        " _ _ _ _ _ B _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ K\n"
+        "w - - 0 0\n"
+    );
+
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 12);
+}
 TEST_F(BitboardTests, CheckTargetPinnedEnPassantMoves)
 {
     std::string board_str(
@@ -535,6 +581,7 @@ TEST_F(BitboardTests, CheckPinnedEnPassantMovesRank)
 
     EXPECT_FALSE(find_fn(white_moves, "c5d6")); // en_passant_not_allowed
 }
+
 TEST_F(BitboardTests, CheckKingCheckMoves)
 {
     std::string board_str(
@@ -556,4 +603,163 @@ TEST_F(BitboardTests, CheckKingCheckMoves)
     EXPECT_TRUE(find_fn(white_moves, "e3f2"));
     EXPECT_TRUE(find_fn(white_moves, "e3f3"));
     EXPECT_TRUE(find_fn(white_moves, "e3d2"));
+}
+
+TEST_F(BitboardTests, MakeUnmakeEnPassantMove)
+{
+    std::string board_str(
+        " r n b q k b n r\n"
+        " p p p p _ p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ P p _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " P P P _ P P P P\n"
+        " R N B Q K B N R\n"
+        "w KQkq 4 0 0\n"
+    );
+
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    auto nwhite_moves = white_moves.size();
+    auto black_moves = board.get_all_legal_moves(PieceColour::BLACK);
+    auto nblack_moves = black_moves.size();
+    ASSERT_TRUE(find_fn(white_moves, "d5e6"));
+
+    auto move = std::ranges::find_if(white_moves, [&](const Move& move) { return move == Move("d5e6"); });
+
+    board.make_move(*move);
+    board.unmake_move(*move);
+
+    auto white_moves2 = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(nwhite_moves, white_moves2.size());
+    auto black_moves2 = board.get_all_legal_moves(PieceColour::BLACK);
+    EXPECT_EQ(nblack_moves, black_moves2.size());
+
+    ASSERT_TRUE(find_fn(white_moves2, "d5e6"));
+
+}
+
+TEST_F(BitboardTests, MakeUnmakeSimpleEnPassantMove)
+{
+    std::string board_str(
+        " _ _ _ _ k _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ P p _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ K _ _ _\n"
+        "w - 4 0 0\n"
+    );
+
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    auto nwhite_moves = white_moves.size();
+    auto black_moves = board.get_all_legal_moves(PieceColour::BLACK);
+    auto nblack_moves = black_moves.size();
+    ASSERT_TRUE(find_fn(white_moves, "d5e6"));
+
+    auto move = std::ranges::find_if(white_moves, [&](const Move& move) { return move == Move("d5e6"); });
+
+    board.make_move(*move);
+    board.unmake_move(*move);
+
+    auto white_moves2 = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(nwhite_moves, white_moves2.size());
+    auto black_moves2 = board.get_all_legal_moves(PieceColour::BLACK);
+    EXPECT_EQ(nblack_moves, black_moves2.size());
+
+    ASSERT_TRUE(find_fn(white_moves2, "d5e6"));
+
+}
+
+TEST_F(BitboardTests, MoveIntoEnPassant)
+{
+    std::string board_str(
+        " _ _ _ _ k _ _ _\n"
+        " _ _ _ _ p _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ P _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ K _ _ _\n"
+        "b - - 0 0\n"
+    );
+
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto first_moves = board.get_all_legal_moves(PieceColour::BLACK);
+    auto first_move = std::ranges::find_if(first_moves, [&](const Move& move) { return move == Move("e7e5"); });
+    board.make_move(*first_move);
+    board.unmake_move(*first_move);
+    board.make_move(*first_move);
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    auto nwhite_moves = white_moves.size();
+    auto black_moves = board.get_all_legal_moves(PieceColour::BLACK);
+    auto nblack_moves = black_moves.size();
+    ASSERT_TRUE(find_fn(white_moves, "d5e6"));
+
+    auto move = std::ranges::find_if(white_moves, [&](const Move& move) { return move == Move("d5e6"); });
+
+    board.make_move(*move);
+    board.unmake_move(*move);
+
+    auto white_moves2 = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(nwhite_moves, white_moves2.size());
+    auto black_moves2 = board.get_all_legal_moves(PieceColour::BLACK);
+    EXPECT_EQ(nblack_moves, black_moves2.size());
+
+    ASSERT_TRUE(find_fn(white_moves2, "d5e6"));
+}
+
+TEST_F(BitboardTests, CheckFoolsMateMoves)
+{
+    std::string board_str(
+        " r n b _ k b n r\n"
+        " p p p p _ p p p\n"
+        " _ _ _ _ p _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ P q\n"
+        " _ _ _ _ _ P _ _\n"
+        " P P P P P _ _ P\n"
+        " R N B Q K B N R\n"
+        "w KQkq - 0 0\n"
+    );
+
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 0);
+    EXPECT_TRUE(board.get_in_check(PieceColour::WHITE));
+    EXPECT_FALSE(board.get_in_check(PieceColour::BLACK));
+}
+
+TEST_F(BitboardTests, CheckNotFoolsMateMoves)
+{
+    std::string board_str(
+        " r n b _ k b n r\n"
+        " p p p p _ p p p\n"
+        " _ _ _ _ p _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ q\n"
+        " _ _ _ _ _ P _ _\n"
+        " P P P P P _ P P\n"
+        " R N B Q K B N R\n"
+        "w KQkq - 0 0\n"
+    );
+
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 1);
+    EXPECT_TRUE(board.get_in_check(PieceColour::WHITE));
+    EXPECT_FALSE(board.get_in_check(PieceColour::BLACK));
+
+    ASSERT_TRUE(find_fn(white_moves, "g2g3"));
 }

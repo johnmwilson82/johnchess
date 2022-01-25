@@ -19,7 +19,11 @@ namespace bitboard_utils
 
     // from https://www.chessprogramming.org/BitScan
     static constexpr inline uint8_t bit_scan_forward(uint64_t bb) {
-        assert(bb != 0);
+        if (bb == 0)
+        {
+            assert(bb != 0);
+        }
+        
 
         return debruijn_index64[((bb ^ (bb - 1)) * debruijn64) >> 58];
     }

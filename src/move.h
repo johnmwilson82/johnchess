@@ -83,12 +83,21 @@ public:
         return m_promotion_type;
     }
 
+    // TODO: deprecate following two 
     void set_captured_piece(std::shared_ptr<Piece> piece) {
         m_captured_piece = piece;
     }
 
     const std::shared_ptr<Piece> get_captured_piece() const {
         return m_captured_piece;
+    }
+
+    void set_captured_piece_type(PieceType piece_type) {
+        m_captured_piece_type = piece_type;
+    }
+
+    const std::optional<PieceType> get_captured_piece_type() const {
+        return m_captured_piece_type;
     }
 
     void set_old_castling_rights(uint8_t castling_rights) {
@@ -104,6 +113,7 @@ private:
     BoardLocation m_to_loc;
     uint8_t m_old_castling_rights = 0;
     std::shared_ptr<Piece> m_captured_piece;
+    std::optional<PieceType> m_captured_piece_type = std::nullopt;
     std::optional<PromotionType> m_promotion_type = std::nullopt;
 
     uint8_t m_type = 0;

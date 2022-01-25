@@ -13,6 +13,8 @@ private:
     uint64_t m_pawns, m_knights, m_bishops, m_rooks, m_queens, m_kings;
     uint64_t m_black_pieces, m_white_pieces, m_occupied;
 
+    mutable uint64_t m_opposite_attacks, m_current_attacks, m_allowed_moves;
+
     uint8_t m_white_to_move; // 1 or 0
     uint8_t m_castling_rights = 0;
 
@@ -45,9 +47,9 @@ private:
     uint64_t get_pawn_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned) const;
     uint64_t get_en_passant_pawn_moves(std::list<Move>& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const;
     uint64_t get_knight_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned) const;
-    uint64_t get_king_moves(std::list<Move>& move_list, bool white_to_move, uint64_t opp_attacks) const;
+    uint64_t get_king_moves(std::list<Move>& move_list, bool white_to_move) const;
 
-    void get_castling_moves(std::list<Move>& move_list, bool white_to_move, uint64_t opposite_attacks) const;
+    void get_castling_moves(std::list<Move>& move_list, bool white_to_move) const;
 
 public:
     inline uint64_t get_occupied() const { return m_occupied; }
@@ -57,7 +59,10 @@ public:
     inline uint64_t get_kings() const { return m_kings; }
 
     uint64_t get_moves(std::list<Move>& move_list, uint64_t pieces, bool white_to_move, std::function<uint64_t(uint8_t)> attacks_fn) const;
-    inline uint64_t pieces_to_move(bool white_to_move) const;
+    uint64_t pieces_to_move(bool white_to_move) const;
+
+    Move& emplace_move(std::list<Move>& move_list, const BoardLocation& from_loc, const BoardLocation& to_loc) const;
+
 public:
     BitBoard();
 
