@@ -13,7 +13,7 @@ private:
     uint64_t m_pawns, m_knights, m_bishops, m_rooks, m_queens, m_kings;
     uint64_t m_black_pieces, m_white_pieces, m_occupied;
 
-    mutable uint64_t m_opposite_attacks, m_current_attacks, m_allowed_moves;
+    mutable uint64_t m_opposite_attacks, m_current_attacks, m_allowed_moves, m_new_allowed_moves;
 
     uint8_t m_white_to_move; // 1 or 0
     uint8_t m_castling_rights = 0;
@@ -44,7 +44,7 @@ private:
         0x0203000000000000, 0x0507000000000000, 0x0a0e000000000000, 0x141c000000000000, 0x2838000000000000, 0x5070000000000000, 0xa0e0000000000000, 0x40c0000000000000, 
     };
 
-    uint64_t get_pawn_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned) const;
+    uint64_t get_pawn_moves(std::list<Move>& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const;
     uint64_t get_en_passant_pawn_moves(std::list<Move>& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const;
     uint64_t get_knight_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned) const;
     uint64_t get_king_moves(std::list<Move>& move_list, bool white_to_move) const;

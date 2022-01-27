@@ -763,3 +763,25 @@ TEST_F(BitboardTests, CheckNotFoolsMateMoves)
 
     ASSERT_TRUE(find_fn(white_moves, "g2g3"));
 }
+
+TEST_F(BitboardTests, CheckCanTakeQueenPosition)
+{
+    std::string board_str(
+        " r n b _ k b n r\n"
+        " p p _ p p p p p\n"
+        " _ _ _ _ _ _ _ _\n"
+        " q _ p _ _ _ _ _\n"
+        " _ P _ _ _ _ _ _\n"
+        " _ _ _ P _ _ _ _\n"
+        " P _ P _ P P P P\n"
+        " R N B Q K B N R\n"
+        "w KQkq - 0 0\n"
+    );
+
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 28);
+
+    ASSERT_TRUE(find_fn(white_moves, "b4a5"));
+}

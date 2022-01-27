@@ -3,6 +3,7 @@
 #include <iostream>
 #include "xboard_interface.h"
 #include "board.h"
+//#include "bitboards/bitboard.h"
 #include "ai.h"
 
 class JohnchessApp {

@@ -70,8 +70,10 @@ Move& BitBoard::emplace_move(std::list<Move>& move_list, const BoardLocation& fr
         if (pieces.first & to_loc.to_bitboard_mask())
         {
             move.set_captured_piece_type(pieces.second);
+            break;
         }
     }
+    move.set_old_castling_rights(m_castling_rights);
     return move;
 }
 
@@ -107,7 +109,7 @@ uint64_t BitBoard::get_moves(std::list<Move>& move_list, uint64_t pieces, bool w
     return all_attacks;
 }
 
-uint64_t BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned) const
+uint64_t BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const
 {
     // Flip the board vertically to calculate the black moves
     uint64_t friendly_pieces = white_to_move ? pieces_to_move(white_to_move) : mirror_vertical(pieces_to_move(white_to_move));
@@ -115,7 +117,6 @@ uint64_t BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move
     uint64_t enemy_pieces = occupied ^ friendly_pieces;
 
     uint64_t moving_pieces = (white_to_move ? m_pawns : mirror_vertical(m_pawns)) & friendly_pieces;
-    moving_pieces &= ~pinned;
 
     uint64_t first_rank = 0x00000000'0000ff00;
 
@@ -152,6 +153,12 @@ uint64_t BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move
 
         // Scalar square vertical mirror
         piece_sq = white_to_move ? piece_sq : piece_sq ^ 56;
+
+        // If pawn is pinned ensure it moves to allowed square during capture
+        if (pinned_piece_allowed_moves.contains(piece_sq))
+        {
+            attacks &= pinned_piece_allowed_moves.at(piece_sq);
+        }
 
         all_attacks |= attacks;
 
@@ -208,6 +215,11 @@ uint64_t BitBoard::get_en_passant_pawn_moves(std::list<Move>& move_list, bool wh
         // Scalar square vertical mirror
         piece_sq = white_to_move ? piece_sq : piece_sq ^ 56;
         
+        if (attacks & (m_kings & pieces_to_move(!m_white_to_move)))
+        {
+            m_new_allowed_moves &= (1ULL << piece_sq);
+        }
+
         // If pawn is pinned ensure it moves to allowed square during capture
         if (pinned_piece_allowed_moves.contains(piece_sq))
         {
@@ -224,7 +236,6 @@ uint64_t BitBoard::get_en_passant_pawn_moves(std::list<Move>& move_list, bool wh
                 // There's only one possible ep capture per pawn
                 auto& move = emplace_move(move_list, BoardLocation(piece_sq), BoardLocation(bit_scan_forward(attacks)));
                 move.set_is_en_passant_capture();
-
             }
         }
         
@@ -237,12 +248,24 @@ uint64_t BitBoard::get_en_passant_pawn_moves(std::list<Move>& move_list, bool wh
 
 uint64_t BitBoard::get_knight_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned) const
 {
-    return get_moves(move_list, m_knights & ~pinned, white_to_move, [](uint8_t sq) { return knight_attack_lut[sq]; });
+    return get_moves(move_list, m_knights & ~pinned, white_to_move, [&](uint8_t sq) {
+
+        uint64_t attacks = knight_attack_lut[sq];
+
+        if (attacks & (m_kings & pieces_to_move(!white_to_move)))
+        {
+            m_new_allowed_moves &= (1ULL << sq);
+        }
+
+        return attacks; 
+    });
 }
 
 uint64_t BitBoard::get_king_moves(std::list<Move>& move_list, bool white_to_move) const
 {
-    return get_moves(move_list, m_kings, white_to_move, [&](uint8_t sq) { return king_attack_lut[sq] & ~m_opposite_attacks; });
+    return get_moves(move_list, m_kings, white_to_move, [&](uint8_t sq) { 
+        return king_attack_lut[sq] & ~m_opposite_attacks; 
+    });
 }
 
 void BitBoard::get_castling_moves(std::list<Move>& move_list, bool white_to_move) const
@@ -315,22 +338,21 @@ std::list<Move> BitBoard::get_all_legal_moves(PieceColour col) const
     m_allowed_moves = 0xffffffff'ffffffff;
 
     uint64_t new_opposite_attacks = 0;
-    uint64_t new_allowed_moves = 0xffffffff'ffffffff;
+    m_new_allowed_moves = 0xffffffff'ffffffff;
 
     new_opposite_attacks |= get_knight_moves(ret, !white_to_move, 0);
-    new_opposite_attacks |= get_king_moves(ret, !white_to_move);
     new_opposite_attacks |= enemy_ray_attacks.get_bishop_moves(ret);
     new_opposite_attacks |= enemy_ray_attacks.get_rook_moves(ret);
     new_opposite_attacks |= enemy_ray_attacks.get_queen_moves(ret);
-    new_opposite_attacks |= get_pawn_moves(ret, !white_to_move, 0);
-
+    new_opposite_attacks |= get_pawn_moves(ret, !white_to_move, {});
+    new_opposite_attacks |= get_king_moves(ret, !white_to_move);
     ret.clear();
 
     m_opposite_attacks = new_opposite_attacks;
 
     uint64_t pinned = enemy_ray_attacks.get_pinned();
 
-    m_allowed_moves = new_allowed_moves & enemy_ray_attacks.get_allowed_next_move_mask();
+    m_allowed_moves = m_new_allowed_moves & enemy_ray_attacks.get_allowed_next_move_mask();
 
 
     BitboardRayAttacks friendly_ray_attacks(*this, white_to_move, enemy_ray_attacks.get_pinned_allowed());
@@ -338,15 +360,20 @@ std::list<Move> BitBoard::get_all_legal_moves(PieceColour col) const
     m_current_attacks = 0;
 
     m_current_attacks |= get_knight_moves(ret, white_to_move, pinned);
-    m_current_attacks |= get_king_moves(ret, white_to_move);
+
     m_current_attacks |= friendly_ray_attacks.get_bishop_moves(ret);
     m_current_attacks |= friendly_ray_attacks.get_rook_moves(ret);
     m_current_attacks |= friendly_ray_attacks.get_queen_moves(ret);
-    m_current_attacks |= get_pawn_moves(ret, white_to_move, pinned);
+    m_current_attacks |= get_pawn_moves(ret, white_to_move, enemy_ray_attacks.get_pinned_allowed());
     if (m_en_passant_col.has_value() && !enemy_ray_attacks.is_enpassant_pinned())
     {
         m_current_attacks |= get_en_passant_pawn_moves(ret, white_to_move, enemy_ray_attacks.get_pinned_allowed());
     }
+
+    // set m_allowed_moves so king can move out of check
+    m_allowed_moves = ~m_opposite_attacks;
+
+    m_current_attacks |= get_king_moves(ret, white_to_move);
     get_castling_moves(ret, white_to_move);
 
     return ret;
@@ -557,6 +584,11 @@ bool BitBoard::make_move(const Move& move)
 
     m_white_to_move = !m_white_to_move;
 
+    if (!(m_occupied & new_loc_mask))
+    {
+        return false;
+    }
+
     return true;
 }
 
@@ -581,6 +613,7 @@ bool BitBoard::unmake_move(const Move& move)
         uint64_t capture_mask = ((m_white_to_move ? 0x00000000'01000000 : 0x00000001'00000000) << new_loc.get_x());
         m_pawns |= capture_mask;
         m_occupied |= capture_mask;
+
         if (m_white_to_move)
         {
             m_white_pieces |= capture_mask;
@@ -646,7 +679,6 @@ bool BitBoard::unmake_move(const Move& move)
 
     // Replace captured piece
     auto captured_piece_type = move.get_captured_piece_type();
-
 
     // For en passant captures we've already replaced the captured piece
     if (captured_piece_type.has_value() && !move.is_en_passant_capture())
