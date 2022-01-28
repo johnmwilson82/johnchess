@@ -13,6 +13,7 @@ private:
     const std::unordered_map<uint8_t, uint64_t>& m_moving_pinned_allowed;
 
     uint64_t m_allowed_next_moves;
+    uint64_t m_king_attacks;
 
     bool m_white_to_move, m_en_passant_pinned;
 
@@ -117,7 +118,7 @@ private:
     uint64_t get_negative_ray_attacks(uint8_t sq, RayDir dir);
     uint64_t get_ray_attacks(uint8_t sq, RayDir dir);
 
-    uint64_t check_king_pin(uint64_t blocked_ray, uint64_t allowed_in_pin_moves);
+    uint64_t check_king_pin(uint64_t blocked_ray, uint64_t allowed_in_pin_moves, RayDir dir);
     uint64_t get_pinned_piece_moves(std::list<Move>& move_list, uint64_t& pieces, std::function<uint64_t(uint8_t)> attacks_fn) const;
 
     const BitBoard& m_bitboard;
@@ -126,6 +127,7 @@ public:
     uint64_t get_bishop_moves(std::list<Move>& move_list);
     uint64_t get_rook_moves(std::list<Move>& move_list);
     uint64_t get_queen_moves(std::list<Move>& move_list);
+    uint64_t get_king_attacks() const { return m_king_attacks; };
 
     uint64_t get_allowed_next_move_mask() const { return m_allowed_next_moves; }
 

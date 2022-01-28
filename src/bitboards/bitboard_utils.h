@@ -29,7 +29,11 @@ namespace bitboard_utils
     }
 
     static constexpr inline uint8_t bit_scan_reverse(uint64_t bb) {
-        assert(bb != 0);
+        if (bb == 0)
+        {
+            assert(bb != 0);
+        }
+
 
         bb |= bb >> 1;
         bb |= bb >> 2;

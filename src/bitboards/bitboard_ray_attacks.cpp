@@ -13,9 +13,23 @@ uint64_t BitboardRayAttacks::get_positive_ray_attacks(uint8_t sq, RayDir dir)
 {
     uint64_t blocked_ray = m_bitboard.get_occupied() & get_ray_mask(sq, dir);
 
-    uint64_t ret = get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(bit_scan_forward(blocked_ray), dir));
+    uint8_t blocker = (blocked_ray == 0) ? 0 : bit_scan_forward(blocked_ray);
 
-    check_king_pin(blocked_ray, ret | (1ULL << sq));
+    uint64_t enemy_king = (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!m_white_to_move));
+
+    uint64_t ret = get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(blocker, dir));
+
+    uint64_t king_pin = check_king_pin(blocked_ray, ret | (1ULL << sq), dir);
+
+    if (blocked_ray && ((1ULL << blocker) & enemy_king))
+    {
+        m_king_attacks |= enemy_king;
+        get_positive_ray_attacks(blocker, dir);
+    }
+    else if ((1ULL << sq) & enemy_king)
+    {
+        m_king_attacks |= ret;
+    };
 
     if (ret & (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!m_white_to_move)))
     {
@@ -29,9 +43,23 @@ uint64_t BitboardRayAttacks::get_negative_ray_attacks(uint8_t sq, RayDir dir)
 {
     uint64_t blocked_ray = m_bitboard.get_occupied() & get_ray_mask(sq, dir);
 
-    uint64_t ret = get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(bit_scan_reverse(blocked_ray), dir));
+    uint8_t blocker = (blocked_ray == 0) ? 0 : bit_scan_reverse(blocked_ray);
+
+    uint64_t enemy_king = (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!m_white_to_move));
+
+    uint64_t ret = get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(blocker, dir));
         
-    check_king_pin(blocked_ray, ret | (1ULL << sq));
+    uint64_t king_pin = check_king_pin(blocked_ray, ret | (1ULL << sq), dir);
+
+    if (blocked_ray && ((1ULL << blocker) & enemy_king))
+    {
+        m_king_attacks |= enemy_king;
+        get_negative_ray_attacks(blocker, dir);
+    }
+    else if((1ULL << sq) & enemy_king)
+    {
+        m_king_attacks |= ret;
+    };
 
     if (ret & (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!m_white_to_move)))
     {
@@ -66,23 +94,26 @@ uint64_t BitboardRayAttacks::get_ray_attacks(uint8_t sq, RayDir dir)
 }
 
 
-uint64_t BitboardRayAttacks::check_king_pin(uint64_t blocked_ray, uint64_t allowed_in_pin_moves)
+uint64_t BitboardRayAttacks::check_king_pin(uint64_t blocked_ray, uint64_t allowed_in_pin_moves, RayDir dir)
 {
     // check blocked ray has king on it
     uint64_t enemy_pieces = m_bitboard.pieces_to_move(!m_white_to_move);
-    uint64_t king_pinned = blocked_ray & (m_bitboard.get_kings() & enemy_pieces);
-
-    blocked_ray ^= king_pinned;
+    uint64_t king = (m_bitboard.get_kings() & enemy_pieces);
+    uint64_t king_pinned = blocked_ray & king;
 
     // check for single bit
-    if (king_pinned && blocked_ray && (blocked_ray & (blocked_ray - 1)) == 0)
+    if (king_pinned)
     {
-        // at this point blocked_ray has one bit on it which is the location of the
-        // piece which is blocked by the king.
-        m_attacked_pinned |= blocked_ray;
-        m_attacked_pinned_allowed[bit_scan_forward(blocked_ray)] = allowed_in_pin_moves;
+        blocked_ray &= ~(get_ray_mask(bit_scan_reverse(king), dir) | king);
+        if (blocked_ray && (blocked_ray & (blocked_ray - 1)) == 0)
+        {
+            // at this point blocked_ray has one bit on it which is the location of the
+            // piece which is blocked by the king.
+            m_attacked_pinned |= blocked_ray;
+            m_attacked_pinned_allowed[bit_scan_forward(blocked_ray)] = allowed_in_pin_moves;
 
-        return blocked_ray;
+            return king_pinned;
+        }
     }
 
     // check for en passant rank pin, where the capturing pawn and pawn to be captured are on
@@ -99,7 +130,7 @@ uint64_t BitboardRayAttacks::check_king_pin(uint64_t blocked_ray, uint64_t allow
         }
     }
     
-    return 0;
+    return king_pinned;
 }
 
 
@@ -191,7 +222,7 @@ uint64_t BitboardRayAttacks::get_queen_moves(std::list<Move>& move_list)
 
     ret |= get_pinned_piece_moves(move_list, queens, queen_moves);
 
-    ret |= m_bitboard.get_moves(move_list, m_bitboard.get_queens(), m_white_to_move, queen_moves);
+    ret |= m_bitboard.get_moves(move_list, queens, m_white_to_move, queen_moves);
 
     return ret;
 }
@@ -205,5 +236,6 @@ BitboardRayAttacks::BitboardRayAttacks(const BitBoard& bitboard,
     m_white_to_move(white_to_move),
     m_moving_pinned_allowed(pinned_piece_allowed_moves),
     m_allowed_next_moves(0xffffffff'ffffffff),
-    m_en_passant_pinned(false)
+    m_en_passant_pinned(false),
+    m_king_attacks(0)
 {}

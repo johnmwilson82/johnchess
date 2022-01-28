@@ -785,3 +785,88 @@ TEST_F(BitboardTests, CheckCanTakeQueenPosition)
 
     ASSERT_TRUE(find_fn(white_moves, "b4a5"));
 }
+
+TEST_F(BitboardTests, CheckBongCloud)
+{
+    BitBoard board;
+
+    board.set_to_start_position();
+
+    board.make_move({ "d2d3" });
+    board.make_move({ "b7b5" });
+    board.make_move({ "e1d2" });
+    board.make_move({ "b5b4" });
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 21);
+
+    ASSERT_FALSE(find_fn(white_moves, "d2c3"));
+}
+
+TEST_F(BitboardTests, CheckBongCloud2)
+{
+    BitBoard board;
+
+    board.set_to_start_position();
+
+    board.make_move({ "f2f3" });
+    board.make_move({ "e7e5" });
+    board.make_move({ "e1f2" });
+    board.make_move({ "d8h4" });
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 2);
+
+    ASSERT_FALSE(find_fn(white_moves, "f2e1"));
+}
+
+TEST_F(BitboardTests, CheckMoveKingAttacked)
+{
+    BitBoard board;
+
+    board.set_to_start_position();
+
+    board.make_move({ "f2f4" });
+    board.make_move({ "e7e5" });
+    board.make_move({ "e1f2" });
+    board.make_move({ "d8f6" });
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 24);
+
+    ASSERT_FALSE(find_fn(white_moves, "f4e5"));
+}
+
+
+TEST_F(BitboardTests, CheckRetreatKingWhenPawnPinned)
+{
+    BitBoard board;
+
+    board.set_to_start_position();
+
+    board.make_move({ "e2e4" });
+    board.make_move({ "e7e6" });
+    board.make_move({ "e1e2" });
+    board.make_move({ "d8e7" });
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 24);
+
+    ASSERT_TRUE(find_fn(white_moves, "e2e1"));
+}
+
+TEST_F(BitboardTests, CheckPinnedQueen)
+{
+    BitBoard board;
+
+    board.set_to_start_position();
+
+    board.make_move({ "d2d4" });
+    board.make_move({ "e7e5" });
+    board.make_move({ "d1d2" });
+    board.make_move({ "f8b4" });
+
+    auto white_moves = board.get_all_legal_moves(PieceColour::WHITE);
+    EXPECT_EQ(white_moves.size(), 22);
+
+}
