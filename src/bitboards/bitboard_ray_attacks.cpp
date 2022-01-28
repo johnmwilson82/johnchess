@@ -19,7 +19,15 @@ uint64_t BitboardRayAttacks::get_positive_ray_attacks(uint8_t sq, RayDir dir)
 
     uint64_t ret = get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(blocker, dir));
 
-    uint64_t king_pin = check_king_pin(blocked_ray, ret | (1ULL << sq), dir);
+    /*if (blocked_ray & enemy_king)
+    {
+        check_king_pin(blocked_ray, get_ray_mask(sq, dir) ^ get_ray_mask(bit_scan_reverse(enemy_king), dir), dir);
+    }*/
+
+    if (enemy_king)
+    {
+        check_king_pin(blocked_ray, (1ULL << sq) | (get_ray_mask(sq, dir) ^ get_ray_mask(bit_scan_forward(enemy_king), dir)), dir);
+    }
 
     if (blocked_ray && ((1ULL << blocker) & enemy_king))
     {
@@ -48,8 +56,15 @@ uint64_t BitboardRayAttacks::get_negative_ray_attacks(uint8_t sq, RayDir dir)
     uint64_t enemy_king = (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!m_white_to_move));
 
     uint64_t ret = get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(blocker, dir));
-        
-    uint64_t king_pin = check_king_pin(blocked_ray, ret | (1ULL << sq), dir);
+
+    /*if (blocked_ray & enemy_king)
+    {
+        check_king_pin(blocked_ray, get_ray_mask(sq, dir) ^ get_ray_mask(bit_scan_reverse(enemy_king), dir), dir);
+    }*/
+    if (enemy_king)
+    {
+        check_king_pin(blocked_ray, (1ULL << sq) | (get_ray_mask(sq, dir) ^ get_ray_mask(bit_scan_forward(enemy_king), dir)), dir);
+    }
 
     if (blocked_ray && ((1ULL << blocker) & enemy_king))
     {
@@ -101,6 +116,8 @@ uint64_t BitboardRayAttacks::check_king_pin(uint64_t blocked_ray, uint64_t allow
     uint64_t king = (m_bitboard.get_kings() & enemy_pieces);
     uint64_t king_pinned = blocked_ray & king;
 
+    uint64_t blocked_ray_less_ep = blocked_ray;
+
     // check for single bit
     if (king_pinned)
     {
@@ -119,11 +136,12 @@ uint64_t BitboardRayAttacks::check_king_pin(uint64_t blocked_ray, uint64_t allow
     // check for en passant rank pin, where the capturing pawn and pawn to be captured are on
     // the same rank as a pinned king (en passant capture is illegal)
     auto ep_col = m_bitboard.get_enpassant_column();
-    if (king_pinned && ep_col.has_value())
+    if (king_pinned && ep_col.has_value() && (dir == RayDir::E || dir == RayDir::W))
     {
         uint64_t ep_square = (!m_white_to_move ? 0x00000001'00000000 : 0x00000000'01000000) << *ep_col;
         
-        uint64_t blocked_ray_less_ep = blocked_ray & ~(ep_square);
+        blocked_ray_less_ep = blocked_ray & ~(ep_square);
+
         if ((blocked_ray_less_ep & (blocked_ray_less_ep - 1)) == 0)
         {
             m_en_passant_pinned = true;
@@ -140,19 +158,21 @@ uint64_t BitboardRayAttacks::get_pinned_piece_moves(std::list<Move>& move_list, 
 
     uint64_t pieces_pin_check = pieces;
 
-    uint8_t current_piece = bit_scan_forward(pieces_pin_check);
-
-    while (m_moving_pinned_allowed.contains(current_piece))
+    while (pieces_pin_check)
     {
-        ret |= m_bitboard.get_moves(move_list, 1ULL << current_piece, m_white_to_move, [&](uint8_t sq) {
-            uint64_t att = attacks_fn(sq);
-            return attacks_fn(sq) & m_moving_pinned_allowed.at(current_piece);
-        });
+        uint8_t current_piece = bit_scan_forward(pieces_pin_check);
+
+        if (m_moving_pinned_allowed.contains(current_piece))
+        {
+            ret |= m_bitboard.get_moves(move_list, 1ULL << current_piece, m_white_to_move, [&](uint8_t sq) {
+                uint64_t att = attacks_fn(sq);
+                return attacks_fn(sq) & m_moving_pinned_allowed.at(current_piece);
+            });
+
+            pieces &= ~(1ULL << current_piece);
+        }
 
         pieces_pin_check &= (pieces_pin_check - 1);
-        pieces &= ~(1ULL << current_piece);
-
-        current_piece = bit_scan_forward(pieces_pin_check);
     }
 
     return ret;

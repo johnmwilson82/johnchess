@@ -281,7 +281,7 @@ void BitBoard::get_castling_moves(std::list<Move>& move_list, bool white_to_move
             emplace_move(move_list, BoardLocation(4, 0), BoardLocation(6, 0));
         }
         if (has_castling_rights(CastlingRights::WHITE_QUEENSIDE) &&
-            !((m_occupied | m_opposite_attacks) & 0x00000000'0000000e))
+            !((m_occupied | m_opposite_attacks) & 0x00000000'0000000c))
         {
             emplace_move(move_list, BoardLocation(4, 0), BoardLocation(2, 0));
         }
@@ -295,7 +295,7 @@ void BitBoard::get_castling_moves(std::list<Move>& move_list, bool white_to_move
             emplace_move(move_list, BoardLocation(4, 7), BoardLocation(6, 7));
         }
         if (has_castling_rights(CastlingRights::BLACK_QUEENSIDE) &&
-            !((m_occupied | m_opposite_attacks) & 0x0e000000'00000000))
+            !((m_occupied | m_opposite_attacks) & 0x0c000000'00000000))
         {
             emplace_move(move_list, BoardLocation(4, 7), BoardLocation(2, 7));
         }
