@@ -19,11 +19,6 @@ uint64_t BitboardRayAttacks::get_positive_ray_attacks(uint8_t sq, RayDir dir)
 
     uint64_t ret = get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(blocker, dir));
 
-    /*if (blocked_ray & enemy_king)
-    {
-        check_king_pin(blocked_ray, get_ray_mask(sq, dir) ^ get_ray_mask(bit_scan_reverse(enemy_king), dir), dir);
-    }*/
-
     if (enemy_king)
     {
         check_king_pin(blocked_ray, (1ULL << sq) | (get_ray_mask(sq, dir) ^ get_ray_mask(bit_scan_forward(enemy_king), dir)), dir);
@@ -57,10 +52,6 @@ uint64_t BitboardRayAttacks::get_negative_ray_attacks(uint8_t sq, RayDir dir)
 
     uint64_t ret = get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(blocker, dir));
 
-    /*if (blocked_ray & enemy_king)
-    {
-        check_king_pin(blocked_ray, get_ray_mask(sq, dir) ^ get_ray_mask(bit_scan_reverse(enemy_king), dir), dir);
-    }*/
     if (enemy_king)
     {
         check_king_pin(blocked_ray, (1ULL << sq) | (get_ray_mask(sq, dir) ^ get_ray_mask(bit_scan_forward(enemy_king), dir)), dir);
@@ -103,9 +94,7 @@ uint64_t BitboardRayAttacks::get_ray_attacks(uint8_t sq, RayDir dir)
         break;
     }
 
-
-
-    return ret & ~m_bitboard.pieces_to_move(m_white_to_move);
+    return ret;
 }
 
 
@@ -118,10 +107,11 @@ uint64_t BitboardRayAttacks::check_king_pin(uint64_t blocked_ray, uint64_t allow
 
     uint64_t blocked_ray_less_ep = blocked_ray;
 
-    // check for single bit
+    
     if (king_pinned)
     {
         blocked_ray &= ~(get_ray_mask(bit_scan_reverse(king), dir) | king);
+        // check for single bit
         if (blocked_ray && (blocked_ray & (blocked_ray - 1)) == 0)
         {
             // at this point blocked_ray has one bit on it which is the location of the

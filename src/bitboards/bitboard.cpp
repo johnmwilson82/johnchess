@@ -59,7 +59,7 @@ uint64_t BitBoard::pieces_to_move(bool white_to_move) const
 
 Move& BitBoard::emplace_move(std::list<Move>& move_list, const BoardLocation& from_loc, const BoardLocation& to_loc) const
 {
-    auto& move = move_list.emplace_back(BoardLocation(from_loc), BoardLocation(to_loc));
+    auto& move = move_list.emplace_back(from_loc, to_loc);
     for (const auto& pieces : { std::make_pair(m_pawns, PieceType::PAWN), 
                                 std::make_pair(m_knights, PieceType::KNIGHT),
                                 std::make_pair(m_bishops, PieceType::BISHOP),
@@ -94,9 +94,9 @@ uint64_t BitBoard::get_moves(std::list<Move>& move_list, uint64_t pieces, bool w
 
         attacks |= attacks_fn(piece_sq);
 
-        attacks &= (~friendly_pieces) & m_allowed_moves;
-
         all_attacks |= attacks;
+
+        attacks &= (~friendly_pieces) & m_allowed_moves;
 
         while (attacks)
         {
@@ -486,7 +486,7 @@ bool BitBoard::make_move(const Move& move)
     }
 
     // Move piece to new_loc
-    for (auto piece_set : { &m_occupied, &m_white_pieces, &m_black_pieces, &m_knights, &m_bishops, &m_rooks, &m_queens})
+    for (auto piece_set : { &m_occupied, &m_white_pieces, &m_black_pieces, &m_knights, &m_bishops, &m_queens})
     {
         if (*piece_set & curr_loc_mask)
         {
@@ -525,14 +525,14 @@ bool BitBoard::make_move(const Move& move)
         if (curr_loc_mask & 0x80000000'00000080)
         {
             m_castling_rights &= m_white_to_move ?
-                static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE) :
-                static_cast<uint8_t>(CastlingRights::BLACK_KINGSIDE);
+                ~(static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE)) :
+                ~(static_cast<uint8_t>(CastlingRights::BLACK_KINGSIDE));
         }
         else if (curr_loc_mask & 0x01000000'00000001)
         {
             m_castling_rights &= m_white_to_move ?
-                static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE) :
-                static_cast<uint8_t>(CastlingRights::BLACK_QUEENSIDE);
+                ~(static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE)) :
+                ~(static_cast<uint8_t>(CastlingRights::BLACK_QUEENSIDE));
         }
 
         m_rooks ^= (new_loc_mask | curr_loc_mask);
@@ -567,10 +567,10 @@ bool BitBoard::make_move(const Move& move)
             }
 
             m_castling_rights &= m_white_to_move ?
-                static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE) |
-                static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE) :
-                static_cast<uint8_t>(CastlingRights::BLACK_KINGSIDE) |
-                static_cast<uint8_t>(CastlingRights::BLACK_QUEENSIDE);
+                ~(static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE) |
+                  static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE)) :
+                ~(static_cast<uint8_t>(CastlingRights::BLACK_KINGSIDE) |
+                  static_cast<uint8_t>(CastlingRights::BLACK_QUEENSIDE));
         }
 
         m_kings ^= (new_loc_mask | curr_loc_mask);
@@ -660,11 +660,12 @@ bool BitBoard::unmake_move(const Move& move)
         }
     }
 
+    // Move piece back to curr_loc - if this is a promotion we just remove the piece
     for (auto piece_set : { &m_pawns, &m_knights, &m_bishops, &m_rooks, &m_queens })
     {
         if (*piece_set & new_loc_mask)
         {
-            *piece_set ^= (move.get_promotion_type() != std::nullopt) ? new_loc_mask : (new_loc_mask | curr_loc_mask);
+            *piece_set ^= (move.get_promotion_type().has_value()) ? new_loc_mask : (new_loc_mask | curr_loc_mask);
         }
     }
 
@@ -703,7 +704,7 @@ bool BitBoard::unmake_move(const Move& move)
     // Check castling
     m_castling_rights = move.get_old_castling_rights();
 
-    if (move.get_promotion_type() != std::nullopt)
+    if (move.get_promotion_type().has_value())
     {
         m_pawns |= curr_loc_mask;
     }

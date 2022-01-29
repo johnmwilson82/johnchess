@@ -35,12 +35,12 @@ int main(int argc, const char* argv[])
     BitBoard board = board_from_string_repr<BitBoard>(board_str);
     //board.set_to_start_position();
 
-    board.make_move({ "d2d4" });
-    board.make_move({ "c7c5" });
-    //b5c6
-    //board.make_move({ "c1d2" });
+    board.make_move({ "f3d4" });
+    //board.make_move({ "b2a1n" });
+    //board.unmake_move({ "b2a1n" });
+    //board.make_move({ "h6f7" });
     //board.make_move({ "f8b4" });
-    //d1e1, d1f1
+    //e8f7
 
     auto moves = board.get_all_legal_moves(board.get_colour_to_move());
 
@@ -50,7 +50,7 @@ int main(int argc, const char* argv[])
         std::cout << move.to_string();// << "\n";
         board.make_move(move);
         //std::cout << "=================================\n";
-        uint64_t res = perft(board, 0);
+        uint64_t res = perft(board, 3);
         total += res;
         //std::cout << "perft result depth 1 = " << perft(board, 1) << "\n";
         //std::cout << "perft result depth 2 = " << perft(board, 2) << "\n";

@@ -19,43 +19,15 @@ protected:
 
 // Metrics taken from https://www.chessprogramming.org/Perft_Results
 
-TEST_F(PerftTests, CheckStartDepth1)
+TEST_F(PerftTests, CheckStartPosition)
 {
     BitBoard board;
     board.set_to_start_position();
 
     EXPECT_EQ(perft(board, 1), 20);
-}
-
-TEST_F(PerftTests, CheckStartDepth2)
-{
-    BitBoard board;
-    board.set_to_start_position();
-
     EXPECT_EQ(perft(board, 2), 400);
-}
-
-TEST_F(PerftTests, CheckStartDepth3)
-{
-    BitBoard board;
-    board.set_to_start_position();
-
     EXPECT_EQ(perft(board, 3), 8902);
-}
-
-TEST_F(PerftTests, CheckStartDepth4)
-{
-    BitBoard board;
-    board.set_to_start_position();
-
     EXPECT_EQ(perft(board, 4), 197281);
-}
-
-TEST_F(PerftTests, CheckStartDepth5)
-{
-    BitBoard board;
-    board.set_to_start_position();
-
     EXPECT_EQ(perft(board, 5), 4865609);
 }
 
@@ -78,4 +50,6 @@ TEST_F(PerftTests, CheckPosition4)
     EXPECT_EQ(perft(board, 1), 6);
     EXPECT_EQ(perft(board, 2), 264);
     EXPECT_EQ(perft(board, 3), 9467);
+    EXPECT_EQ(perft(board, 4), 422333);
+    EXPECT_EQ(perft(board, 5), 15833292);
 }
