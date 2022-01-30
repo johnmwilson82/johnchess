@@ -18,7 +18,9 @@ BitBoard::BitBoard() :
     m_occupied(0),
     m_opposite_attacks(0),
     m_current_attacks(0),
-    m_white_to_move(1)
+    m_white_to_move(1),
+    m_allowed_moves(0xffffffff'ffffffff),
+    m_new_allowed_moves(0xffffffff'ffffffff)
 {
 
 }
@@ -272,7 +274,13 @@ uint64_t BitBoard::get_king_moves(std::list<Move>& move_list, bool white_to_move
 
 void BitBoard::get_castling_moves(std::list<Move>& move_list, bool white_to_move) const
 {
-    // Todo: check for pieces attacking given squares
+    if (pieces_to_move(white_to_move) & m_kings & m_opposite_attacks)
+    {
+        // king is in check, no castling for him
+        return;
+    }
+
+    // Check thaat king won't move through check to castle and add to list
     if (white_to_move)
     {
         if (has_castling_rights(CastlingRights::WHITE_KINGSIDE) && 
@@ -281,7 +289,8 @@ void BitBoard::get_castling_moves(std::list<Move>& move_list, bool white_to_move
             emplace_move(move_list, BoardLocation(4, 0), BoardLocation(6, 0));
         }
         if (has_castling_rights(CastlingRights::WHITE_QUEENSIDE) &&
-            !((m_occupied | m_opposite_attacks) & 0x00000000'0000000c))
+            !((m_occupied | m_opposite_attacks) & 0x00000000'0000000c) &&
+            !(m_occupied & 0x00000000'00000002))
         {
             emplace_move(move_list, BoardLocation(4, 0), BoardLocation(2, 0));
         }
@@ -295,7 +304,8 @@ void BitBoard::get_castling_moves(std::list<Move>& move_list, bool white_to_move
             emplace_move(move_list, BoardLocation(4, 7), BoardLocation(6, 7));
         }
         if (has_castling_rights(CastlingRights::BLACK_QUEENSIDE) &&
-            !((m_occupied | m_opposite_attacks) & 0x0c000000'00000000))
+            !((m_occupied | m_opposite_attacks) & 0x0c000000'00000000) &&
+            !(m_occupied & 0x02000000'00000000))
         {
             emplace_move(move_list, BoardLocation(4, 7), BoardLocation(2, 7));
         }
@@ -332,6 +342,12 @@ std::list<Move> BitBoard::get_all_legal_moves(PieceColour col) const
     std::list<Move> ret;
 
     bool white_to_move = col == PieceColour::WHITE;
+
+    // if there's no king the game is over
+    if (!(pieces_to_move(white_to_move) & m_kings))
+    {
+        return ret;
+    }
 
     std::unordered_map<uint8_t, uint64_t> dummy;
     BitboardRayAttacks enemy_ray_attacks(*this, !white_to_move, dummy);
@@ -483,6 +499,24 @@ bool BitBoard::make_move(const Move& move)
         {
             *piece_set &= ~new_loc_mask;
         }
+
+        // Handle removal of castling rights if rook is taken
+        if (new_loc_mask == 0x01000000'00000000)
+        {
+            m_castling_rights &= ~static_cast<uint8_t>(CastlingRights::BLACK_QUEENSIDE);
+        }
+        else if (new_loc_mask == 0x80000000'00000000)
+        {
+            m_castling_rights &= ~static_cast<uint8_t>(CastlingRights::BLACK_KINGSIDE);
+        }
+        else if (new_loc_mask == 0x00000000'00000001)
+        {
+            m_castling_rights &= ~static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE);
+        }
+        else if (new_loc_mask == 0x80000000'00000080)
+        {
+            m_castling_rights &= ~static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE);
+        }
     }
 
     // Move piece to new_loc
@@ -548,7 +582,7 @@ bool BitBoard::make_move(const Move& move)
 
             if (new_loc_mask & 0x40000000'00000040)
             {
-                rook_mask = (m_white_to_move ? 0x00000000'000000c0 : 0xc0000000'00000000);
+                rook_mask = (m_white_to_move ? 0x00000000'000000a0 : 0xa0000000'00000000);
             }
             // queens side
             if (new_loc_mask & 0x04000000'00000004)
@@ -679,7 +713,7 @@ bool BitBoard::unmake_move(const Move& move)
 
             if (new_loc_mask & 0x40000000'00000040)
             {
-                rook_mask = (!m_white_to_move ? 0x00000000'000000c0 : 0xc0000000'00000000);
+                rook_mask = (!m_white_to_move ? 0x00000000'000000a0 : 0xa0000000'00000000);
             }
             // queens side
             if (new_loc_mask & 0x04000000'00000004)

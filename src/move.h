@@ -59,7 +59,7 @@ public:
     Move(const BoardLocation& from_loc, const DynMove& dm);
     Move(const std::string& move_str);
     Move(const BoardLocation& from_loc, const BoardLocation& to_loc);
-    
+
     bool operator== (const Move& m) const;
     
     std::string to_string() const;

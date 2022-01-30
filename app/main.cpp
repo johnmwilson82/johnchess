@@ -37,17 +37,27 @@ int main(int argc, const char* argv[])
 
     board.make_move({ "f3d4" });
     //board.make_move({ "b2a1n" });
-    //board.unmake_move({ "b2a1n" });
-    //board.make_move({ "h6f7" });
+    //board.make_move({ "b4d6" });
+    //board.make_move({ "c7c5" });
+    //board.make_move({ "d6b8" });
     //board.make_move({ "f8b4" });
-    //e8f7
+    //e8c8
 
     auto moves = board.get_all_legal_moves(board.get_colour_to_move());
 
+    auto move = std::ranges::find_if(moves, [&](const Move& move) { return move == Move("b2a1n"); });
+
+    //board.make_move(*move);
+    //board.unmake_move(*move);
+    //board.make_move(*move);
+
     uint64_t total = 0;
     for (const auto& move : moves)
-    {
+    {        
+        //if (!(move == Move("g7h6") || move == Move("b2a1n"))) continue;
+
         std::cout << move.to_string();// << "\n";
+
         board.make_move(move);
         //std::cout << "=================================\n";
         uint64_t res = perft(board, 3);

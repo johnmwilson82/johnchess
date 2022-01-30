@@ -49,7 +49,7 @@ Move::Move(const std::string& move_str) :
 
 bool Move::operator== (const Move& m) const
 {
-    return (m_from_loc == m.m_from_loc) && (m_to_loc == m.m_to_loc);
+    return (m_from_loc == m.m_from_loc) && (m_to_loc == m.m_to_loc) && (m_promotion_type == m.m_promotion_type);
 }
 
 std::string Move::to_string() const
