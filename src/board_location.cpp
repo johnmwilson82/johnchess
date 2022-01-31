@@ -1,5 +1,5 @@
 #include "board_location.h"
-#include "pieces.h"
+//#include "pieces.h"
 
 
 BoardLocation::BoardLocation(uint8_t bitboard_sq) :
@@ -53,7 +53,7 @@ BoardLocation::~BoardLocation()
 }
 
 
-BoardLocation BoardLocation::apply_move(const DynMove& dm) const
+/*BoardLocation BoardLocation::apply_move(const DynMove& dm) const
 {
     return apply_move(dm.get_dx(), dm.get_dy());
 }
@@ -90,3 +90,4 @@ bool BoardLocation::apply_move_inplace(int dx, int dy)
     m_y += dy;
     return true;
 }
+*/

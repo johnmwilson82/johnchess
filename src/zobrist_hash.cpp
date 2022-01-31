@@ -1,7 +1,7 @@
 #include "zobrist_hash.h"
 #include <random>
 
-
+/*
 size_t ZobristHash::piece_to_index(const Piece& piece) const
 {
     size_t piece_idx = static_cast<size_t>(piece.get_type());
@@ -12,7 +12,7 @@ size_t ZobristHash::piece_to_index(const Piece& piece) const
     }
 
     return piece_idx;
-}
+}*/
 
 
 ZobristHash::ZobristHash()
@@ -41,12 +41,12 @@ uint64_t ZobristHash::get_hash(const IBoard& board) const
     uint64_t ret = 0;
     for(int i = 0; i < 64; ++i)
     {
-        auto piece = board.piece_on_square(i & 0x7, i >> 3);
+        /*auto piece = board.piece_on_square(i & 0x7, i >> 3);
         if(piece)
         {
             auto j = piece_to_index(*piece);
             ret ^= piece_table[i][j];
-        }
+        }*/
     }
 
     if (board.get_colour_to_move() == PieceColour::BLACK)

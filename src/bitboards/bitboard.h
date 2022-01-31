@@ -14,6 +14,7 @@ private:
     uint64_t m_black_pieces, m_white_pieces, m_occupied;
 
     mutable uint64_t m_opposite_attacks, m_current_attacks, m_allowed_moves, m_new_allowed_moves;
+    mutable MoveList m_move_list;
 
     uint8_t m_white_to_move; // 1 or 0
     uint8_t m_castling_rights = 0;
@@ -44,12 +45,12 @@ private:
         0x0203000000000000, 0x0507000000000000, 0x0a0e000000000000, 0x141c000000000000, 0x2838000000000000, 0x5070000000000000, 0xa0e0000000000000, 0x40c0000000000000, 
     };
 
-    uint64_t get_pawn_moves(std::list<Move>& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const;
-    uint64_t get_en_passant_pawn_moves(std::list<Move>& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const;
-    uint64_t get_knight_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned) const;
-    uint64_t get_king_moves(std::list<Move>& move_list, bool white_to_move) const;
+    uint64_t get_pawn_moves(MoveList& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const;
+    uint64_t get_en_passant_pawn_moves(MoveList& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const;
+    uint64_t get_knight_moves(MoveList& move_list, bool white_to_move, uint64_t pinned) const;
+    uint64_t get_king_moves(MoveList& move_list, bool white_to_move) const;
 
-    void get_castling_moves(std::list<Move>& move_list, bool white_to_move) const;
+    void get_castling_moves(MoveList& move_list, bool white_to_move) const;
 
 public:
     inline uint64_t get_occupied() const { return m_occupied; }
@@ -58,10 +59,10 @@ public:
     inline uint64_t get_queens() const { return m_queens; }
     inline uint64_t get_kings() const { return m_kings; }
 
-    uint64_t get_moves(std::list<Move>& move_list, uint64_t pieces, bool white_to_move, std::function<uint64_t(uint8_t)> attacks_fn) const;
+    uint64_t get_moves(MoveList& move_list, uint64_t pieces, bool white_to_move, std::function<uint64_t(uint8_t)> attacks_fn) const;
     uint64_t pieces_to_move(bool white_to_move) const;
 
-    Move& emplace_move(std::list<Move>& move_list, const BoardLocation& from_loc, const BoardLocation& to_loc) const;
+    Move& emplace_move(MoveList& move_list, const BoardLocation& from_loc, const BoardLocation& to_loc) const;
 
 public:
     BitBoard();
@@ -105,7 +106,7 @@ public:
     void populate_squares_properties();
 
     //! Return the number of available moves for a given colour
-    std::list<Move> get_all_legal_moves(PieceColour col) const;
+    MoveList& get_all_legal_moves(PieceColour col) const;
 
     bool add_piece(PieceType type, PieceColour col, BoardLocation loc);
 

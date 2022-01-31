@@ -1,17 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="test_board.cpp">
-      <Filter>tests</Filter>
-    </ClCompile>
     <ClCompile Include="test_read_write_board.cpp">
       <Filter>tests</Filter>
     </ClCompile>
     <ClCompile Include="test_zobrist_hash.cpp">
       <Filter>tests</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\board.cpp">
-      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\board_location.cpp">
       <Filter>src</Filter>
@@ -26,9 +20,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\move.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\pieces.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\xboard_interface.cpp">
@@ -60,9 +51,6 @@
     <ClInclude Include="..\src\ai.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\board.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\board_location.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -76,12 +64,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\move.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\pieces.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\square.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\xboard_interface.h">

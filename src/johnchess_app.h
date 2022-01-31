@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include "xboard_interface.h"
-#include "board.h"
+#include "iboard.h"
 //#include "bitboards/bitboard.h"
 #include "ai.h"
 
@@ -23,7 +23,7 @@ public: //public methods
 
 private:
     std::unique_ptr<XBoardInterface> m_xboard_interface;
-    std::unique_ptr<Board> m_board;
+    std::unique_ptr<IBoard> m_board;
     std::unique_ptr<AI> m_ai;
 
     app_opts_t* parse_args(int argc, const char* argv[]);

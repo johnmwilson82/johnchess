@@ -1,20 +1,20 @@
 #include "move.h"
 
-#include "pieces.h"
 #include "iboard.h"
 
 
-Move::Move(const BoardLocation& from_loc, const DynMove& dm) :
+/*Move::Move(const BoardLocation& from_loc, const DynMove& dm) :
     m_from_loc(from_loc),
     m_to_loc(from_loc.apply_move(dm))
 {
 }
-
+*/
 Move::Move(const BoardLocation& from_loc, const BoardLocation& to_loc) :
     m_from_loc(from_loc),
     m_to_loc(to_loc)
 {
 }
+
 
 Move::Move(const std::string& move_str) :
     m_from_loc(move_str.substr(0, 2)),

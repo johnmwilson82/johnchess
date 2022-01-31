@@ -142,7 +142,7 @@ uint64_t BitboardRayAttacks::check_king_pin(uint64_t blocked_ray, uint64_t allow
 }
 
 
-uint64_t BitboardRayAttacks::get_pinned_piece_moves(std::list<Move>& move_list, uint64_t& pieces, std::function<uint64_t(uint8_t)> attacks_fn) const
+uint64_t BitboardRayAttacks::get_pinned_piece_moves(IBoard::MoveList& move_list, uint64_t& pieces, std::function<uint64_t(uint8_t)> attacks_fn) const
 {
     uint64_t ret = 0;
 
@@ -169,7 +169,7 @@ uint64_t BitboardRayAttacks::get_pinned_piece_moves(std::list<Move>& move_list, 
 }
 
 
-uint64_t BitboardRayAttacks::get_bishop_moves(std::list<Move>& move_list)
+uint64_t BitboardRayAttacks::get_bishop_moves(IBoard::MoveList& move_list)
 {
     auto bishop_moves = [&](uint8_t sq) {
         return get_ray_attacks(sq, RayDir::NE) |
@@ -191,7 +191,7 @@ uint64_t BitboardRayAttacks::get_bishop_moves(std::list<Move>& move_list)
 }
 
 
-uint64_t BitboardRayAttacks::get_rook_moves(std::list<Move>& move_list)
+uint64_t BitboardRayAttacks::get_rook_moves(IBoard::MoveList& move_list)
 {
     auto rook_moves = [&](uint8_t sq) {
         return get_ray_attacks(sq, RayDir::N) |
@@ -212,7 +212,7 @@ uint64_t BitboardRayAttacks::get_rook_moves(std::list<Move>& move_list)
 }
 
 
-uint64_t BitboardRayAttacks::get_queen_moves(std::list<Move>& move_list)
+uint64_t BitboardRayAttacks::get_queen_moves(IBoard::MoveList& move_list)
 {
     auto queen_moves = [&](uint8_t sq) {
         return get_ray_attacks(sq, RayDir::NE) |

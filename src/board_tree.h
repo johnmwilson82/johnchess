@@ -1,7 +1,7 @@
 #pragma once
 
 #include "move.h"
-#include "board.h"
+#include "iboard.h"
 #include "board_tree_node.h"
 
 #include "utils/board_strings.h"

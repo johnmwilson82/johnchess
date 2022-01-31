@@ -208,7 +208,7 @@ namespace utils
     template<IsBoard T>
     static std::string board_to_string_repr(const T& board)
     {
-        std::ostringstream oss;
+        /*std::ostringstream oss;
 
         for (int y = 7; y >= 0; --y)
         {
@@ -254,7 +254,8 @@ namespace utils
         }
 
         oss << write_fen_props_line(board) << std::endl;
-
-        return oss.str();
+        
+        return oss.str();*/
+        return "";
     }
 };

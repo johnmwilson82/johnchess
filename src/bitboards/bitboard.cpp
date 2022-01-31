@@ -59,7 +59,7 @@ uint64_t BitBoard::pieces_to_move(bool white_to_move) const
     return m_white_pieces * white_to_move | m_black_pieces * !white_to_move;
 }
 
-Move& BitBoard::emplace_move(std::list<Move>& move_list, const BoardLocation& from_loc, const BoardLocation& to_loc) const
+Move& BitBoard::emplace_move(MoveList& move_list, const BoardLocation& from_loc, const BoardLocation& to_loc) const
 {
     auto& move = move_list.emplace_back(from_loc, to_loc);
     for (const auto& pieces : { std::make_pair(m_pawns, PieceType::PAWN), 
@@ -81,7 +81,7 @@ Move& BitBoard::emplace_move(std::list<Move>& move_list, const BoardLocation& fr
     return move;
 }
 
-uint64_t BitBoard::get_moves(std::list<Move>& move_list, uint64_t pieces, bool white_to_move, std::function<uint64_t(uint8_t)> attacks_fn) const
+uint64_t BitBoard::get_moves(MoveList& move_list, uint64_t pieces, bool white_to_move, std::function<uint64_t(uint8_t)> attacks_fn) const
 {
     uint64_t friendly_pieces = pieces_to_move(white_to_move);
     uint64_t moving_pieces = pieces & friendly_pieces;
@@ -113,7 +113,7 @@ uint64_t BitBoard::get_moves(std::list<Move>& move_list, uint64_t pieces, bool w
     return all_attacks;
 }
 
-uint64_t BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const
+uint64_t BitBoard::get_pawn_moves(MoveList& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const
 {
     // Flip the board vertically to calculate the black moves
     uint64_t friendly_pieces = white_to_move ? pieces_to_move(white_to_move) : mirror_vertical(pieces_to_move(white_to_move));
@@ -197,7 +197,7 @@ uint64_t BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move
     return all_attacks;
 }
 
-uint64_t BitBoard::get_en_passant_pawn_moves(std::list<Move>& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const
+uint64_t BitBoard::get_en_passant_pawn_moves(MoveList& move_list, bool white_to_move, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const
 {
     // Flip the board vertically to calculate the black moves
     uint64_t friendly_pieces = white_to_move ? pieces_to_move(white_to_move) : mirror_vertical(pieces_to_move(white_to_move));
@@ -251,7 +251,7 @@ uint64_t BitBoard::get_en_passant_pawn_moves(std::list<Move>& move_list, bool wh
 }
 
 
-uint64_t BitBoard::get_knight_moves(std::list<Move>& move_list, bool white_to_move, uint64_t pinned) const
+uint64_t BitBoard::get_knight_moves(MoveList& move_list, bool white_to_move, uint64_t pinned) const
 {
     return get_moves(move_list, m_knights & ~pinned, white_to_move, [&](uint8_t sq) {
 
@@ -266,14 +266,14 @@ uint64_t BitBoard::get_knight_moves(std::list<Move>& move_list, bool white_to_mo
     });
 }
 
-uint64_t BitBoard::get_king_moves(std::list<Move>& move_list, bool white_to_move) const
+uint64_t BitBoard::get_king_moves(MoveList& move_list, bool white_to_move) const
 {
     return get_moves(move_list, m_kings, white_to_move, [&](uint8_t sq) { 
         return king_attack_lut[sq] & ~m_opposite_attacks; 
     });
 }
 
-void BitBoard::get_castling_moves(std::list<Move>& move_list, bool white_to_move) const
+void BitBoard::get_castling_moves(MoveList& move_list, bool white_to_move) const
 {
     if (pieces_to_move(white_to_move) & m_kings & m_opposite_attacks)
     {
@@ -338,9 +338,9 @@ void BitBoard::populate_squares_properties()
 
 }
 
-std::list<Move> BitBoard::get_all_legal_moves(PieceColour col) const
+IBoard::MoveList& BitBoard::get_all_legal_moves(PieceColour col) const
 {
-    std::list<Move> ret;
+    MoveList& ret = m_move_list;
 
     bool white_to_move = col == PieceColour::WHITE;
 

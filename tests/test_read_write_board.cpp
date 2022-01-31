@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 
+#if(0)
 #include <board.h>
 #include <utils\board_strings.h>
 
@@ -119,3 +120,4 @@ TEST_F(BoardReadWriteTests, CheckWriteToString2)
 
     EXPECT_EQ(board_str, out_str);
 }
+#endif

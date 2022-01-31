@@ -1,5 +1,5 @@
-#include "board.h"
-#include "pieces.h"
+#include "iboard.h"
+//#include "pieces.h"
 
 class ZobristHash
 {
@@ -49,7 +49,7 @@ private:
 
     uint64_t props_table[static_cast<size_t>(BoardPropsIndex::SIZE)];
 
-    size_t piece_to_index(const Piece& piece) const;
+    //size_t piece_to_index(const Piece& piece) const;
     
 public:
     ZobristHash();

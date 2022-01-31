@@ -1,13 +1,17 @@
 #pragma once
 #include <functional>
+#include <boost/container/static_vector.hpp>
 
 #include "piece_types.h"
 #include <optional>
+#include <ranges>
 #include <move.h>
 
 class IBoard
 {
 public:
+    using MoveList = boost::container::static_vector<Move, 256>;
+
     enum Mate {
         CHECKMATE,
         STALEMATE,
@@ -64,7 +68,7 @@ public:
     virtual void populate_squares_properties() = 0;
 
     //! Return the number of available moves for a given colour
-    virtual std::list<Move> get_all_legal_moves(PieceColour col) const = 0;
+    virtual const MoveList& get_all_legal_moves(PieceColour col) const = 0;
 
     virtual bool add_piece(PieceType type, PieceColour col, BoardLocation loc) = 0;
 

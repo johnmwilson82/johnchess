@@ -54,10 +54,10 @@ const double BoardTreeNode::get_score(PieceColour ai_col, PieceColour colour_to_
         {
             switch (m_board->get_mate(colour_to_move))
             {
-            case Board::CHECKMATE:
+            case IBoard::CHECKMATE:
                 return 200;
 
-            case Board::STALEMATE:
+            case IBoard::STALEMATE:
                 return 0;
 
             default:

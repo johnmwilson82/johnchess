@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <fstream>
 
+#include "bitboards/bitboard.h"
 #include "utils/board_strings.h"
 
 JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
@@ -16,7 +17,7 @@ JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
     m_xboard_interface->add_variant("normal");
 
     show_welcome();
-    m_board = std::make_unique<Board>();
+    m_board = std::make_unique<BitBoard>();
     m_board->set_to_start_position();
 
     m_ai = std::make_unique<BasicAI>(PieceColour::BLACK, 2);
@@ -34,7 +35,7 @@ void JohnchessApp::make_ai_move()
 
     std::string move_string = m_ai->make_move(*m_board).to_string();
 
-    auto new_board = std::make_unique<Board>(*m_board, move_string);
+    auto new_board = std::make_unique<BitBoard>();
 
     if(new_board->get_in_check(moving_colour))
     {
@@ -60,10 +61,10 @@ bool JohnchessApp::check_game_end()
     PieceColour colour_to_move = m_board->get_colour_to_move();
 
     // Check whether AI player is in mate
-    Board::Mate mate = m_board->get_mate(colour_to_move);
-    if(mate != Board::NO_MATE)
+    IBoard::Mate mate = m_board->get_mate(colour_to_move);
+    if(mate != IBoard::NO_MATE)
     {
-        if(mate == Board::STALEMATE)
+        if(mate == IBoard::STALEMATE)
         {
             m_xboard_interface->reply_result(XBoardInterface::Result::DRAW);
         }
@@ -99,7 +100,7 @@ void JohnchessApp::main_loop()
                 PieceColour colour_to_move = m_board->get_colour_to_move();
 
                 const auto rcvd_move = rcvd.get_move_string();
-                auto new_board = std::make_unique<Board>(*m_board, rcvd_move);
+                auto new_board = std::make_unique<BitBoard>();
 
                 if(new_board->get_in_check(colour_to_move))
                 {

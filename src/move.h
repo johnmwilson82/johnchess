@@ -9,7 +9,7 @@
 class IBoard;
 class Piece;
 
-class DynMove
+/*class DynMove
 {
 // DynMove: Describes the dynamics of a move (where a piece moves to 
 // relative to it's current position)
@@ -23,7 +23,7 @@ public:
 
 private:
     int m_dx, m_dy;
-};
+};*/
 
 class MoveHashFunction;
 
@@ -56,7 +56,7 @@ public:
         KNIGHT
     };
 
-    Move(const BoardLocation& from_loc, const DynMove& dm);
+    //Move(const BoardLocation& from_loc, const DynMove& dm);
     Move(const std::string& move_str);
     Move(const BoardLocation& from_loc, const BoardLocation& to_loc);
 

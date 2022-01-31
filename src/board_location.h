@@ -45,7 +45,7 @@ public: // methods
      * \param dm Relative move to be added to the current location
      * \return New BoardLocation with the relative move applied
      */
-    BoardLocation apply_move(const DynMove& dm) const;
+    //BoardLocation apply_move(const DynMove& dm) const;
 
     //! Apply a move to a BoardLocation
     /*!
@@ -53,14 +53,14 @@ public: // methods
      * \param dy Relative shift in rows
      * \return New BoardLocation with the relative move applied
      */
-    BoardLocation apply_move(int dx, int dy) const;
+    //BoardLocation apply_move(int dx, int dy) const;
 
     //! Apply a move in-place to a BoardLocation
     /*!
      * \param dm Relative move to be added to the current location
      * \return true is move if valid and resultant position is on the board, false otherwise
      */
-    bool apply_move_inplace(const DynMove& dm);
+    //bool apply_move_inplace(const DynMove& dm);
 
     //! Apply a move in-place to a BoardLocation
     /*!
@@ -68,7 +68,7 @@ public: // methods
      * \param dy Relative shift in rows
      * \return true is move if valid and resultant position is on the board, false otherwise
      */
-    bool apply_move_inplace(int dx, int dy);
+    //bool apply_move_inplace(int dx, int dy);
 
     //! Equals operator
     bool operator== (const BoardLocation& bl) const
@@ -117,7 +117,7 @@ public: // inlines
     inline bool get_on_board() { return m_on_board; }
 
 private:
-    void register_captured(Piece* piece);
+    //void register_captured(Piece* piece);
 
 private: // properties
     int m_x, m_y;

@@ -2,7 +2,6 @@
 
 #include "ai.h"
 
-#include <board.h>
 #include <bitboards/bitboard.h>
 #include <utils/board_strings.h>
 #include <utils/perft.h>

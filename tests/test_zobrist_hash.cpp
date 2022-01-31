@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-
+#if(0)
 #define private public
 #include <zobrist_hash.h>
 #include <utils\board_strings.h>
@@ -145,3 +145,4 @@ TEST_F(ZobristHashTests, CheckMoveHash)
     EXPECT_EQ(expected_hash, test_hash);
 
 }
+#endif

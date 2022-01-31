@@ -60,18 +60,6 @@
     <ClInclude Include="src\utils\perft.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\board.h">
-      <Filter>Source Files\naive_board_impl</Filter>
-    </ClInclude>
-    <ClInclude Include="src\board_location.h">
-      <Filter>Source Files\naive_board_impl</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pieces.h">
-      <Filter>Source Files\naive_board_impl</Filter>
-    </ClInclude>
-    <ClInclude Include="src\square.h">
-      <Filter>Source Files\naive_board_impl</Filter>
-    </ClInclude>
     <ClInclude Include="src\move.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -83,6 +71,9 @@
     </ClInclude>
     <ClInclude Include="src\bitboards\bitboard_ray_attacks.h">
       <Filter>Source Files\bitboards</Filter>
+    </ClInclude>
+    <ClInclude Include="src\board_location.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -107,15 +98,6 @@
     <ClCompile Include="src\board_tree_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\board.cpp">
-      <Filter>Source Files\naive_board_impl</Filter>
-    </ClCompile>
-    <ClCompile Include="src\board_location.cpp">
-      <Filter>Source Files\naive_board_impl</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pieces.cpp">
-      <Filter>Source Files\naive_board_impl</Filter>
-    </ClCompile>
     <ClCompile Include="src\move.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -124,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="src\bitboards\bitboard_ray_attacks.cpp">
       <Filter>Source Files\bitboards</Filter>
+    </ClCompile>
+    <ClCompile Include="src\board_location.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

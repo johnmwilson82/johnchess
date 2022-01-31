@@ -15,7 +15,7 @@
 
 ShannonHeuristic::ShannonHeuristic(const IBoard& board)
 {
-    auto piece_fn = [&](const Piece& piece) {
+    /*auto piece_fn = [&](const Piece& piece) {
         double mult = piece.get_colour() == PieceColour::WHITE ? 1 : -1;
 
         switch(piece.get_type())
@@ -50,7 +50,8 @@ ShannonHeuristic::ShannonHeuristic(const IBoard& board)
     };
 
     board.for_all_pieces(piece_fn);    
-    
+    */
     //accum += board.get_all_legal_moves(Piece::WHITE).size() * 0.1;
     //accum -= board.get_all_legal_moves(Piece::BLACK).size() * 0.1;
+
 }
