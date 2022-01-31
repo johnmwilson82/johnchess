@@ -164,7 +164,13 @@ uint64_t BitBoard::get_pawn_moves(std::list<Move>& move_list, bool white_to_move
             attacks &= pinned_piece_allowed_moves.at(piece_sq);
         }
 
-        all_attacks |= (white_to_move ? (left_attack | right_attack) : mirror_vertical(left_attack | right_attack));
+        uint64_t attack_sqs = white_to_move ? (left_attack | right_attack) : mirror_vertical(left_attack | right_attack);
+        all_attacks |= attack_sqs;
+
+        if (attack_sqs & (m_kings & pieces_to_move(!white_to_move)))
+        {
+            m_new_allowed_moves &= (1ULL << piece_sq);
+        }
 
         while (attacks)
         {
@@ -219,11 +225,6 @@ uint64_t BitBoard::get_en_passant_pawn_moves(std::list<Move>& move_list, bool wh
         // Scalar square vertical mirror
         piece_sq = white_to_move ? piece_sq : piece_sq ^ 56;
         
-        if (attacks & (m_kings & pieces_to_move(!m_white_to_move)))
-        {
-            m_new_allowed_moves &= (1ULL << piece_sq);
-        }
-
         // If pawn is pinned ensure it moves to allowed square during capture
         if (pinned_piece_allowed_moves.contains(piece_sq))
         {
@@ -528,6 +529,8 @@ bool BitBoard::make_move(const Move& move)
         }
     }
 
+    m_en_passant_col = std::nullopt;
+
     if (m_pawns & curr_loc_mask)
     {
         // en passant rules
@@ -556,13 +559,13 @@ bool BitBoard::make_move(const Move& move)
 
     if (m_rooks & curr_loc_mask)
     {
-        if (curr_loc_mask & 0x80000000'00000080)
+        if (curr_loc_mask & (m_white_to_move ? 0x00000000'00000080 : 0x80000000'00000000))
         {
             m_castling_rights &= m_white_to_move ?
                 ~(static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE)) :
                 ~(static_cast<uint8_t>(CastlingRights::BLACK_KINGSIDE));
         }
-        else if (curr_loc_mask & 0x01000000'00000001)
+        else if (curr_loc_mask & (m_white_to_move ? 0x00000000'00000001 : 0x01000000'00000000))
         {
             m_castling_rights &= m_white_to_move ?
                 ~(static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE)) :

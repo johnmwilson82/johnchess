@@ -853,6 +853,29 @@ TEST_F(BitboardTests, MoveIntoEnPassant)
     ASSERT_TRUE(find_fn(white_moves2, "d5e6"));
 }
 
+TEST_F(BitboardTests, CheckBlackInPawnCheckMoves)
+{
+    std::string board_str(
+        " _ _ _ _ k _ _ r\n"
+        " _ _ _ P _ _ _ R\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ K _ _ _\n"
+        "b - - 0 0\n"
+    );
+
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    auto moves = board.get_all_legal_moves(PieceColour::BLACK);
+    EXPECT_EQ(moves.size(), 2);
+    EXPECT_TRUE(board.get_in_check(PieceColour::BLACK));
+    EXPECT_TRUE(find_fn(moves, "e8f8"));
+    EXPECT_TRUE(find_fn(moves, "e8d8"));
+}
+
 TEST_F(BitboardTests, CheckFoolsMateMoves)
 {
     std::string board_str(

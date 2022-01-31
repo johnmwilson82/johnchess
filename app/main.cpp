@@ -36,12 +36,12 @@ int main(int argc, const char* argv[])
     //board.set_to_start_position();
 
     board.make_move({ "f3d4" });
-    //board.make_move({ "b2a1n" });
-    //board.make_move({ "b4d6" });
-    //board.make_move({ "c7c5" });
-    //board.make_move({ "d6b8" });
+    //board.make_move({ "b2a1r" });
+    //board.make_move({ "d2d3" });
+    //board.make_move({ "a1b1" });
+    //board.make_move({ "f1e1" });
     //board.make_move({ "f8b4" });
-    //e8c8
+    //b5c6
 
     auto moves = board.get_all_legal_moves(board.get_colour_to_move());
 
@@ -60,7 +60,7 @@ int main(int argc, const char* argv[])
 
         board.make_move(move);
         //std::cout << "=================================\n";
-        uint64_t res = perft(board, 3);
+        uint64_t res = perft(board, 4);
         total += res;
         //std::cout << "perft result depth 1 = " << perft(board, 1) << "\n";
         //std::cout << "perft result depth 2 = " << perft(board, 2) << "\n";
