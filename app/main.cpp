@@ -20,28 +20,28 @@ using namespace utils;
 int main(int argc, const char* argv[])
 {
     std::string board_str(
-        " r _ _ _ k _ _ r\n"
-        " P p p p _ p p p\n"
-        " _ b _ _ _ n b N\n"
-        " n P _ _ _ _ _ _\n"
-        " B B P _ P _ _ _\n"
-        " q _ _ _ _ N _ _\n"
-        " P p _ P _ _ P P\n"
-        " R _ _ Q _ R K _\n"
-        "w kq - 0 0\n"
+        " r n b q _ k _ r\n"
+        " p p _ P b p p p\n"
+        " _ _ p _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ B _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " P P P _ N n P P\n"
+        " R N B Q K _ _ R\n"
+        "w KQ - 1 8\n"
     );
 
 
     BitBoard board = board_from_string_repr<BitBoard>(board_str);
     //board.set_to_start_position();
 
-    board.make_move({ "f3d4" });
-    //board.make_move({ "b2a1r" });
+    board.make_move({ "d7c8q" });
+    board.make_move({ "f2h1" });
     //board.make_move({ "d2d3" });
     //board.make_move({ "a1b1" });
     //board.make_move({ "f1e1" });
     //board.make_move({ "f8b4" });
-    //b5c6
+    //e1g1
 
     auto moves = board.get_all_legal_moves(board.get_colour_to_move());
 
@@ -60,7 +60,7 @@ int main(int argc, const char* argv[])
 
         board.make_move(move);
         //std::cout << "=================================\n";
-        uint64_t res = perft(board, 4);
+        uint64_t res = perft(board, 0);
         total += res;
         //std::cout << "perft result depth 1 = " << perft(board, 1) << "\n";
         //std::cout << "perft result depth 2 = " << perft(board, 2) << "\n";

@@ -498,25 +498,25 @@ bool BitBoard::make_move(const Move& move)
     {
         if (*piece_set & new_loc_mask)
         {
-            *piece_set &= ~new_loc_mask;
-        }
-
-        // Handle removal of castling rights if rook is taken
-        if (new_loc_mask == 0x01000000'00000000)
-        {
-            m_castling_rights &= ~static_cast<uint8_t>(CastlingRights::BLACK_QUEENSIDE);
-        }
-        else if (new_loc_mask == 0x80000000'00000000)
-        {
-            m_castling_rights &= ~static_cast<uint8_t>(CastlingRights::BLACK_KINGSIDE);
-        }
-        else if (new_loc_mask == 0x00000000'00000001)
-        {
-            m_castling_rights &= ~static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE);
-        }
-        else if (new_loc_mask == 0x80000000'00000080)
-        {
-            m_castling_rights &= ~static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE);
+            *piece_set &= ~new_loc_mask;        
+            
+            // Handle removal of castling rights if rook is taken
+            if (new_loc_mask == 0x01000000'00000000)
+            {
+                m_castling_rights &= ~static_cast<uint8_t>(CastlingRights::BLACK_QUEENSIDE);
+            }
+            else if (new_loc_mask == 0x80000000'00000000)
+            {
+                m_castling_rights &= ~static_cast<uint8_t>(CastlingRights::BLACK_KINGSIDE);
+            }
+            else if (new_loc_mask == 0x00000000'00000001)
+            {
+                m_castling_rights &= ~static_cast<uint8_t>(CastlingRights::WHITE_QUEENSIDE);
+            }
+            else if (new_loc_mask == 0x00000000'00000080)
+            {
+                m_castling_rights &= ~static_cast<uint8_t>(CastlingRights::WHITE_KINGSIDE);
+            }
         }
     }
 
