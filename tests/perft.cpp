@@ -59,7 +59,7 @@ TEST_F(PerftTests, CheckStartPosition5)
     EXPECT_EQ(perft(board, 5), 4865609);
 }
 
-/*TEST_F(PerftTests, CheckStartPosition6)
+TEST_F(PerftTests, CheckStartPosition6)
 {
     BitBoard board;
     board.set_to_start_position();
@@ -73,7 +73,7 @@ TEST_F(PerftTests, CheckStartPosition7)
     board.set_to_start_position();
 
     EXPECT_EQ(perft(board, 7), 3195901860);
-}*/
+}
 
 TEST_F(PerftTests, CheckPosition4)
 {
@@ -96,6 +96,30 @@ TEST_F(PerftTests, CheckPosition4)
     EXPECT_EQ(perft(board, 3), 9467);
     EXPECT_EQ(perft(board, 4), 422333);
     EXPECT_EQ(perft(board, 5), 15833292);
+}
+
+TEST_F(PerftTests, CheckKiwiPete)
+{
+    std::string board_str(
+        " r _ _ _ k _ _ r\n"
+        " p _ p p q p b _\n"
+        " b n _ _ p n p _\n"
+        " _ _ _ P N _ _ _\n"
+        " _ p _ _ P _ _ _\n"
+        " _ _ N _ _ Q _ p\n"
+        " P P P B B P P P\n"
+        " R _ _ _ K _ _ R\n"
+        "w KQkq - 1 8\n"
+    );
+
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
+
+    EXPECT_EQ(perft(board, 1), 48);
+    EXPECT_EQ(perft(board, 2), 2039);
+    EXPECT_EQ(perft(board, 3), 97862);
+    EXPECT_EQ(perft(board, 4), 4085603);
+    EXPECT_EQ(perft(board, 5), 193690690);
+    //EXPECT_EQ(perft(board, 6), 8031647685);
 }
 
 TEST_F(PerftTests, CheckPosition5)
