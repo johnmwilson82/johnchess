@@ -1,4 +1,4 @@
-#include "iboard.h"
+#include "bitboards/bitboard.h"
 //#include "pieces.h"
 
 class ZobristHash
@@ -49,11 +49,12 @@ private:
 
     uint64_t props_table[static_cast<size_t>(BoardPropsIndex::SIZE)];
 
-    //size_t piece_to_index(const Piece& piece) const;
-    
+    size_t piece_to_index(PieceType type, PieceColour colour) const;
+    void add_piece_mask_to_hash(PieceType type, PieceColour colour, uint64_t mask, uint64_t& hash) const;
+
 public:
     ZobristHash();
 
-    uint64_t get_hash(const IBoard& board) const;
-    uint64_t get_hash(const IBoard& board, const Move& move) const;
+    uint64_t get_hash(const BitBoard& board) const;
+    uint64_t get_hash(const BitBoard& board, const Move& move) const;
 };

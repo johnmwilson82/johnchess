@@ -48,11 +48,11 @@ void BoardTree::rebase(uint64_t new_hash)
 
 void BoardTree::set_new_root_from_move(const Move& move)
 {
-    set_new_root_from_board(*root_node->get_board().clone_moved(move));
+    //set_new_root_from_board(*root_node->get_board().clone_moved(move));
 }
 
 
-void BoardTree::set_new_root_from_board(const IBoard& board)
+void BoardTree::set_new_root_from_board(const BitBoard& board)
 {
     rebase(hasher->get_hash(board));
 }
@@ -115,7 +115,7 @@ Move BoardTree::search(uint8_t search_depth, PieceColour ai_colour)
 }
 
 
-BoardTree::BoardTree(const IBoard& board) :
+BoardTree::BoardTree(const BitBoard& board) :
     hasher(std::make_unique<ZobristHash>()),
     root_node(std::make_shared<BoardTreeNode>(board, *hasher))
 {

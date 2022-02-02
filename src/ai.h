@@ -24,7 +24,7 @@ public:
      * \param board pointer to the board that the AI will make a move on
      * \return movement
      */
-    virtual Move make_move(const IBoard& board) = 0;
+    virtual Move make_move(const BitBoard& board) = 0;
 
     //! Set the colour of the AI side
     void set_colour(PieceColour colour) { m_colour = colour; }
@@ -48,7 +48,7 @@ public:
     {}
 
     ~BasicAI() {};
-    Move make_move(const IBoard& board) override
+    Move make_move(const BitBoard& board) override
     {
         if(!m_board_tree)
         {

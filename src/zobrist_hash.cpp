@@ -1,18 +1,19 @@
 #include "zobrist_hash.h"
+#include <bitboards/bitboard_utils.h>
 #include <random>
 
-/*
-size_t ZobristHash::piece_to_index(const Piece& piece) const
-{
-    size_t piece_idx = static_cast<size_t>(piece.get_type());
 
-    if(piece.get_colour() == PieceColour::BLACK)
+size_t ZobristHash::piece_to_index(PieceType type, PieceColour colour) const
+{
+    size_t piece_idx = static_cast<size_t>(type);
+
+    if(colour == PieceColour::BLACK)
     {
         piece_idx += static_cast<size_t>(PieceIndex::BLACK_KING);
     }
 
     return piece_idx;
-}*/
+}
 
 
 ZobristHash::ZobristHash()
@@ -36,18 +37,34 @@ ZobristHash::ZobristHash()
     }
 }
 
-uint64_t ZobristHash::get_hash(const IBoard& board) const
+void ZobristHash::add_piece_mask_to_hash(PieceType type, PieceColour colour, uint64_t mask, uint64_t& hash) const
+{
+    while (mask)
+    {
+        auto i = bitboard_utils::bit_scan_forward(mask);
+        auto j = piece_to_index(type, colour);
+        hash ^= piece_table[i][j];
+
+        mask &= mask - 1;
+    }
+}
+
+uint64_t ZobristHash::get_hash(const BitBoard& board) const
 {
     uint64_t ret = 0;
-    for(int i = 0; i < 64; ++i)
-    {
-        /*auto piece = board.piece_on_square(i & 0x7, i >> 3);
-        if(piece)
-        {
-            auto j = piece_to_index(*piece);
-            ret ^= piece_table[i][j];
-        }*/
-    }
+
+    add_piece_mask_to_hash(PieceType::KING, PieceColour::WHITE, board.get_kings() & board.pieces_to_move(1), ret);
+    add_piece_mask_to_hash(PieceType::KING, PieceColour::BLACK, board.get_kings() & board.pieces_to_move(0), ret);
+    add_piece_mask_to_hash(PieceType::QUEEN, PieceColour::WHITE, board.get_queens() & board.pieces_to_move(1), ret);
+    add_piece_mask_to_hash(PieceType::QUEEN, PieceColour::BLACK, board.get_queens() & board.pieces_to_move(0), ret);
+    add_piece_mask_to_hash(PieceType::ROOK, PieceColour::WHITE, board.get_rooks() & board.pieces_to_move(1), ret);
+    add_piece_mask_to_hash(PieceType::ROOK, PieceColour::BLACK, board.get_rooks() & board.pieces_to_move(0), ret);
+    add_piece_mask_to_hash(PieceType::BISHOP, PieceColour::WHITE, board.get_bishops() & board.pieces_to_move(1), ret);
+    add_piece_mask_to_hash(PieceType::BISHOP, PieceColour::BLACK, board.get_bishops() & board.pieces_to_move(0), ret);
+    add_piece_mask_to_hash(PieceType::KNIGHT, PieceColour::WHITE, board.get_knights() & board.pieces_to_move(1), ret);
+    add_piece_mask_to_hash(PieceType::KNIGHT, PieceColour::BLACK, board.get_knights() & board.pieces_to_move(0), ret);
+    add_piece_mask_to_hash(PieceType::PAWN, PieceColour::WHITE, board.get_pawns() & board.pieces_to_move(1), ret);
+    add_piece_mask_to_hash(PieceType::PAWN, PieceColour::BLACK, board.get_pawns() & board.pieces_to_move(0), ret);
 
     if (board.get_colour_to_move() == PieceColour::BLACK)
     {
@@ -84,11 +101,11 @@ uint64_t ZobristHash::get_hash(const IBoard& board) const
     return ret;
 }
 
-uint64_t ZobristHash::get_hash(const IBoard& board, const Move& move) const
+uint64_t ZobristHash::get_hash(const BitBoard& board, const Move& move) const
 {
-    std::unique_ptr<IBoard> new_board = board.clone();
+    BitBoard new_board(board);
 
-    new_board->make_move(move);
+    new_board.make_move(move);
 
-    return get_hash(*new_board);
+    return get_hash(new_board);
 }

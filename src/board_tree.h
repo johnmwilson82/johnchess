@@ -1,7 +1,7 @@
 #pragma once
 
 #include "move.h"
-#include "iboard.h"
+#include "bitboards/bitboard.h"
 #include "board_tree_node.h"
 
 #include "utils/board_strings.h"
@@ -20,9 +20,9 @@ private:
 
 public:
     void set_new_root_from_move(const Move& move);
-    void set_new_root_from_board(const IBoard& board);
+    void set_new_root_from_board(const BitBoard& board);
     void populate_tree(uint8_t search_depth, std::list<std::shared_ptr<BoardTreeNode>> btns, PieceColour colour_to_move);
     Move search(uint8_t search_depth, PieceColour ai_colour);
 
-    BoardTree(const IBoard& board);
+    BoardTree(const BitBoard& board);
 };

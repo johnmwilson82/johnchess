@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#if(0)
+
 #define private public
 #include <zobrist_hash.h>
 #include <utils\board_strings.h>
@@ -30,7 +30,7 @@ TEST_F(ZobristHashTests, CheckHashWithRemovedPawn)
         " R N B _ K _ N R\n"
     );
 
-    Board board = board_from_string_repr<Board>(board_str);
+    BitBoard board = board_from_string_repr<BitBoard>(board_str);
 
     std::string board_str_no_e4(
         " r n b q k b _ r\n"
@@ -43,11 +43,11 @@ TEST_F(ZobristHashTests, CheckHashWithRemovedPawn)
         " R N B _ K _ N R\n"
     );
 
-    Board board_no_e4 = board_from_string_repr<Board>(board_str_no_e4);
+    BitBoard board_no_e4 = board_from_string_repr<BitBoard>(board_str_no_e4);
     
-    Board board_only_e4;
+    BitBoard board_only_e4;
 
-    board_only_e4.add_piece<Pawn>(PieceColour::WHITE, "e4");
+    board_only_e4.add_piece(PieceType::PAWN, PieceColour::WHITE, { "e4" });
 
     auto board_hash = hasher->get_hash(board);
 
@@ -76,9 +76,9 @@ TEST_F(ZobristHashTests, CheckHashThroughCastling)
         " R N B Q K _ _ R\n"
     );
 
-    Board pre_castle_board = board_from_string_repr<Board>(board_str_pre_castle);
-    pre_castle_board.set_castling_rights({ Board::CastlingRights::WHITE_KINGSIDE, Board::CastlingRights::WHITE_QUEENSIDE,
-                                           Board::CastlingRights::BLACK_KINGSIDE, Board::CastlingRights::BLACK_QUEENSIDE });
+    BitBoard pre_castle_board = board_from_string_repr<BitBoard>(board_str_pre_castle);
+    pre_castle_board.set_castling_rights({ BitBoard::CastlingRights::WHITE_KINGSIDE, BitBoard::CastlingRights::WHITE_QUEENSIDE,
+                                           BitBoard::CastlingRights::BLACK_KINGSIDE, BitBoard::CastlingRights::BLACK_QUEENSIDE });
 
     std::string board_str_post_castle(
         " r n b q k b _ r\n"
@@ -91,13 +91,13 @@ TEST_F(ZobristHashTests, CheckHashThroughCastling)
         " R N B Q _ R K _\n"
     );
 
-    Board post_castle_board = board_from_string_repr<Board>(board_str_post_castle);
-    post_castle_board.set_castling_rights({ Board::CastlingRights::BLACK_KINGSIDE, Board::CastlingRights::BLACK_QUEENSIDE });
+    BitBoard post_castle_board = board_from_string_repr<BitBoard>(board_str_post_castle);
+    post_castle_board.set_castling_rights({ IBoard::CastlingRights::BLACK_KINGSIDE, IBoard::CastlingRights::BLACK_QUEENSIDE });
     post_castle_board.set_colour_to_move(PieceColour::BLACK);
 
-    Move castle_move("e1g1");
+    BitBoard new_board(pre_castle_board);
 
-    Board new_board(pre_castle_board, castle_move);
+    new_board.make_move({ "e1g1" });
 
     auto expected_hash = hasher->get_hash(post_castle_board);
 
@@ -120,7 +120,7 @@ TEST_F(ZobristHashTests, CheckMoveHash)
         " R N B Q _ R K _\n"
     );
 
-    Board pre_move_board = board_from_string_repr<Board>(board_str_pre_move);
+    BitBoard pre_move_board = board_from_string_repr<BitBoard>(board_str_pre_move);
 
     Move move("c1a3");
 
@@ -135,7 +135,7 @@ TEST_F(ZobristHashTests, CheckMoveHash)
         " R N _ Q _ R K _\n"
     );
 
-    Board post_move_board = board_from_string_repr<Board>(board_str_post_move);
+    BitBoard post_move_board = board_from_string_repr<BitBoard>(board_str_post_move);
     post_move_board.set_colour_to_move(PieceColour::BLACK);
 
     auto test_hash = hasher->get_hash(pre_move_board, move);
@@ -145,4 +145,3 @@ TEST_F(ZobristHashTests, CheckMoveHash)
     EXPECT_EQ(expected_hash, test_hash);
 
 }
-#endif

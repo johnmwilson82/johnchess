@@ -56,6 +56,8 @@ public:
     inline uint64_t get_occupied() const { return m_occupied; }
     inline uint64_t get_rooks() const { return m_rooks; }
     inline uint64_t get_bishops() const { return m_bishops; }
+    inline uint64_t get_knights() const { return m_knights; }
+    inline uint64_t get_pawns() const { return m_pawns; }
     inline uint64_t get_queens() const { return m_queens; }
     inline uint64_t get_kings() const { return m_kings; }
 
