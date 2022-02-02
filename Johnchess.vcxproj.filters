@@ -30,9 +30,6 @@
     <ClInclude Include="src\ai.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\board_tree.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\heuristic.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -48,7 +45,7 @@
     <ClInclude Include="src\utils\board_strings.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\board_tree_node.h">
+    <ClInclude Include="src\search_tree_node.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\iboard.h">
@@ -75,11 +72,11 @@
     <ClInclude Include="src\board_location.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\search_tree.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\board_tree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\heuristic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -95,7 +92,7 @@
     <ClCompile Include="app\main.cpp">
       <Filter>Source Files\app</Filter>
     </ClCompile>
-    <ClCompile Include="src\board_tree_node.cpp">
+    <ClCompile Include="src\search_tree_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\move.cpp">
@@ -108,6 +105,9 @@
       <Filter>Source Files\bitboards</Filter>
     </ClCompile>
     <ClCompile Include="src\board_location.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\search_tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

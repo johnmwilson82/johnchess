@@ -19,21 +19,13 @@ namespace bitboard_utils
 
     // from https://www.chessprogramming.org/BitScan
     static constexpr inline uint8_t bit_scan_forward(uint64_t bb) {
-        if (bb == 0)
-        {
-            assert(bb != 0);
-        }
-        
+        assert(bb != 0);
 
         return debruijn_index64[((bb ^ (bb - 1)) * debruijn64) >> 58];
     }
 
     static constexpr inline uint8_t bit_scan_reverse(uint64_t bb) {
-        if (bb == 0)
-        {
-            assert(bb != 0);
-        }
-
+        assert(bb != 0);
 
         bb |= bb >> 1;
         bb |= bb >> 2;
@@ -47,5 +39,9 @@ namespace bitboard_utils
 
     static inline uint64_t mirror_vertical(uint64_t bb) {
         return _byteswap_uint64(bb);
+    }
+
+    static inline uint64_t pop_count(uint64_t bb) {
+        return __popcnt64(bb);
     }
 }

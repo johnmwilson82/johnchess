@@ -10,7 +10,7 @@
 class IBoard
 {
 public:
-    using MoveList = boost::container::static_vector<Move, 256>;
+    using MoveList = boost::container::static_vector<Move, 100>;
 
     enum Mate {
         CHECKMATE,

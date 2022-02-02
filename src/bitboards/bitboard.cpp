@@ -316,7 +316,14 @@ void BitBoard::get_castling_moves(MoveList& move_list, bool white_to_move) const
 
 IBoard::Mate BitBoard::get_mate(PieceColour col) const
 {
-    return Mate();
+    if (get_all_legal_moves(col).size() == 0)
+    {
+        if (get_in_check(col))
+            return CHECKMATE;
+        else
+            return STALEMATE;
+    }
+    return NO_MATE;
 }
 
 PieceColour BitBoard::get_colour_to_move() const
@@ -341,17 +348,12 @@ void BitBoard::populate_squares_properties()
 IBoard::MoveList& BitBoard::get_all_legal_moves(PieceColour col) const
 {
     MoveList& ret = m_move_list;
+    ret.clear();
 
     bool white_to_move = col == PieceColour::WHITE;
 
-    // if there's no king the game is over
-    if (!(pieces_to_move(white_to_move) & m_kings))
-    {
-        return ret;
-    }
 
-    std::unordered_map<uint8_t, uint64_t> dummy;
-    BitboardRayAttacks enemy_ray_attacks(*this, !white_to_move, dummy);
+    BitboardRayAttacks enemy_ray_attacks(*this, !white_to_move, m_dummy_map);
 
     m_opposite_attacks = 0;
     m_allowed_moves = 0xffffffff'ffffffff;
@@ -486,11 +488,6 @@ bool BitBoard::make_move(const Move& move)
 
     const auto& curr_loc = move.get_from_loc();
     const auto curr_loc_mask = curr_loc.to_bitboard_mask();
-
-    if (!(m_occupied & curr_loc_mask))
-    {
-        return false;
-    }
 
     // Remove piece at new_loc
     uint64_t was_occupied = m_occupied;
@@ -640,15 +637,6 @@ bool BitBoard::make_move(const Move& move)
 
     m_white_to_move = !m_white_to_move;
 
-    if (!(m_occupied & new_loc_mask))
-    {
-        return false;
-    }
-
-    if ((m_white_pieces | m_black_pieces) != m_occupied)
-    {
-        return false;
-    }
     return true;
 }
 
@@ -659,11 +647,6 @@ bool BitBoard::unmake_move(const Move& move)
 
     const auto& curr_loc = move.get_from_loc();
     const auto curr_loc_mask = curr_loc.to_bitboard_mask();
-
-    if (!(m_occupied & new_loc_mask))
-    {
-        return false;
-    }
 
     // en passant rules
     if (move.is_en_passant_capture())
@@ -791,16 +774,6 @@ bool BitBoard::unmake_move(const Move& move)
     }
 
     m_white_to_move = !m_white_to_move;
-
-    if (!(m_occupied & curr_loc_mask) || !(captured_piece_type.has_value() ? (m_occupied & new_loc_mask) : 1))
-    {
-        return false;
-    }
-
-    if ((m_white_pieces | m_black_pieces) != m_occupied)
-    {
-        return false;
-    }
 
     return true;
 }

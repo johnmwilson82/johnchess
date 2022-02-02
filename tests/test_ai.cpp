@@ -1,9 +1,8 @@
 #include "gtest/gtest.h"
 
-#if(0)
 #include "ai.h"
 
-#include <board.h>
+#include <bitboards\bitboard.h>
 #include <utils\board_strings.h>
 
 using namespace utils;
@@ -29,7 +28,7 @@ TEST_F(AiTests, CheckFindBackRankMateWhite)
         " _ _ _ R K _ _ _\n"
     );
 
-    auto board = board_from_string_repr<Board>(board_str);
+    auto board = board_from_string_repr<BitBoard>(board_str);
     board.set_colour_to_move(PieceColour::WHITE);
 
     BasicAI ai(PieceColour::WHITE, 1);
@@ -52,7 +51,7 @@ TEST_F(AiTests, CheckFindBackRankMateBlack)
         " _ _ _ _ _ _ K _\n"
     );
 
-    auto board = board_from_string_repr<Board>(board_str);
+    auto board = board_from_string_repr<BitBoard>(board_str);
     board.set_colour_to_move(PieceColour::BLACK);
 
     BasicAI ai(PieceColour::BLACK, 1);
@@ -76,7 +75,7 @@ TEST_F(AiTests, CheckMoveQueenFromDangerBlack)
         " _ _ _ _ _ _ K _\n"
     );
 
-    auto board = board_from_string_repr<Board>(board_str);
+    auto board = board_from_string_repr<BitBoard>(board_str);
     board.set_colour_to_move(PieceColour::BLACK);
 
     BasicAI ai(PieceColour::BLACK, 1);
@@ -99,7 +98,7 @@ TEST_F(AiTests, CheckMoveQueenFromDangerWhite)
         " _ _ _ _ _ _ K _\n"
     );
 
-    auto board = board_from_string_repr<Board>(board_str);
+    auto board = board_from_string_repr<BitBoard>(board_str);
     board.set_colour_to_move(PieceColour::WHITE);
 
     BasicAI ai(PieceColour::WHITE, 1);
@@ -122,7 +121,7 @@ TEST_F(AiTests, CheckWillForkWhite)
         " _ _ _ _ _ _ K _\n"
     );
 
-    auto board = board_from_string_repr<Board>(board_str);
+    auto board = board_from_string_repr<BitBoard>(board_str);
     board.set_colour_to_move(PieceColour::WHITE);
 
     BasicAI ai(PieceColour::WHITE, 2);
@@ -145,7 +144,7 @@ TEST_F(AiTests, CheckWillForkBlack)
         " _ _ Q _ _ _ K _\n"
     );
 
-    auto board = board_from_string_repr<Board>(board_str);
+    auto board = board_from_string_repr<BitBoard>(board_str);
     board.set_colour_to_move(PieceColour::BLACK);
 
     BasicAI ai(PieceColour::BLACK, 2);
@@ -154,4 +153,3 @@ TEST_F(AiTests, CheckWillForkBlack)
 
     EXPECT_EQ(move.to_string(), std::string("d4e2"));
 }
-#endif

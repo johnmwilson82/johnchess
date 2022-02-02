@@ -1,5 +1,7 @@
 #include "heuristic.h"
 
+#include <bitboards/bitboard_utils.h>
+
 // f(p) = 200(K-K')
 //        + 9(Q-Q')
 //        + 5(R-R')
@@ -12,45 +14,30 @@
 // D,S,I = doubled, blocked and isolated pawns
 // M = Mobility (the number of legal moves)
 
+using namespace bitboard_utils;
 
-ShannonHeuristic::ShannonHeuristic(const IBoard& board)
+ShannonHeuristic::ShannonHeuristic(const BitBoard& board)
 {
-    /*auto piece_fn = [&](const Piece& piece) {
-        double mult = piece.get_colour() == PieceColour::WHITE ? 1 : -1;
+    bool white_to_move = board.get_colour_to_move() == PieceColour::WHITE;
 
-        switch(piece.get_type())
-        {
-            case PieceType::PAWN:
-                accum += 1 * mult;
-                if(piece.get_all_valid_moves().size() == 0)
-                {
-                    accum -= 0.5 * mult;
-                }
-                // TODO: check isolated pawns and doubled pawns
-                break;
-            
-            case PieceType::BISHOP:
-            case PieceType::KNIGHT:
-                accum += 3 * mult;
-                break;
+    accum += pop_count(board.get_pawns() & board.pieces_to_move(white_to_move));
+    accum -= pop_count(board.get_pawns() & board.pieces_to_move(!white_to_move));
 
-            case PieceType::ROOK:
-                accum += 5 * mult;
-                break;
+    accum += 3.0f * pop_count(board.get_knights() & board.pieces_to_move(white_to_move));
+    accum -= 3.0f * pop_count(board.get_knights() & board.pieces_to_move(!white_to_move));
 
-            case PieceType::QUEEN:
-                accum += 9 * mult;
-                break;
+    accum += 3.0f * pop_count(board.get_bishops() & board.pieces_to_move(white_to_move));
+    accum -= 3.0f * pop_count(board.get_bishops() & board.pieces_to_move(!white_to_move));
 
-            case PieceType::KING:
-                accum += 200 * mult;
-                break;
-            
-        }
-    };
+    accum += 5.0f * pop_count(board.get_rooks() & board.pieces_to_move(white_to_move));
+    accum -= 5.0f * pop_count(board.get_rooks() & board.pieces_to_move(!white_to_move));
 
-    board.for_all_pieces(piece_fn);    
-    */
+    accum += 9.0f * pop_count(board.get_queens() & board.pieces_to_move(white_to_move));
+    accum -= 9.0f * pop_count(board.get_queens() & board.pieces_to_move(!white_to_move));
+
+    accum += board.get_kings() & board.pieces_to_move(white_to_move) ? 200 : 0;
+    accum -= board.get_kings() & board.pieces_to_move(!white_to_move) ? 200 : 0;
+
     //accum += board.get_all_legal_moves(Piece::WHITE).size() * 0.1;
     //accum -= board.get_all_legal_moves(Piece::BLACK).size() * 0.1;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "iboard.h"
+#include "bitboards/bitboard.h"
 
 class ShannonHeuristic
 {
@@ -16,11 +16,11 @@ class ShannonHeuristic
 // D,S,I = doubled, blocked and isolated pawns
 // M = Mobility (the number of legal moves)
 private:
-    double accum = 0.0;
+    float accum = 0.0;
 
 public:
-    ShannonHeuristic(const IBoard& board);
+    ShannonHeuristic(const BitBoard& board);
     
-    double get() const { return accum; };
+    float get() const { return accum; };
 };
 

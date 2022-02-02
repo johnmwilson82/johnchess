@@ -152,8 +152,8 @@
     <ClInclude Include="src\bitboards\bitboard_ray_attacks.h" />
     <ClInclude Include="src\bitboards\bitboard_utils.h" />
     <ClInclude Include="src\board_location.h" />
-    <ClInclude Include="src\board_tree.h" />
-    <ClInclude Include="src\board_tree_node.h" />
+    <ClInclude Include="src\search_tree.h" />
+    <ClInclude Include="src\search_tree_node.h" />
     <ClInclude Include="src\heuristic.h" />
     <ClInclude Include="src\iboard.h" />
     <ClInclude Include="src\johnchess_app.h" />
@@ -169,8 +169,8 @@
     <ClCompile Include="src\bitboards\bitboard.cpp" />
     <ClCompile Include="src\bitboards\bitboard_ray_attacks.cpp" />
     <ClCompile Include="src\board_location.cpp" />
-    <ClCompile Include="src\board_tree.cpp" />
-    <ClCompile Include="src\board_tree_node.cpp" />
+    <ClCompile Include="src\search_tree.cpp" />
+    <ClCompile Include="src\search_tree_node.cpp" />
     <ClCompile Include="src\heuristic.cpp" />
     <ClCompile Include="src\johnchess_app.cpp" />
     <ClCompile Include="src\move.cpp" />

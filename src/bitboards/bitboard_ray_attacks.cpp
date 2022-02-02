@@ -4,8 +4,60 @@
 
 using namespace bitboard_utils;
 
+
 uint64_t BitboardRayAttacks::get_ray_mask(uint8_t sq, RayDir dir) const
 {
+    auto ray_fn_neg = [&](int step)
+    {
+        int isq = static_cast<int>(sq) + step;
+        uint64_t ret = 0;
+        while (isq >= 0)
+        {
+            isq |= 1ULL << isq;
+            isq += step;
+        }
+        return ret;
+    };
+
+    auto ray_fn_pos = [&](int step)
+    {
+        int isq = static_cast<int>(sq) + step;
+        uint64_t ret = 0;
+        while (isq < 64)
+        {
+            isq |= 1ULL << isq;
+            isq += step;
+        }
+        return ret;
+    };
+
+    switch (dir)
+    {
+    case RayDir::NE:
+        //return ray_fn_pos(9);
+        break;
+    case RayDir::N:
+        return 0x0101010101010100 << sq;
+        break;
+    case RayDir::NW:
+        //return ray_fn_pos(7);
+        break;
+    case RayDir::W:
+        return (0x7fffffff'ffffffff >> (63 - sq)) - (((2ULL << (sq | 7)) - 1) >> 8);
+        break;
+    case RayDir::SE:
+        //return ray_fn_neg(-7);
+        break;
+    case RayDir::S:
+        return 0x0080808080808080 >> (63 - sq);
+        break;
+    case RayDir::SW:
+        //return ray_fn_neg(-9);
+        break;
+    case RayDir::E:
+        return 2 * ((1ULL << (sq | 7)) - (1ULL << sq));
+        break;
+    }
     return ray_masks[static_cast<size_t>(dir)][sq];
 }
 
@@ -85,7 +137,7 @@ uint64_t BitboardRayAttacks::get_ray_attacks(uint8_t sq, RayDir dir)
     case RayDir::NE:
     case RayDir::N:
     case RayDir::NW:
-    case RayDir::W:
+    case RayDir::E:
         ret = get_positive_ray_attacks(sq, dir);
         break;
 

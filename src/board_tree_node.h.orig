@@ -7,11 +7,11 @@
 #include "zobrist_hash.h"
 #include "heuristic.h"
 
-class BoardTreeNode
+class MoveTreeNode
 {
 public:
-    using hash_map_t = std::unordered_map<uint64_t, std::weak_ptr<BoardTreeNode>>;
-    using edge_t = std::pair<std::shared_ptr<BoardTreeNode>, Move>;
+    using hash_map_t = std::unordered_map<uint64_t, std::weak_ptr<MoveTreeNode>>;
+    using edge_t = std::pair<std::shared_ptr<MoveTreeNode>, Move>;
 
 private:
     const BitBoard& m_board;
@@ -25,7 +25,7 @@ private:
     const uint32_t m_ply;
 
 public:
-    std::shared_ptr<BoardTreeNode> child_node(const Move& move, hash_map_t& hash_map, const ZobristHash& hasher);
+    std::shared_ptr<MoveTreeNode> child_node(const Move& move, hash_map_t& hash_map, const ZobristHash& hasher);
 
     std::list<edge_t>& get_children() { return m_child_nodes; };
 
@@ -39,6 +39,11 @@ public:
 
     void set_check_for_mate() { m_check_for_mate = true; }
 
+<<<<<<< Updated upstream
     BoardTreeNode(const BitBoard& board, const ZobristHash& hasher);
     BoardTreeNode(const BoardTreeNode& node, const Move& move, const ZobristHash& hasher);
+=======
+    MoveTreeNode(const IBoard& board, const ZobristHash& hasher);
+    MoveTreeNode(const MoveTreeNode& node, const Move& move, const ZobristHash& hasher);
+>>>>>>> Stashed changes
 };

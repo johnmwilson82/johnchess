@@ -1,6 +1,6 @@
 #include "../src/johnchess_app.h"
 
-#if 0
+#if 1
 
 int main(int argc, const char* argv[])
 {
@@ -14,6 +14,7 @@ int main(int argc, const char* argv[])
 #include "../src/utils/perft.h"
 #include "bitboards/bitboard.h"
 #include "utils/board_strings.h"
+#include <iomanip>
 
 using namespace utils;
 
@@ -33,10 +34,9 @@ int main(int argc, const char* argv[])
 
 
     BitBoard board = board_from_string_repr<BitBoard>(board_str);
-    //board.set_to_start_position();
 
-    board.make_move({ "d7c8q" });
-    board.make_move({ "f2h1" });
+    //board.make_move({ "d7c8q" });
+    //board.make_move({ "f2h1" });
     //board.make_move({ "d2d3" });
     //board.make_move({ "a1b1" });
     //board.make_move({ "f1e1" });
@@ -60,7 +60,7 @@ int main(int argc, const char* argv[])
 
         board.make_move(move);
         //std::cout << "=================================\n";
-        uint64_t res = perft(board, 0);
+        uint64_t res = perft(board, 4);
         total += res;
         //std::cout << "perft result depth 1 = " << perft(board, 1) << "\n";
         //std::cout << "perft result depth 2 = " << perft(board, 2) << "\n";

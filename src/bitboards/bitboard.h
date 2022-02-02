@@ -10,6 +10,8 @@
 class BitBoard : public IBoard
 {
 private:
+    std::unordered_map<uint8_t, uint64_t> m_dummy_map;
+
     uint64_t m_pawns, m_knights, m_bishops, m_rooks, m_queens, m_kings;
     uint64_t m_black_pieces, m_white_pieces, m_occupied;
 

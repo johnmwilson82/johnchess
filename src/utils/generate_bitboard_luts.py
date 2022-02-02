@@ -33,7 +33,7 @@ def ray_attacks_from_square(sq, dir):
 
     return int(np.sum(legal_attacks))
 
-print("knight moves")
+"""print("knight moves")
 for i in range(8):
     print(" ".join(["0x%016x," % knight_moves_from_square(j) for j in range(i*8, (i+1)*8)]))
 print("====================================================")
@@ -48,4 +48,16 @@ for dir in [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (1, 1), (0, 1), (-1, 1)
     print(dir)
     for i in range(8):
         print(" ".join(["0x%016x," % ray_attacks_from_square(j, dir) for j in range(i*8, (i+1)*8)]))
-    print("====================================================")
+    print("====================================================")"""
+
+dir = (-1, 0)
+
+for i in range(8):
+    print(" ".join(["0x%016x," % ray_attacks_from_square(j, dir) for j in range(i*8, (i+1)*8)]))
+
+def calc_west_ray_attacks(sq):
+    return (0x7fffffffffffffff >> (63 - sq)) - (((2 << (sq | 7)) - 1) >> 8)
+
+print("..." + "%x" %((0xff << 10) & ~((2 << (10 | 7)) - 1)))
+for i in range(8):
+    print(" ".join(["0x%016x," % calc_west_ray_attacks(j) for j in range(i*8, (i+1)*8)]))

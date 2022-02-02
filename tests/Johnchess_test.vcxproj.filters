@@ -10,9 +10,6 @@
     <ClCompile Include="..\src\board_location.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\board_tree.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\heuristic.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -31,9 +28,6 @@
     <ClCompile Include="test_ai.cpp">
       <Filter>tests</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\board_tree_node.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="perft.cpp">
       <Filter>tests</Filter>
     </ClCompile>
@@ -46,15 +40,18 @@
     <ClCompile Include="..\src\bitboards\bitboard_ray_attacks.cpp">
       <Filter>src\bitboards</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\search_tree.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\search_tree_node.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ai.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\board_location.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\board_tree.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\heuristic.h">
@@ -75,9 +72,6 @@
     <ClInclude Include="..\src\utils\board_strings.h">
       <Filter>src\utils</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\board_tree_node.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\bitboards\bitboard.h">
       <Filter>src\bitboards</Filter>
     </ClInclude>
@@ -86,6 +80,12 @@
     </ClInclude>
     <ClInclude Include="..\src\bitboards\bitboard_ray_attacks.h">
       <Filter>src\bitboards</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\search_tree.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\search_tree_node.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

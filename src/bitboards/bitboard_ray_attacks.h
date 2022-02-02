@@ -20,12 +20,12 @@ private:
     enum class RayDir : size_t
     {
         SE,
-        E,
+        W,
         NE,
         S,
         N,
         NW,
-        W,
+        E,
         SW
     };
 

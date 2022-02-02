@@ -35,25 +35,24 @@ void JohnchessApp::make_ai_move()
 
     std::string move_string = m_ai->make_move(*m_board).to_string();
 
-    auto new_board = std::make_unique<BitBoard>();
+    m_board->make_move(move_string);
 
-    if(new_board->get_in_check(moving_colour))
+    m_board->get_all_legal_moves(m_board->get_colour_to_move()); // TODO: this is just to load the state for get_in_check
+    if(m_board->get_in_check(moving_colour))
     {
         throw std::runtime_error("AI seems to have generated a nonsense move :" + move_string);
     }
 
-    m_board = std::move(new_board);
-
     m_xboard_interface->send_move(move_string);
 
-    std::ofstream ofs("current_board.txt");
+    //std::ofstream ofs("current_board.txt");
 
-    ofs << "Move = " << move_string << std::endl;
+    //ofs << "Move = " << move_string << std::endl;
 
-    ofs << utils::board_to_string_repr(*m_board);
+    //ofs << utils::board_to_string_repr(*m_board);
 
-    ofs << std::endl << (m_board->get_colour_to_move() == PieceColour::WHITE ? "White" : "Black") << " to move" << std::endl;
-    ofs.flush();
+    //ofs << std::endl << (m_board->get_colour_to_move() == PieceColour::WHITE ? "White" : "Black") << " to move" << std::endl;
+    //ofs.flush();
 }
 
 bool JohnchessApp::check_game_end()
@@ -100,15 +99,16 @@ void JohnchessApp::main_loop()
                 PieceColour colour_to_move = m_board->get_colour_to_move();
 
                 const auto rcvd_move = rcvd.get_move_string();
-                auto new_board = std::make_unique<BitBoard>();
+                m_board->make_move(rcvd_move);
 
-                if(new_board->get_in_check(colour_to_move))
+                m_board->get_all_legal_moves(m_board->get_colour_to_move()); // TODO: this is just to load the state for get_in_check
+                if(m_board->get_in_check(colour_to_move))
                 {
+                    m_board->unmake_move(rcvd_move);
                     m_xboard_interface->reply_illegal_move(rcvd);
                     break;
                 }
 
-                m_board = std::move(new_board); 
                 // Check whether received move has caused game end
                 if(check_game_end()) break;
 
