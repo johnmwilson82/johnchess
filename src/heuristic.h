@@ -19,7 +19,7 @@ private:
     float accum = 0.0;
 
 public:
-    ShannonHeuristic(const BitBoard& board);
+    ShannonHeuristic(const BitBoard& board, PieceColour colour);
     
     float get() const { return accum; };
 };

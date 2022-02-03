@@ -65,7 +65,7 @@ TEST_F(AiTests, CheckFindBackRankMateBlack)
 TEST_F(AiTests, CheckMoveQueenFromDangerBlack)
 {
     std::string board_str(
-        " _ q b _ _ r k _\n"
+        " _ q n _ _ r k _\n"
         " p p _ _ _ p p p\n"
         " _ _ _ _ _ _ _ _\n"
         " _ _ _ _ _ _ _ _\n"
@@ -78,7 +78,7 @@ TEST_F(AiTests, CheckMoveQueenFromDangerBlack)
     auto board = board_from_string_repr<BitBoard>(board_str);
     board.set_colour_to_move(PieceColour::BLACK);
 
-    BasicAI ai(PieceColour::BLACK, 1);
+    BasicAI ai(PieceColour::BLACK, 3);
 
     auto move = ai.make_move(board);
 
@@ -101,7 +101,7 @@ TEST_F(AiTests, CheckMoveQueenFromDangerWhite)
     auto board = board_from_string_repr<BitBoard>(board_str);
     board.set_colour_to_move(PieceColour::WHITE);
 
-    BasicAI ai(PieceColour::WHITE, 1);
+    BasicAI ai(PieceColour::WHITE, 3);
 
     auto move = ai.make_move(board);
 
@@ -124,7 +124,7 @@ TEST_F(AiTests, CheckWillForkWhite)
     auto board = board_from_string_repr<BitBoard>(board_str);
     board.set_colour_to_move(PieceColour::WHITE);
 
-    BasicAI ai(PieceColour::WHITE, 2);
+    BasicAI ai(PieceColour::WHITE, 3);
 
     auto move = ai.make_move(board);
 
@@ -147,7 +147,7 @@ TEST_F(AiTests, CheckWillForkBlack)
     auto board = board_from_string_repr<BitBoard>(board_str);
     board.set_colour_to_move(PieceColour::BLACK);
 
-    BasicAI ai(PieceColour::BLACK, 2);
+    BasicAI ai(PieceColour::BLACK, 3);
 
     auto move = ai.make_move(board);
 

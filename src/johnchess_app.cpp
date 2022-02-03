@@ -20,7 +20,7 @@ JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
     m_board = std::make_unique<BitBoard>();
     m_board->set_to_start_position();
 
-    m_ai = std::make_unique<BasicAI>(PieceColour::BLACK, 2);
+    m_ai = std::make_unique<BasicAI>(PieceColour::BLACK, 5);
 }
 
 JohnchessApp::~JohnchessApp()

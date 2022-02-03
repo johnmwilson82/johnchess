@@ -16,27 +16,27 @@
 
 using namespace bitboard_utils;
 
-ShannonHeuristic::ShannonHeuristic(const BitBoard& board)
+ShannonHeuristic::ShannonHeuristic(const BitBoard& board, PieceColour ai_colour)
 {
-    bool white_to_move = board.get_colour_to_move() == PieceColour::WHITE;
+    bool ai_player_is_white = PieceColour::WHITE == ai_colour;
 
-    accum += pop_count(board.get_pawns() & board.pieces_to_move(white_to_move));
-    accum -= pop_count(board.get_pawns() & board.pieces_to_move(!white_to_move));
+    accum += pop_count(board.get_pawns() & board.pieces_to_move(ai_player_is_white));
+    accum -= pop_count(board.get_pawns() & board.pieces_to_move(!ai_player_is_white));
 
-    accum += 3.0f * pop_count(board.get_knights() & board.pieces_to_move(white_to_move));
-    accum -= 3.0f * pop_count(board.get_knights() & board.pieces_to_move(!white_to_move));
+    accum += 3.0f * pop_count(board.get_knights() & board.pieces_to_move(ai_player_is_white));
+    accum -= 3.0f * pop_count(board.get_knights() & board.pieces_to_move(!ai_player_is_white));
 
-    accum += 3.0f * pop_count(board.get_bishops() & board.pieces_to_move(white_to_move));
-    accum -= 3.0f * pop_count(board.get_bishops() & board.pieces_to_move(!white_to_move));
+    accum += 3.0f * pop_count(board.get_bishops() & board.pieces_to_move(ai_player_is_white));
+    accum -= 3.0f * pop_count(board.get_bishops() & board.pieces_to_move(!ai_player_is_white));
 
-    accum += 5.0f * pop_count(board.get_rooks() & board.pieces_to_move(white_to_move));
-    accum -= 5.0f * pop_count(board.get_rooks() & board.pieces_to_move(!white_to_move));
+    accum += 5.0f * pop_count(board.get_rooks() & board.pieces_to_move(ai_player_is_white));
+    accum -= 5.0f * pop_count(board.get_rooks() & board.pieces_to_move(!ai_player_is_white));
 
-    accum += 9.0f * pop_count(board.get_queens() & board.pieces_to_move(white_to_move));
-    accum -= 9.0f * pop_count(board.get_queens() & board.pieces_to_move(!white_to_move));
+    accum += 9.0f * pop_count(board.get_queens() & board.pieces_to_move(ai_player_is_white));
+    accum -= 9.0f * pop_count(board.get_queens() & board.pieces_to_move(!ai_player_is_white));
 
-    accum += board.get_kings() & board.pieces_to_move(white_to_move) ? 200 : 0;
-    accum -= board.get_kings() & board.pieces_to_move(!white_to_move) ? 200 : 0;
+    accum += board.get_kings() & board.pieces_to_move(ai_player_is_white) ? 200 : 0;
+    accum -= board.get_kings() & board.pieces_to_move(!ai_player_is_white) ? 200 : 0;
 
     //accum += board.get_all_legal_moves(Piece::WHITE).size() * 0.1;
     //accum -= board.get_all_legal_moves(Piece::BLACK).size() * 0.1;
