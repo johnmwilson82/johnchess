@@ -60,10 +60,10 @@ bool JohnchessApp::check_game_end()
     PieceColour colour_to_move = m_board->get_colour_to_move();
 
     // Check whether AI player is in mate
-    IBoard::Mate mate = m_board->get_mate(colour_to_move);
-    if(mate != IBoard::NO_MATE)
+    BitBoard::Mate mate = m_board->get_mate(colour_to_move);
+    if(mate != BitBoard::NO_MATE)
     {
-        if(mate == IBoard::STALEMATE)
+        if(mate == BitBoard::STALEMATE)
         {
             m_xboard_interface->reply_result(XBoardInterface::Result::DRAW);
         }

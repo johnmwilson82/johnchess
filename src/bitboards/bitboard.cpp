@@ -314,7 +314,7 @@ void BitBoard::get_castling_moves(MoveList& move_list, bool white_to_move) const
 }
 
 
-IBoard::Mate BitBoard::get_mate(PieceColour col) const
+BitBoard::Mate BitBoard::get_mate(PieceColour col) const
 {
     if (get_all_legal_moves(col).size() == 0)
     {
@@ -336,16 +336,7 @@ void BitBoard::set_colour_to_move(PieceColour colour)
     m_white_to_move = colour == PieceColour::WHITE ? 1 : 0;
 }
 
-void BitBoard::delete_all_pieces()
-{
-}
-
-void BitBoard::populate_squares_properties()
-{
-
-}
-
-IBoard::MoveList& BitBoard::get_all_legal_moves(PieceColour col) const
+BitBoard::MoveList& BitBoard::get_all_legal_moves(PieceColour col) const
 {
     MoveList& ret = m_move_list;
     ret.clear();
@@ -371,6 +362,7 @@ IBoard::MoveList& BitBoard::get_all_legal_moves(PieceColour col) const
 
     new_opposite_attacks |= get_pawn_moves(ret, !white_to_move, {});
     new_opposite_attacks |= get_king_moves(ret, !white_to_move);
+
     ret.clear();
 
     m_opposite_attacks = new_opposite_attacks;
@@ -776,23 +768,4 @@ bool BitBoard::unmake_move(const Move& move)
     m_white_to_move = !m_white_to_move;
 
     return true;
-}
-
-std::unique_ptr<IBoard> BitBoard::clone() const
-{
-    return std::unique_ptr<IBoard>();
-}
-
-std::unique_ptr<IBoard> BitBoard::clone_moved(const Move& move) const
-{
-    return std::unique_ptr<IBoard>();
-}
-
-void BitBoard::for_all_pieces(std::function<void(const Piece& piece)> fn) const
-{
-}
-
-std::shared_ptr<const Piece> BitBoard::piece_on_square(int x, int y) const
-{
-    return std::shared_ptr<const Piece>();
 }

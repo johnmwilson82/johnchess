@@ -71,22 +71,22 @@ uint64_t ZobristHash::get_hash(const BitBoard& board) const
         ret ^= props_table[static_cast<size_t>(BoardPropsIndex::BLACK_TO_MOVE)];
     }
 
-    if (board.has_castling_rights(IBoard::CastlingRights::BLACK_KINGSIDE))
+    if (board.has_castling_rights(BitBoard::CastlingRights::BLACK_KINGSIDE))
     {
         ret ^= props_table[static_cast<size_t>(BoardPropsIndex::BLACK_CAN_CASTLE_KINGSIDE)];
     }
 
-    if (board.has_castling_rights(IBoard::CastlingRights::BLACK_QUEENSIDE))
+    if (board.has_castling_rights(BitBoard::CastlingRights::BLACK_QUEENSIDE))
     {
         ret ^= props_table[static_cast<size_t>(BoardPropsIndex::BLACK_CAN_CASTLE_QUEENSIDE)];
     }
 
-    if (board.has_castling_rights(IBoard::CastlingRights::WHITE_KINGSIDE))
+    if (board.has_castling_rights(BitBoard::CastlingRights::WHITE_KINGSIDE))
     {
         ret ^= props_table[static_cast<size_t>(BoardPropsIndex::WHITE_CAN_CASTLE_KINGSIDE)];
     }
 
-    if (board.has_castling_rights(IBoard::CastlingRights::WHITE_QUEENSIDE))
+    if (board.has_castling_rights(BitBoard::CastlingRights::WHITE_QUEENSIDE))
     {
         ret ^= props_table[static_cast<size_t>(BoardPropsIndex::WHITE_CAN_CASTLE_QUEENSIDE)];
     }

@@ -8,7 +8,7 @@ float SearchTree::maxi(int depth, PieceColour ai_colour) {
         return eval.get();
     }
 
-    IBoard::MoveList move_list = m_board.get_all_legal_moves(m_board.get_colour_to_move());
+    BitBoard::MoveList move_list = m_board.get_all_legal_moves(m_board.get_colour_to_move());
 
     if (move_list.empty())
     {
@@ -37,7 +37,7 @@ float SearchTree::mini(int depth, PieceColour ai_colour) {
         return -eval.get();
     }
 
-    IBoard::MoveList move_list = m_board.get_all_legal_moves(m_board.get_colour_to_move());
+    BitBoard::MoveList move_list = m_board.get_all_legal_moves(m_board.get_colour_to_move());
 
     if (move_list.empty())
     {
@@ -67,7 +67,7 @@ float SearchTree::alpha_beta_max(float alpha, float beta, uint8_t depth_left, Pi
         return eval.get();
     }
 
-    IBoard::MoveList move_list = m_board.get_all_legal_moves(m_board.get_colour_to_move());
+    BitBoard::MoveList move_list = m_board.get_all_legal_moves(m_board.get_colour_to_move());
 
     if (move_list.empty())
     {
@@ -101,7 +101,7 @@ float SearchTree::alpha_beta_min(float alpha, float beta, uint8_t depth_left, Pi
         return -eval.get();
     }
 
-    IBoard::MoveList move_list = m_board.get_all_legal_moves(m_board.get_colour_to_move());
+    BitBoard::MoveList move_list = m_board.get_all_legal_moves(m_board.get_colour_to_move());
 
     if (move_list.empty())
     {
@@ -133,7 +133,7 @@ Move SearchTree::search(uint8_t search_depth, PieceColour ai_colour)
 
     std::unique_ptr<Move> best_move;
 
-    IBoard::MoveList move_list = m_board.get_all_legal_moves(m_board.get_colour_to_move());
+    BitBoard::MoveList move_list = m_board.get_all_legal_moves(m_board.get_colour_to_move());
 
     float alpha = -std::numeric_limits<float>::infinity();
     float beta = std::numeric_limits<float>::infinity();

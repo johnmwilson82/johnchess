@@ -155,7 +155,6 @@
     <ClInclude Include="src\search_tree.h" />
     <ClInclude Include="src\search_tree_node.h" />
     <ClInclude Include="src\heuristic.h" />
-    <ClInclude Include="src\iboard.h" />
     <ClInclude Include="src\johnchess_app.h" />
     <ClInclude Include="src\move.h" />
     <ClInclude Include="src\piece_types.h" />

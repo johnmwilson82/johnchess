@@ -1,14 +1,29 @@
 #pragma once
 
 #include <functional>
+#include <boost/container/static_vector.hpp>
 
 #include <move.h>
 #include <piece_types.h>
 
-#include "iboard.h"
-
-class BitBoard : public IBoard
+class BitBoard
 {
+public:
+    using MoveList = boost::container::static_vector<Move, 256>;
+
+    enum Mate {
+        CHECKMATE,
+        STALEMATE,
+        NO_MATE
+    };
+
+    enum class CastlingRights : uint8_t {
+        WHITE_KINGSIDE = 0x1,
+        WHITE_QUEENSIDE = 0x2,
+        BLACK_KINGSIDE = 0x4,
+        BLACK_QUEENSIDE = 0x8
+    };
+
 private:
     std::unordered_map<uint8_t, uint64_t> m_dummy_map;
 
@@ -103,31 +118,17 @@ public:
 
     void set_colour_to_move(PieceColour colour);
 
-    //! Delete all the pieces from the board
-    void delete_all_pieces();
-
-    //! This shouldn't really be public TODO: refactor the board_from_string_repr stuff
-    void populate_squares_properties();
-
     //! Return the number of available moves for a given colour
     MoveList& get_all_legal_moves(PieceColour col) const;
 
     bool add_piece(PieceType type, PieceColour col, BoardLocation loc);
 
-    bool has_castling_rights(CastlingRights castling_rights) const override;
-    void set_castling_rights(const std::vector<CastlingRights>& castling_rights) override;
+    bool has_castling_rights(CastlingRights castling_rights) const;
+    void set_castling_rights(const std::vector<CastlingRights>& castling_rights);
 
     std::optional<uint8_t> get_enpassant_column() const;
-    void set_enpassant_column(std::optional<uint8_t> col) override;
+    void set_enpassant_column(std::optional<uint8_t> col);
 
     bool make_move(const Move& move);
     bool unmake_move(const Move& move);
-
-    std::unique_ptr<IBoard> clone() const;
-    std::unique_ptr<IBoard> clone_moved(const Move& move) const;
-
-    //!< pieces on the board
-    void for_all_pieces(std::function<void(const Piece& piece)> fn) const;
-
-    std::shared_ptr<const Piece> piece_on_square(int x, int y) const;
 };

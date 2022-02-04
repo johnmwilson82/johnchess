@@ -1,5 +1,5 @@
 #pragma once
-#include "../iboard.h"
+#include "../bitboards/bitboard.h"
 
 struct PerftStats
 {
@@ -9,7 +9,7 @@ struct PerftStats
     uint64_t promotions;
 };
 
-uint64_t perft(IBoard& board, int depth)
+uint64_t perft(BitBoard& board, int depth)
 {
     if (depth == 0)
     {

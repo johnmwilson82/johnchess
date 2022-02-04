@@ -101,7 +101,7 @@ TEST_F(AiTests, CheckMoveQueenFromDangerWhite)
     auto board = board_from_string_repr<BitBoard>(board_str);
     board.set_colour_to_move(PieceColour::WHITE);
 
-    BasicAI ai(PieceColour::WHITE, 3);
+    BasicAI ai(PieceColour::WHITE, 5);
 
     auto move = ai.make_move(board);
 

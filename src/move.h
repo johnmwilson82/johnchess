@@ -6,7 +6,7 @@
 #include "board_location.h"
 #include "piece_types.h"
 
-class IBoard;
+class BitBoard;
 class Piece;
 
 /*class DynMove

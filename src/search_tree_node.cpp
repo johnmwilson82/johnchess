@@ -33,7 +33,7 @@ std::shared_ptr<SearchTreeNode> SearchTreeNode::child_node(const Move& move, has
 }
 
 
-const IBoard& SearchTreeNode::get_board() const
+const BitBoard& SearchTreeNode::get_board() const
 {
     return *m_board;
 }
@@ -56,10 +56,10 @@ const double SearchTreeNode::get_score(PieceColour ai_col, PieceColour colour_to
         {
             switch (m_board->get_mate(colour_to_move))
             {
-            case IBoard::CHECKMATE:
+            case BitBoard::CHECKMATE:
                 return 200;
 
-            case IBoard::STALEMATE:
+            case BitBoard::STALEMATE:
                 return 0;
 
             default:
@@ -86,7 +86,7 @@ const double SearchTreeNode::get_score(PieceColour ai_col, PieceColour colour_to
 
 
 // Root node
-SearchTreeNode::SearchTreeNode(const IBoard& board, const ZobristHash& hasher) :
+SearchTreeNode::SearchTreeNode(const BitBoard& board, const ZobristHash& hasher) :
     m_board(board.clone()),
     m_hash(hasher.get_hash(*m_board)),
     m_heuristic(*m_board),

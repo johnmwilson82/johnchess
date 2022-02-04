@@ -114,7 +114,7 @@ TEST_F(BoardReadWriteTests, CheckWriteToString2)
     board.add_piece<Bishop>(PieceColour::BLACK, "f8");
     board.add_piece<Rook>(PieceColour::BLACK, "g8");
 
-    board.set_castling_rights({ IBoard::CastlingRights::WHITE_KINGSIDE, IBoard::CastlingRights::WHITE_QUEENSIDE, IBoard::CastlingRights::BLACK_KINGSIDE });
+    board.set_castling_rights({ BitBoard::CastlingRights::WHITE_KINGSIDE, BitBoard::CastlingRights::WHITE_QUEENSIDE, BitBoard::CastlingRights::BLACK_KINGSIDE });
     board.set_colour_to_move(PieceColour::BLACK);
     auto out_str = board_to_string_repr(board);
 

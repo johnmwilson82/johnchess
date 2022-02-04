@@ -92,7 +92,7 @@ TEST_F(ZobristHashTests, CheckHashThroughCastling)
     );
 
     BitBoard post_castle_board = board_from_string_repr<BitBoard>(board_str_post_castle);
-    post_castle_board.set_castling_rights({ IBoard::CastlingRights::BLACK_KINGSIDE, IBoard::CastlingRights::BLACK_QUEENSIDE });
+    post_castle_board.set_castling_rights({ BitBoard::CastlingRights::BLACK_KINGSIDE, BitBoard::CastlingRights::BLACK_QUEENSIDE });
     post_castle_board.set_colour_to_move(PieceColour::BLACK);
 
     BitBoard new_board(pre_castle_board);

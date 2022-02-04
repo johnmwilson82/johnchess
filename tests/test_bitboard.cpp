@@ -15,7 +15,7 @@ protected:
     {
     }
 
-    bool find_fn(IBoard::MoveList move_list, const std::string& move_str)
+    bool find_fn(BitBoard::MoveList move_list, const std::string& move_str)
     {
         return std::ranges::find_if(move_list, [&move_str](const Move& move) { return move == Move(move_str); }) != move_list.end();
     };

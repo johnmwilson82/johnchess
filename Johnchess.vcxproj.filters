@@ -48,9 +48,6 @@
     <ClInclude Include="src\search_tree_node.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\iboard.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\piece_types.h">
       <Filter>Source Files</Filter>
     </ClInclude>

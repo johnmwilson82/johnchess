@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include "xboard_interface.h"
-#include "iboard.h"
-//#include "bitboards/bitboard.h"
+
+#include "bitboards/bitboard.h"
 #include "ai.h"
 
 class JohnchessApp {

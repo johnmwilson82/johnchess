@@ -1,7 +1,7 @@
 #pragma once
 
 #include "move.h"
-#include "iboard.h"
+#include "bitboards/bitboard.h"
 #include "search_tree_node.h"
 
 #include "utils/board_strings.h"
@@ -11,9 +11,7 @@ class SearchTree
 {
 private:
     std::unique_ptr<ZobristHash> hasher;
-    //SearchTreeNode::hash_map_t nodes; 
 
-    //std::shared_ptr<SearchTreeNode> root_node;
     BitBoard& m_board;
     float m_mult;
 

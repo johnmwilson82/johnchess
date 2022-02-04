@@ -4,12 +4,12 @@
 #include <sstream>
 #include <cassert>
 
-#include "../iboard.h"
+#include "../bitboards/bitboard.h"
 
 namespace utils
 {
     template<typename T>
-    concept IsBoard = std::is_base_of<IBoard, T>::value;
+    concept IsBoard = std::is_base_of<BitBoard, T>::value;
 
     template<IsBoard T>
     static void read_fen_props_line(const std::string& line, T& board)
@@ -29,22 +29,22 @@ namespace utils
 
         board.set_colour_to_move(tokens[0] == "w" ? PieceColour::WHITE : PieceColour::BLACK);
 
-        std::vector<IBoard::CastlingRights> castling_rights;
+        std::vector<BitBoard::CastlingRights> castling_rights;
         for (auto chr : tokens[1])
         {
             switch (chr)
             {
             case 'K':
-                castling_rights.push_back(IBoard::CastlingRights::WHITE_KINGSIDE);
+                castling_rights.push_back(BitBoard::CastlingRights::WHITE_KINGSIDE);
                 break;
             case 'Q':
-                castling_rights.push_back(IBoard::CastlingRights::WHITE_QUEENSIDE);
+                castling_rights.push_back(BitBoard::CastlingRights::WHITE_QUEENSIDE);
                 break;
             case 'k':
-                castling_rights.push_back(IBoard::CastlingRights::BLACK_KINGSIDE);
+                castling_rights.push_back(BitBoard::CastlingRights::BLACK_KINGSIDE);
                 break;
             case 'q':
-                castling_rights.push_back(IBoard::CastlingRights::BLACK_QUEENSIDE);
+                castling_rights.push_back(BitBoard::CastlingRights::BLACK_QUEENSIDE);
                 break;
             }
         }
@@ -58,29 +58,29 @@ namespace utils
         // fullmove clock and halfmove clock are tokens[3] and tokens[4] respectively
     }
 
-    static std::string write_fen_props_line(const IBoard& board)
+    static std::string write_fen_props_line(const BitBoard& board)
     {
         std::ostringstream oss;
 
         oss << (board.get_colour_to_move() == PieceColour::WHITE ? "w " : "b ");
 
         bool no_castling_rights = true;
-        if (board.has_castling_rights(IBoard::CastlingRights::WHITE_KINGSIDE))
+        if (board.has_castling_rights(BitBoard::CastlingRights::WHITE_KINGSIDE))
         {
             oss << "K";
             no_castling_rights = false;
         }
-        if (board.has_castling_rights(IBoard::CastlingRights::WHITE_QUEENSIDE))
+        if (board.has_castling_rights(BitBoard::CastlingRights::WHITE_QUEENSIDE))
         {
             oss << "Q";
             no_castling_rights = false;
         }
-        if (board.has_castling_rights(IBoard::CastlingRights::BLACK_KINGSIDE))
+        if (board.has_castling_rights(BitBoard::CastlingRights::BLACK_KINGSIDE))
         {
             oss << "k";
             no_castling_rights = false;
         }
-        if (board.has_castling_rights(IBoard::CastlingRights::BLACK_QUEENSIDE))
+        if (board.has_castling_rights(BitBoard::CastlingRights::BLACK_QUEENSIDE))
         {
             oss << "q";
             no_castling_rights = false;
@@ -199,8 +199,6 @@ namespace utils
             }
         }
         std::cout << s << std::endl;
-
-        ret.populate_squares_properties();
 
         return ret;
     }
