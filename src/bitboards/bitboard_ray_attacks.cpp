@@ -4,8 +4,8 @@
 
 using namespace bitboard_utils;
 
-
-uint64_t BitboardRayAttacks::get_ray_mask(uint8_t sq, RayDir dir) const
+template<bool WhiteToMove>
+uint64_t BitboardRayAttacks<WhiteToMove>::get_ray_mask(uint8_t sq, RayDir dir) const
 {
     auto ray_fn_neg = [&](int step)
     {
@@ -61,13 +61,14 @@ uint64_t BitboardRayAttacks::get_ray_mask(uint8_t sq, RayDir dir) const
     return ray_masks[static_cast<size_t>(dir)][sq];
 }
 
-uint64_t BitboardRayAttacks::get_positive_ray_attacks(uint8_t sq, RayDir dir)
+template<bool WhiteToMove>
+uint64_t BitboardRayAttacks<WhiteToMove>::get_positive_ray_attacks(uint8_t sq, RayDir dir)
 {
     uint64_t blocked_ray = m_bitboard.get_occupied() & get_ray_mask(sq, dir);
 
     uint8_t blocker = (blocked_ray == 0) ? 0 : bit_scan_forward(blocked_ray);
 
-    uint64_t enemy_king = (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!m_white_to_move));
+    uint64_t enemy_king = (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!WhiteToMove));
 
     uint64_t ret = get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(blocker, dir));
 
@@ -86,7 +87,7 @@ uint64_t BitboardRayAttacks::get_positive_ray_attacks(uint8_t sq, RayDir dir)
         m_king_attacks |= ret;
     };
 
-    if (ret & (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!m_white_to_move)))
+    if (ret & (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!WhiteToMove)))
     {
         m_allowed_next_moves &= ret | (1ULL << sq);
     }
@@ -94,13 +95,14 @@ uint64_t BitboardRayAttacks::get_positive_ray_attacks(uint8_t sq, RayDir dir)
     return ret;
 }
 
-uint64_t BitboardRayAttacks::get_negative_ray_attacks(uint8_t sq, RayDir dir)
+template<bool WhiteToMove>
+uint64_t BitboardRayAttacks<WhiteToMove>::get_negative_ray_attacks(uint8_t sq, RayDir dir)
 {
     uint64_t blocked_ray = m_bitboard.get_occupied() & get_ray_mask(sq, dir);
 
     uint8_t blocker = (blocked_ray == 0) ? 0 : bit_scan_reverse(blocked_ray);
 
-    uint64_t enemy_king = (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!m_white_to_move));
+    uint64_t enemy_king = (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!WhiteToMove));
 
     uint64_t ret = get_ray_mask(sq, dir) ^ ((blocked_ray == 0) ? 0 : get_ray_mask(blocker, dir));
 
@@ -119,7 +121,7 @@ uint64_t BitboardRayAttacks::get_negative_ray_attacks(uint8_t sq, RayDir dir)
         m_king_attacks |= ret;
     };
 
-    if (ret & (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!m_white_to_move)))
+    if (ret & (m_bitboard.get_kings() & m_bitboard.pieces_to_move(!WhiteToMove)))
     {
         m_allowed_next_moves &= ret | (1ULL << sq);
     }
@@ -127,8 +129,8 @@ uint64_t BitboardRayAttacks::get_negative_ray_attacks(uint8_t sq, RayDir dir)
     return ret;
 }
 
-
-uint64_t BitboardRayAttacks::get_ray_attacks(uint8_t sq, RayDir dir)
+template<bool WhiteToMove>
+uint64_t BitboardRayAttacks<WhiteToMove>::get_ray_attacks(uint8_t sq, RayDir dir)
 {
     uint64_t ret;
 
@@ -149,11 +151,11 @@ uint64_t BitboardRayAttacks::get_ray_attacks(uint8_t sq, RayDir dir)
     return ret;
 }
 
-
-uint64_t BitboardRayAttacks::check_king_pin(uint64_t blocked_ray, uint64_t allowed_in_pin_moves, RayDir dir)
+template<bool WhiteToMove>
+uint64_t BitboardRayAttacks<WhiteToMove>::check_king_pin(uint64_t blocked_ray, uint64_t allowed_in_pin_moves, RayDir dir)
 {
     // check blocked ray has king on it
-    uint64_t enemy_pieces = m_bitboard.pieces_to_move(!m_white_to_move);
+    uint64_t enemy_pieces = m_bitboard.pieces_to_move(!WhiteToMove);
     uint64_t king = (m_bitboard.get_kings() & enemy_pieces);
     uint64_t king_pinned = blocked_ray & king;
 
@@ -180,7 +182,7 @@ uint64_t BitboardRayAttacks::check_king_pin(uint64_t blocked_ray, uint64_t allow
     auto ep_col = m_bitboard.get_enpassant_column();
     if (king_pinned && ep_col.has_value() && (dir == RayDir::E || dir == RayDir::W))
     {
-        uint64_t ep_square = (!m_white_to_move ? 0x00000001'00000000 : 0x00000000'01000000) << *ep_col;
+        uint64_t ep_square = (!WhiteToMove ? 0x00000001'00000000 : 0x00000000'01000000) << *ep_col;
         
         blocked_ray_less_ep = blocked_ray & ~(ep_square);
 
@@ -193,8 +195,8 @@ uint64_t BitboardRayAttacks::check_king_pin(uint64_t blocked_ray, uint64_t allow
     return king_pinned;
 }
 
-
-uint64_t BitboardRayAttacks::get_pinned_piece_moves(BitBoard::MoveList& move_list, uint64_t& pieces, std::function<uint64_t(uint8_t)> attacks_fn) const
+template<bool WhiteToMove>
+uint64_t BitboardRayAttacks<WhiteToMove>::get_pinned_piece_moves(BitBoard::MoveList& move_list, uint64_t& pieces, std::function<uint64_t(uint8_t)> attacks_fn) const
 {
     uint64_t ret = 0;
 
@@ -206,7 +208,7 @@ uint64_t BitboardRayAttacks::get_pinned_piece_moves(BitBoard::MoveList& move_lis
 
         if (m_moving_pinned_allowed.contains(current_piece))
         {
-            ret |= m_bitboard.get_moves(move_list, 1ULL << current_piece, m_white_to_move, [&](uint8_t sq) {
+            ret |= m_bitboard.get_moves<WhiteToMove>(move_list, 1ULL << current_piece, [&](uint8_t sq) {
                 uint64_t att = attacks_fn(sq);
                 return attacks_fn(sq) & m_moving_pinned_allowed.at(current_piece);
             });
@@ -220,8 +222,8 @@ uint64_t BitboardRayAttacks::get_pinned_piece_moves(BitBoard::MoveList& move_lis
     return ret;
 }
 
-
-uint64_t BitboardRayAttacks::get_bishop_moves(BitBoard::MoveList& move_list)
+template<bool WhiteToMove>
+uint64_t BitboardRayAttacks<WhiteToMove>::get_bishop_moves(BitBoard::MoveList& move_list)
 {
     auto bishop_moves = [&](uint8_t sq) {
         return get_ray_attacks(sq, RayDir::NE) |
@@ -237,13 +239,13 @@ uint64_t BitboardRayAttacks::get_bishop_moves(BitBoard::MoveList& move_list)
 
     ret |= get_pinned_piece_moves(move_list, bishops, bishop_moves);
 
-    ret |= m_bitboard.get_moves(move_list, bishops, m_white_to_move, bishop_moves);
+    ret |= m_bitboard.get_moves<WhiteToMove>(move_list, bishops, bishop_moves);
 
     return ret;
 }
 
-
-uint64_t BitboardRayAttacks::get_rook_moves(BitBoard::MoveList& move_list)
+template<bool WhiteToMove>
+uint64_t BitboardRayAttacks<WhiteToMove>::get_rook_moves(BitBoard::MoveList& move_list)
 {
     auto rook_moves = [&](uint8_t sq) {
         return get_ray_attacks(sq, RayDir::N) |
@@ -258,13 +260,13 @@ uint64_t BitboardRayAttacks::get_rook_moves(BitBoard::MoveList& move_list)
 
     ret |= get_pinned_piece_moves(move_list, rooks, rook_moves);
 
-    ret |= m_bitboard.get_moves(move_list, rooks, m_white_to_move, rook_moves);
+    ret |= m_bitboard.get_moves<WhiteToMove>(move_list, rooks, rook_moves);
 
     return ret;
 }
 
-
-uint64_t BitboardRayAttacks::get_queen_moves(BitBoard::MoveList& move_list)
+template<bool WhiteToMove>
+uint64_t BitboardRayAttacks<WhiteToMove>::get_queen_moves(BitBoard::MoveList& move_list)
 {
     auto queen_moves = [&](uint8_t sq) {
         return get_ray_attacks(sq, RayDir::NE) |
@@ -284,20 +286,30 @@ uint64_t BitboardRayAttacks::get_queen_moves(BitBoard::MoveList& move_list)
 
     ret |= get_pinned_piece_moves(move_list, queens, queen_moves);
 
-    ret |= m_bitboard.get_moves(move_list, queens, m_white_to_move, queen_moves);
+    ret |= m_bitboard.get_moves<WhiteToMove>(move_list, queens, queen_moves);
 
     return ret;
 }
 
-
-BitboardRayAttacks::BitboardRayAttacks(const BitBoard& bitboard,
-                                       bool white_to_move,
+template<bool WhiteToMove>
+BitboardRayAttacks<WhiteToMove>::BitboardRayAttacks(const BitBoard& bitboard,
                                        const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) :
     m_bitboard(bitboard),
     m_attacked_pinned(0),
-    m_white_to_move(white_to_move),
     m_moving_pinned_allowed(pinned_piece_allowed_moves),
     m_allowed_next_moves(0xffffffff'ffffffff),
     m_en_passant_pinned(false),
     m_king_attacks(0)
 {}
+
+template uint64_t BitboardRayAttacks<true>::get_queen_moves(BitBoard::MoveList& move_list);
+template uint64_t BitboardRayAttacks<true>::get_rook_moves(BitBoard::MoveList& move_list);
+template uint64_t BitboardRayAttacks<true>::get_bishop_moves(BitBoard::MoveList& move_list);
+template uint64_t BitboardRayAttacks<false>::get_queen_moves(BitBoard::MoveList& move_list);
+template uint64_t BitboardRayAttacks<false>::get_rook_moves(BitBoard::MoveList& move_list);
+template uint64_t BitboardRayAttacks<false>::get_bishop_moves(BitBoard::MoveList& move_list);
+
+template BitboardRayAttacks<true>::BitboardRayAttacks(const BitBoard& bitboard,
+    const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves);
+template BitboardRayAttacks<false>::BitboardRayAttacks(const BitBoard& bitboard,
+    const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves);

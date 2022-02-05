@@ -5,6 +5,7 @@
 #include <move.h>
 #include "bitboard.h"
 
+template<bool WhiteToMove>
 class BitboardRayAttacks
 {
 private:
@@ -15,7 +16,7 @@ private:
     uint64_t m_allowed_next_moves;
     uint64_t m_king_attacks;
 
-    bool m_white_to_move, m_en_passant_pinned;
+    bool m_en_passant_pinned;
 
     enum class RayDir : size_t
     {
@@ -137,6 +138,5 @@ public:
     const std::unordered_map<uint8_t, uint64_t>& get_pinned_allowed() const { return m_attacked_pinned_allowed; }
 
     BitboardRayAttacks(const BitBoard& bitboard, 
-                       bool white_to_move, 
                        const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves);
 };
