@@ -4,15 +4,14 @@
 
 
 Move::Move(const BoardLocation& from_loc, const BoardLocation& to_loc) :
-    m_from_loc(from_loc),
-    m_to_loc(to_loc)
+    m_data((from_loc.get_raw() << FROM_LOC_SHIFT) | (to_loc.get_raw() << TO_LOC_SHIFT) | INIT_DATA)
 {
 }
 
 
 Move::Move(const std::string& move_str) :
-    m_from_loc(move_str.substr(0, 2)),
-    m_to_loc(move_str.substr(2, 2))
+    m_data((BoardLocation(move_str.substr(0, 2)).get_raw() << FROM_LOC_SHIFT) | 
+           (BoardLocation(move_str.substr(2, 2)).get_raw() << TO_LOC_SHIFT) | INIT_DATA)
 {
     if(move_str.length() == 5)
     {
@@ -43,12 +42,16 @@ Move::Move(const std::string& move_str) :
 
 bool Move::operator== (const Move& m) const
 {
-    return (m_from_loc == m.m_from_loc) && (m_to_loc == m.m_to_loc) && (m_promotion_type == m.m_promotion_type);
+    constexpr uint32_t compare_mask = FROM_LOC_MASK | TO_LOC_MASK | PROMOTION_TYPE_MASK;
+    return (m_data & compare_mask) == (m.m_data & compare_mask);
 }
 
 std::string Move::to_string() const
 {
-    std::string move_str = m_from_loc.to_string() + m_to_loc.to_string();
+    auto thing1 = BoardLocation(get_from_loc());
+    auto thing2 = BoardLocation(get_to_loc());
+
+    std::string move_str = BoardLocation(get_from_loc()).to_string() + BoardLocation(get_to_loc()).to_string();
 
     auto promotion_type = get_promotion_type();
 
@@ -75,14 +78,4 @@ std::string Move::to_string() const
     }
 
     return move_str;
-}
-
-const BoardLocation& Move::get_to_loc() const
-{
-    return m_to_loc;
-}
-
-const BoardLocation& Move::get_from_loc() const
-{
-    return m_from_loc;
 }

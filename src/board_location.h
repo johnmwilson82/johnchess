@@ -48,6 +48,11 @@ public: // methods
         return 1ULL << m_loc;
     }
 
+    uint8_t get_raw() const
+    {
+        return m_loc;
+    }
+
 public: // inlines
 
     //! Get board column

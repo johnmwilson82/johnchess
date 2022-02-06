@@ -14,25 +14,38 @@ class MoveHashFunction;
 class Move
 {
 private:
-    static constexpr uint32_t CAPTURED_PIECE_TYPE = 0x700;
-    static constexpr uint32_t CAPTURED_PIECE_OFFSET = 8;
+    /*
+     * m_data bits:
+     *      0 - 5    from_loc
+     *      6 - 11   to_loc
+     *      12 - 15  old_castling_rights
+     *      16 - 18  captured_piece_type
+     *      19 - 21  promotion_type
+     *      22       is_en_passant_capture
+     */
 
-    static constexpr uint32_t OLD_CASTLING_RIGHTS_MASK = 0xf0;
-    static constexpr uint32_t OLD_CASTLING_RIGHTS_OFFSET = 4;
+    static constexpr uint32_t FROM_LOC_SHIFT = 0;
+    static constexpr uint32_t FROM_LOC_MASK = 0x3F << FROM_LOC_SHIFT;
 
-    static constexpr uint32_t PROMOTION_MASK = 0x8;
-    static constexpr uint32_t EN_PASSANT_CAPTURE_MASK = 0x4;
-    static constexpr uint32_t SPECIAL_MASK = 0x3;
+    static constexpr uint32_t TO_LOC_SHIFT = 6;
+    static constexpr uint32_t TO_LOC_MASK = 0x3F << TO_LOC_SHIFT;
+
+    static constexpr uint32_t OLD_CASTLING_RIGHTS_SHIFT = 12;
+    static constexpr uint32_t OLD_CASTLING_RIGHTS_MASK = 0xF << OLD_CASTLING_RIGHTS_SHIFT;
+
+    static constexpr uint32_t CAPTURED_PIECE_TYPE_SHIFT = 16;
+    static constexpr uint32_t CAPTURED_PIECE_TYPE_MASK = 0x7 << CAPTURED_PIECE_TYPE_SHIFT;
+
+    static constexpr uint32_t PROMOTION_TYPE_SHIFT = 19;
+    static constexpr uint32_t PROMOTION_TYPE_MASK = 0x7 << PROMOTION_TYPE_SHIFT;
+
+    static constexpr uint32_t IS_EN_PASSANT_CAPTURE_SHIFT = 22;
+    static constexpr uint32_t IS_EN_PASSANT_CAPTURE_MASK = 0x1 << IS_EN_PASSANT_CAPTURE_SHIFT;
+
+    static constexpr uint32_t INIT_DATA = PROMOTION_TYPE_MASK | CAPTURED_PIECE_TYPE_MASK;
 
 // Move: Describes a move, which is the new location of a given piece
 public:
-    enum class SimpleMoveType : uint8_t {
-        QUIET,
-        DOUBLE_PAWN_PUSH,
-        KING_SIDE_CASTLE,
-        QUEEN_SIDE_CASTLE
-    };
-
     enum class PromotionType : uint8_t {
         QUEEN,
         ROOK,
@@ -48,57 +61,55 @@ public:
     
     std::string to_string() const;
 
-    const BoardLocation& get_to_loc() const;
-    const BoardLocation& get_from_loc() const;
+    const BoardLocation get_to_loc() const
+    {
+        return (m_data & TO_LOC_MASK) >> TO_LOC_SHIFT;
+    }
+
+    const BoardLocation get_from_loc() const
+    {
+        return (m_data & FROM_LOC_MASK) >> FROM_LOC_SHIFT;
+    }
 
     void set_is_en_passant_capture() {
-        m_type |= EN_PASSANT_CAPTURE_MASK;
+        m_data |= IS_EN_PASSANT_CAPTURE_MASK;
     }
 
     bool is_en_passant_capture() const {
-        return m_type & EN_PASSANT_CAPTURE_MASK;
+        return m_data & IS_EN_PASSANT_CAPTURE_MASK;
     }
 
-    void set_promotion_type(PromotionType promotion_type) { 
-        m_promotion_type = promotion_type;
+    void set_promotion_type(PromotionType promotion_type) {
+        m_data &= ~PROMOTION_TYPE_MASK;
+        m_data |= static_cast<uint8_t>(promotion_type) << PROMOTION_TYPE_SHIFT;
     }
 
     const std::optional<PromotionType> get_promotion_type() const { 
-        return m_promotion_type;
-    }
-
-    // TODO: deprecate following two 
-    void set_captured_piece(std::shared_ptr<Piece> piece) {
-        m_captured_piece = piece;
-    }
-
-    const std::shared_ptr<Piece> get_captured_piece() const {
-        return m_captured_piece;
+        uint8_t ret = (m_data & PROMOTION_TYPE_MASK) >> PROMOTION_TYPE_SHIFT;
+        return ret == (PROMOTION_TYPE_MASK >> PROMOTION_TYPE_SHIFT) ? 
+            std::nullopt : std::optional<PromotionType>(static_cast<PromotionType>(ret));
     }
 
     void set_captured_piece_type(PieceType piece_type) {
-        m_captured_piece_type = piece_type;
+        m_data &= ~CAPTURED_PIECE_TYPE_MASK;
+        m_data |= static_cast<uint8_t>(piece_type) << CAPTURED_PIECE_TYPE_SHIFT;
     }
 
     const std::optional<PieceType> get_captured_piece_type() const {
-        return m_captured_piece_type;
+        uint8_t ret = (m_data & CAPTURED_PIECE_TYPE_MASK) >> CAPTURED_PIECE_TYPE_SHIFT;
+        return ret == (CAPTURED_PIECE_TYPE_MASK >> CAPTURED_PIECE_TYPE_SHIFT) ? 
+            std::nullopt : std::optional<PieceType>(static_cast<PieceType>(ret));
     }
 
     void set_old_castling_rights(uint8_t castling_rights) {
-        m_old_castling_rights = castling_rights;
+        m_data &= ~OLD_CASTLING_RIGHTS_MASK;
+        m_data |= castling_rights << OLD_CASTLING_RIGHTS_SHIFT;
     }
 
     uint8_t get_old_castling_rights() const{
-        return m_old_castling_rights;
+        return static_cast<uint8_t>((m_data & OLD_CASTLING_RIGHTS_MASK) >> OLD_CASTLING_RIGHTS_SHIFT);
     }
 
 private:
-    BoardLocation m_from_loc;
-    BoardLocation m_to_loc;
-    uint8_t m_old_castling_rights = 0;
-    std::shared_ptr<Piece> m_captured_piece;
-    std::optional<PieceType> m_captured_piece_type = std::nullopt;
-    std::optional<PromotionType> m_promotion_type = std::nullopt;
-
-    uint8_t m_type = 0;
+    uint32_t m_data;
 };

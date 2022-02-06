@@ -26,8 +26,6 @@ public:
     };
 
 private:
-    std::unordered_map<uint8_t, uint64_t> m_dummy_map;
-
     uint64_t m_pawns, m_knights, m_bishops, m_rooks, m_queens, m_kings;
     uint64_t m_black_pieces, m_white_pieces, m_occupied;
 
@@ -38,6 +36,8 @@ private:
     uint8_t m_castling_rights = 0;
 
     std::optional<uint8_t> m_en_passant_col;
+
+    std::unordered_map<uint8_t, uint64_t> m_dummy_map;
 
     static constexpr uint64_t knight_attack_lut[64] =
     {
@@ -78,7 +78,7 @@ private:
     template<bool WhiteToMove>
     void get_castling_moves(MoveList& move_list) const;
 
-    const std::array<std::pair<uint64_t*, PieceType>, 6> piece_map = {
+    const std::array<std::pair<const uint64_t*, PieceType>, 6> piece_map = {
         std::make_pair(&m_pawns, PieceType::PAWN),
         std::make_pair(&m_knights, PieceType::KNIGHT),
         std::make_pair(&m_bishops, PieceType::BISHOP),
@@ -108,6 +108,7 @@ public:
 
 public:
     BitBoard();
+    BitBoard(const BitBoard& orig);
 
     //! Set the board to the starting position
     /*!

@@ -25,6 +25,34 @@ BitBoard::BitBoard() :
 
 }
 
+BitBoard::BitBoard(const BitBoard& orig) :
+    m_pawns(orig.m_pawns),
+    m_knights(orig.m_knights),
+    m_bishops(orig.m_bishops),
+    m_rooks(orig.m_rooks),
+    m_queens(orig.m_queens),
+    m_kings(orig.m_kings),
+    m_white_pieces(orig.m_white_pieces),
+    m_black_pieces(orig.m_black_pieces),
+    m_occupied(orig.m_occupied),
+    m_opposite_attacks(orig.m_opposite_attacks),
+    m_current_attacks(orig.m_current_attacks),
+    m_white_to_move(orig.m_white_to_move),
+    m_allowed_moves(orig.m_allowed_moves),
+    m_new_allowed_moves(orig.m_new_allowed_moves),
+    m_castling_rights(orig.m_castling_rights),
+    m_en_passant_col(orig.m_en_passant_col),
+    piece_map({
+        std::make_pair(&m_pawns, PieceType::PAWN),
+        std::make_pair(&m_knights, PieceType::KNIGHT),
+        std::make_pair(&m_bishops, PieceType::BISHOP),
+        std::make_pair(&m_rooks, PieceType::ROOK),
+        std::make_pair(&m_queens, PieceType::QUEEN),
+        std::make_pair(&m_kings, PieceType::KING)
+    })
+{
+}
+
 void BitBoard::set_to_start_position()
 {
     m_pawns   = 0x00ff0000'0000ff00;
@@ -59,9 +87,9 @@ Move& BitBoard::emplace_move(MoveList& move_list, const BoardLocation& from_loc,
     auto& move = move_list.emplace_back(from_loc, to_loc);
     auto to_loc_mask = to_loc.to_bitboard_mask();
 
-    for (const auto& [piece, type] : piece_map)
+    for (const auto& [pieces, type] : piece_map)
     {
-        if (*piece & to_loc_mask)
+        if (*pieces & to_loc_mask)
         {
             move.set_captured_piece_type(type);
             break;
