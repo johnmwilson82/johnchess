@@ -9,22 +9,6 @@
 class BitBoard;
 class Piece;
 
-/*class DynMove
-{
-// DynMove: Describes the dynamics of a move (where a piece moves to 
-// relative to it's current position)
-public:
-    constexpr DynMove(int dx, int dy) :
-        m_dx(dx), m_dy(dy)
-    {
-    }
-    inline int get_dx() const { return m_dx; }
-    inline int get_dy() const { return m_dy; }
-
-private:
-    int m_dx, m_dy;
-};*/
-
 class MoveHashFunction;
 
 class Move
@@ -65,7 +49,7 @@ public:
     std::string to_string() const;
 
     const BoardLocation& get_to_loc() const;
-    const BoardLocation get_from_loc() const;
+    const BoardLocation& get_from_loc() const;
 
     void set_is_en_passant_capture() {
         m_type |= EN_PASSANT_CAPTURE_MASK;

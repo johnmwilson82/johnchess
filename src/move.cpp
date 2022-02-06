@@ -82,7 +82,7 @@ const BoardLocation& Move::get_to_loc() const
     return m_to_loc;
 }
 
-const BoardLocation Move::get_from_loc() const
+const BoardLocation& Move::get_from_loc() const
 {
     return m_from_loc;
 }

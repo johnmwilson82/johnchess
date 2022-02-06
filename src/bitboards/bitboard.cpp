@@ -57,6 +57,8 @@ bool BitBoard::get_in_check(PieceColour col) const
 Move& BitBoard::emplace_move(MoveList& move_list, const BoardLocation& from_loc, const BoardLocation& to_loc) const
 {
     auto& move = move_list.emplace_back(from_loc, to_loc);
+    auto to_loc_mask = to_loc.to_bitboard_mask();
+
     for (const auto& pieces : { std::make_pair(m_pawns, PieceType::PAWN), 
                                 std::make_pair(m_knights, PieceType::KNIGHT),
                                 std::make_pair(m_bishops, PieceType::BISHOP),
@@ -64,9 +66,7 @@ Move& BitBoard::emplace_move(MoveList& move_list, const BoardLocation& from_loc,
                                 std::make_pair(m_queens, PieceType::QUEEN),
                                 std::make_pair(m_kings, PieceType::KING)})
     {
-        auto test_to = to_loc.to_bitboard_mask();
-        auto test_from = from_loc.to_bitboard_mask();
-        if (pieces.first & to_loc.to_bitboard_mask())
+        if (pieces.first & to_loc_mask)
         {
             move.set_captured_piece_type(pieces.second);
             break;

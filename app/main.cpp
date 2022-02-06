@@ -1,6 +1,6 @@
 #include "../src/johnchess_app.h"
 
-#if 1
+#if 0
 
 int main(int argc, const char* argv[])
 {

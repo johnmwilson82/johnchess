@@ -1,15 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <string>
-#include <iostream>
 
-
-class BitBoard;
-class DynMove;
-class Piece;
-
-constexpr uint8_t BOARD_DIM = 8;
 
 /*! /brief Board location
  *
@@ -30,8 +22,7 @@ public: //ctor + dtor
 
     BoardLocation& operator=(const BoardLocation& other)
     {
-        m_x = other.m_x;
-        m_y = other.m_y;
+        m_loc = other.m_loc;
 
         return *this;
     }
@@ -40,21 +31,21 @@ public: // methods
     //! Equals operator
     bool operator== (const BoardLocation& bl) const
     {
-        return m_x == bl.m_x && m_y == bl.m_y;
+        return m_loc == bl.m_loc;
     }
 
     //! Return string representation of BoardLocation (using standard notation)
     std::string to_string() const
     {
         std::string ret = "a1";
-        ret[0] += m_x;
-        ret[1] += m_y;
+        ret[0] += get_x();
+        ret[1] += get_y();
         return ret;
     }
 
     uint64_t to_bitboard_mask() const
     {
-        return 1ULL << (m_y * 8 + m_x);
+        return 1ULL << m_loc;
     }
 
 public: // inlines
@@ -63,14 +54,14 @@ public: // inlines
     /*!
      * \return 0 for col a -> 7 for col h
      */
-    inline int get_x() const { return m_x; }
+    inline int get_x() const { return m_loc & 0x7; }
 
     //! Get board row
     /*!
      * \return 0 for row 1 -> 7 for row 8
      */
-    inline int get_y() const { return m_y; }
+    inline int get_y() const { return m_loc >> 3; }
 
 private: // properties
-    int m_x, m_y;
+    uint8_t m_loc; // == y * 8 + x;
 };

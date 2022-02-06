@@ -1,17 +1,14 @@
+#include <stdexcept>
 #include "board_location.h"
-//#include "pieces.h"
-
 
 BoardLocation::BoardLocation(uint8_t bitboard_sq) :
-    m_x(bitboard_sq % 8),
-    m_y(bitboard_sq / 8)
+    m_loc(bitboard_sq)
 {
 }
 
 
 BoardLocation::BoardLocation(const BoardLocation& board_loc) :
-    m_x(board_loc.m_x),
-    m_y(board_loc.m_y)
+    m_loc(board_loc.m_loc)
 {
 }
 
@@ -29,12 +26,11 @@ BoardLocation::BoardLocation(const std::string& loc_str)
     if(col < 0 || col > 7)
         throw(std::runtime_error(std::string("Invalid loc string (col) ") + loc_str));
 
-    m_x = col; m_y = row;
+    m_loc = row * 8 + col;
 }
 
 
 BoardLocation::BoardLocation(int x, int y) :
-    m_x(x),
-    m_y(y)
+    m_loc(y * 8 + x)
 {
 }

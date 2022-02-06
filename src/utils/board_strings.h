@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <cassert>
+#include <iostream>
 
 #include "../bitboards/bitboard.h"
 
