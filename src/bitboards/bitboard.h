@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 
 #include <functional>
 #include <boost/container/static_vector.hpp>
@@ -76,6 +77,15 @@ private:
 
     template<bool WhiteToMove>
     void get_castling_moves(MoveList& move_list) const;
+
+    const std::array<std::pair<uint64_t*, PieceType>, 6> piece_map = {
+        std::make_pair(&m_pawns, PieceType::PAWN),
+        std::make_pair(&m_knights, PieceType::KNIGHT),
+        std::make_pair(&m_bishops, PieceType::BISHOP),
+        std::make_pair(&m_rooks, PieceType::ROOK),
+        std::make_pair(&m_queens, PieceType::QUEEN),
+        std::make_pair(&m_kings, PieceType::KING)
+    };
 
 public:
     constexpr inline uint64_t get_occupied() const { return m_occupied; }

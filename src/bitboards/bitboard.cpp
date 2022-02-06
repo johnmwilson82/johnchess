@@ -59,19 +59,15 @@ Move& BitBoard::emplace_move(MoveList& move_list, const BoardLocation& from_loc,
     auto& move = move_list.emplace_back(from_loc, to_loc);
     auto to_loc_mask = to_loc.to_bitboard_mask();
 
-    for (const auto& pieces : { std::make_pair(m_pawns, PieceType::PAWN), 
-                                std::make_pair(m_knights, PieceType::KNIGHT),
-                                std::make_pair(m_bishops, PieceType::BISHOP),
-                                std::make_pair(m_rooks, PieceType::ROOK),
-                                std::make_pair(m_queens, PieceType::QUEEN),
-                                std::make_pair(m_kings, PieceType::KING)})
+    for (const auto& [piece, type] : piece_map)
     {
-        if (pieces.first & to_loc_mask)
+        if (*piece & to_loc_mask)
         {
-            move.set_captured_piece_type(pieces.second);
+            move.set_captured_piece_type(type);
             break;
         }
     }
+
     move.set_old_castling_rights(m_castling_rights);
     return move;
 }
