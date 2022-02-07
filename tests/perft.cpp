@@ -59,7 +59,7 @@ TEST_F(PerftTests, CheckStartPosition5)
     EXPECT_EQ(perft(board, 5), 4865609);
 }
 
-/*TEST_F(PerftTests, CheckStartPosition6)
+TEST_F(PerftTests, CheckStartPosition6)
 {
     BitBoard board;
     board.set_to_start_position();

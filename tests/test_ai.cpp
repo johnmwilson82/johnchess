@@ -147,7 +147,7 @@ TEST_F(AiTests, CheckWillForkBlack)
     auto board = board_from_string_repr<BitBoard>(board_str);
     board.set_colour_to_move(PieceColour::BLACK);
 
-    BasicAI ai(PieceColour::BLACK, 3);
+    BasicAI ai(PieceColour::BLACK, 4);
 
     auto move = ai.make_move(board);
 

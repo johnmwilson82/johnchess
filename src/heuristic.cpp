@@ -38,7 +38,7 @@ ShannonHeuristic::ShannonHeuristic(const BitBoard& board, PieceColour ai_colour)
     accum += board.get_kings() & board.pieces_to_move(ai_player_is_white) ? 200 : 0;
     accum -= board.get_kings() & board.pieces_to_move(!ai_player_is_white) ? 200 : 0;
 
-    //accum += board.get_all_legal_moves(Piece::WHITE).size() * 0.1;
-    //accum -= board.get_all_legal_moves(Piece::BLACK).size() * 0.1;
+    accum += board.get_all_legal_moves(ai_colour).size() * 0.1;
+    accum -= board.get_all_legal_moves(opposite_colour(ai_colour)).size() * 0.1;
 
 }

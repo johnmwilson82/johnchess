@@ -98,7 +98,7 @@ float SearchTree::alpha_beta_min(float alpha, float beta, uint8_t depth_left, Pi
     if (depth_left == 0)
     {
         ShannonHeuristic eval(m_board, ai_colour);
-        return -eval.get();
+        return eval.get();
     }
 
     BitBoard::MoveList move_list = m_board.get_all_legal_moves(m_board.get_colour_to_move());

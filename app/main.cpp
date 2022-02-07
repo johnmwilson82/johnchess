@@ -1,6 +1,6 @@
 #include "../src/johnchess_app.h"
 
-#if 0
+#if 1
 
 int main(int argc, const char* argv[])
 {
@@ -21,15 +21,15 @@ using namespace utils;
 int main(int argc, const char* argv[])
 {
     std::string board_str(
-        " r n b q _ k _ r\n"
-        " p p _ P b p p p\n"
-        " _ _ p _ _ _ _ _\n"
-        " _ _ _ _ _ _ _ _\n"
-        " _ _ B _ _ _ _ _\n"
-        " _ _ _ _ _ _ _ _\n"
-        " P P P _ N n P P\n"
-        " R N B Q K _ _ R\n"
-        "w KQ - 1 8\n"
+        " r _ _ _ k _ _ r\n"
+        " p _ p p q p b _\n"
+        " b n _ _ p n p _\n"
+        " _ _ _ P N _ _ _\n"
+        " _ p _ _ P _ _ _\n"
+        " _ _ N _ _ Q _ p\n"
+        " P P P B B P P P\n"
+        " R _ _ _ K _ _ R\n"
+        "w KQkq - 1 8\n"
     );
 
 
