@@ -137,47 +137,50 @@ template<bool WhiteToMove>
 uint64_t BitBoard::get_pawn_moves(MoveList& move_list, const std::unordered_map<uint8_t, uint64_t>& pinned_piece_allowed_moves) const
 {
     // Flip the board vertically to calculate the black moves
-    uint64_t friendly_pieces = WhiteToMove ? pieces_to_move(WhiteToMove) : mirror_vertical(pieces_to_move(WhiteToMove));
-    uint64_t occupied = WhiteToMove ? m_occupied : mirror_vertical(m_occupied);
+    uint64_t friendly_pieces = pieces_to_move(WhiteToMove);
+    uint64_t occupied = m_occupied;
     uint64_t enemy_pieces = occupied ^ friendly_pieces;
 
-    uint64_t moving_pieces = (WhiteToMove ? m_pawns : mirror_vertical(m_pawns)) & friendly_pieces;
+    uint64_t moving_pieces = m_pawns & friendly_pieces;
 
-    constexpr uint64_t first_rank = 0x00000000'0000ff00;
+    constexpr uint64_t first_rank = WhiteToMove ? 0x00000000'0000ff00 : 0x00ff0000'00000000;
 
-    constexpr int8_t forward = 8;
+    constexpr DirShift forward = WhiteToMove ? DirShift::N : DirShift::S;
+    constexpr DirShift capture_left = WhiteToMove ? DirShift::NW : DirShift::SW;
+    constexpr DirShift capture_right = WhiteToMove ? DirShift::NE : DirShift::SE;
 
     uint64_t all_attacks = 0;
 
     while (moving_pieces)
     {
         auto piece_sq = bit_scan_forward(moving_pieces);
+        uint64_t sq_mask = 1ULL << piece_sq;
 
         // one square forward
-        uint64_t attacks = 1ULL << (piece_sq + forward);
+        uint64_t attacks = dir_shift<forward>(sq_mask);
         
         // two squares forward
-        attacks |= ((first_rank & (1ULL << piece_sq)) << (2 * forward));
+        attacks |= dir_shift<forward>(dir_shift<forward>((first_rank & sq_mask)));
 
         // remove blocked forward moves 
-        attacks &= ~(occupied | ((occupied & ~(1ULL << piece_sq)) << forward));
+        attacks &= ~(occupied | dir_shift<forward>(occupied & ~sq_mask));
 
         // capture left
-        uint64_t left_attack = ((1ULL << piece_sq) & 0x00010101'01010100) ? 0 : 1ULL << (piece_sq + forward - 1);
+        uint64_t left_attack = (sq_mask & 0x00010101'01010100) ? 0 : dir_shift<capture_left>(sq_mask);
         attacks |= enemy_pieces & left_attack;
 
         // capture right
-        uint64_t right_attack = ((1ULL << piece_sq) & 0x00808080'80808000) ? 0 : 1ULL << (piece_sq + forward + 1);
+        uint64_t right_attack = (sq_mask & 0x00808080'80808000) ? 0 : dir_shift<capture_right>(sq_mask);
         attacks |= enemy_pieces & right_attack;
 
         // attacks can't move into friendly pieces
         attacks &= ~friendly_pieces;
 
         // flip back attacks
-        attacks = (WhiteToMove ? attacks : mirror_vertical(attacks)) & m_allowed_moves;
+        attacks &= m_allowed_moves;
 
         // Scalar square vertical mirror
-        piece_sq = WhiteToMove ? piece_sq : piece_sq ^ 56;
+        //piece_sq = WhiteToMove ? piece_sq : piece_sq ^ 56;
 
         // If pawn is pinned ensure it moves to allowed square during capture
         if (pinned_piece_allowed_moves.contains(piece_sq))
@@ -185,12 +188,12 @@ uint64_t BitBoard::get_pawn_moves(MoveList& move_list, const std::unordered_map<
             attacks &= pinned_piece_allowed_moves.at(piece_sq);
         }
         
-        uint64_t attack_sqs = WhiteToMove ? (left_attack | right_attack) : mirror_vertical(left_attack | right_attack);
+        uint64_t attack_sqs = left_attack | right_attack;
         all_attacks |= attack_sqs;
 
         if (attack_sqs & (m_kings & pieces_to_move(!WhiteToMove)))
         {
-            m_new_allowed_moves &= (1ULL << piece_sq);
+            m_new_allowed_moves &= 1ULL << piece_sq;
         }
 
         while (attacks)

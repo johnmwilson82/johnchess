@@ -4,6 +4,28 @@
 
 namespace bitboard_utils
 {
+    enum class DirShift : int8_t {
+        SW = -9,
+        S = -8,
+        SE = -7,
+        W = -1,
+        E = 1,
+        NW = 7,
+        N  = 8,
+        NE = 9,
+    };
+
+    template<DirShift dir>
+    static constexpr uint64_t dir_shift(uint64_t bb)
+    {
+        int8_t shift = static_cast<int8_t>(dir);
+        if (shift < 0)
+        {
+            return bb >> -shift;
+        }
+        return bb << shift;
+    }
+
     static constexpr uint8_t debruijn_index64[64] = {
         0, 47,  1, 56, 48, 27,  2, 60,
         57, 49, 41, 37, 28, 16,  3, 61,
