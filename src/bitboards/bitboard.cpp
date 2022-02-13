@@ -138,8 +138,7 @@ uint64_t BitBoard::get_pawn_moves(MoveList& move_list, const std::unordered_map<
 {
     // Flip the board vertically to calculate the black moves
     uint64_t friendly_pieces = pieces_to_move(WhiteToMove);
-    uint64_t occupied = m_occupied;
-    uint64_t enemy_pieces = occupied ^ friendly_pieces;
+    uint64_t enemy_pieces = m_occupied ^ friendly_pieces;
 
     uint64_t moving_pieces = m_pawns & friendly_pieces;
 
@@ -163,7 +162,7 @@ uint64_t BitBoard::get_pawn_moves(MoveList& move_list, const std::unordered_map<
         attacks |= dir_shift<forward>(dir_shift<forward>((first_rank & sq_mask)));
 
         // remove blocked forward moves 
-        attacks &= ~(occupied | dir_shift<forward>(occupied & ~sq_mask));
+        attacks &= ~(m_occupied | dir_shift<forward>(m_occupied & ~sq_mask));
 
         // capture left
         uint64_t left_attack = (sq_mask & 0x00010101'01010100) ? 0 : dir_shift<capture_left>(sq_mask);
@@ -178,9 +177,6 @@ uint64_t BitBoard::get_pawn_moves(MoveList& move_list, const std::unordered_map<
 
         // flip back attacks
         attacks &= m_allowed_moves;
-
-        // Scalar square vertical mirror
-        //piece_sq = WhiteToMove ? piece_sq : piece_sq ^ 56;
 
         // If pawn is pinned ensure it moves to allowed square during capture
         if (pinned_piece_allowed_moves.contains(piece_sq))

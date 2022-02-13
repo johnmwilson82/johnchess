@@ -19,11 +19,7 @@ namespace bitboard_utils
     static constexpr uint64_t dir_shift(uint64_t bb)
     {
         int8_t shift = static_cast<int8_t>(dir);
-        if (shift < 0)
-        {
-            return bb >> -shift;
-        }
-        return bb << shift;
+        return shift < 0 ? bb >> -shift : bb << shift;
     }
 
     static constexpr uint8_t debruijn_index64[64] = {

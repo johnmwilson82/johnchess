@@ -29,7 +29,7 @@ public: //ctor + dtor
 
 public: // methods
     //! Equals operator
-    bool operator== (const BoardLocation& bl) const
+    inline bool operator== (const BoardLocation& bl) const
     {
         return m_loc == bl.m_loc;
     }
@@ -43,12 +43,12 @@ public: // methods
         return ret;
     }
 
-    uint64_t to_bitboard_mask() const
+    inline uint64_t to_bitboard_mask() const
     {
         return 1ULL << m_loc;
     }
 
-    uint8_t get_raw() const
+    inline uint8_t get_raw() const
     {
         return m_loc;
     }
