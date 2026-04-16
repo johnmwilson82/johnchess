@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <chrono>
 #include "xboard_interface.h"
 
 #include "bitboards/bitboard.h"
@@ -37,5 +38,6 @@ private:
     std::ostream& get_output_stream();
     bool m_force_mode;
     std::vector<Move> m_move_history;
+    int m_time_remaining_cs = 30000; // centiseconds, updated by TIME command
 
 };

@@ -20,7 +20,7 @@ JohnchessApp::JohnchessApp(int argc, const char* argv[]) :
     m_board = std::make_unique<BitBoard>();
     m_board->set_to_start_position();
 
-    m_ai = std::make_unique<BasicAI>(PieceColour::BLACK, 5);
+    m_ai = std::make_unique<BasicAI>(PieceColour::BLACK);
 }
 
 JohnchessApp::~JohnchessApp()
@@ -33,7 +33,10 @@ void JohnchessApp::make_ai_move()
 {
     auto moving_colour = m_board->get_colour_to_move();
 
-    Move move = m_ai->make_move(*m_board);
+    auto budget = std::chrono::milliseconds(std::max(100, m_time_remaining_cs * 10 / 30));
+    auto deadline = std::chrono::steady_clock::now() + budget;
+
+    Move move = m_ai->make_move(*m_board, deadline);
     std::string move_string = move.to_string();
 
     m_board->make_move(move_string);
@@ -159,17 +162,16 @@ void JohnchessApp::main_loop()
                 }
                 break;
 
-            case XBoardInterface::CommandReceived::MEMORY:
-                // set max memory
-            case XBoardInterface::CommandReceived::LEVEL:
-                // set level
-            case XBoardInterface::CommandReceived::POST:
-                // set output pondering mode
-            case XBoardInterface::CommandReceived::HARD:
-                // set hard mode
-            case XBoardInterface::CommandReceived::RANDOM:
-                // set random mode
             case XBoardInterface::CommandReceived::TIME:
+                if (!rcvd.get_intparams().empty())
+                    m_time_remaining_cs = rcvd.get_intparams().front();
+                break;
+
+            case XBoardInterface::CommandReceived::MEMORY:
+            case XBoardInterface::CommandReceived::LEVEL:
+            case XBoardInterface::CommandReceived::POST:
+            case XBoardInterface::CommandReceived::HARD:
+            case XBoardInterface::CommandReceived::RANDOM:
             case XBoardInterface::CommandReceived::OTIM:
             case XBoardInterface::CommandReceived::NONE:
                 break;

@@ -6,6 +6,7 @@
 
 #include "utils/board_strings.h"
 #include <unordered_map>
+#include <chrono>
 
 
 struct TTEntry {
@@ -30,8 +31,10 @@ private:
     float maxi(int depth, PieceColour ai_colour);
     float mini(int depth, PieceColour ai_colour);
 
+    static constexpr uint8_t MAX_DEPTH = 20;
+
 public:
-    Move search(uint8_t search_depth, PieceColour ai_colour);
+    Move search(std::chrono::steady_clock::time_point deadline, PieceColour ai_colour);
 
     SearchTree(BitBoard& board);
 };
