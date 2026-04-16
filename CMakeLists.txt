@@ -5,6 +5,9 @@ SET(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 
 add_subdirectory(src)
 
+enable_testing()
+add_subdirectory(tests)
+
 # add a target to generate API documentation with Doxygen
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
@@ -16,4 +19,3 @@ COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 endif(DOXYGEN_FOUND)
 
-set_property(TARGET johnchess PROPERTY CXX_STANDARD 11)

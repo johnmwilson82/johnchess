@@ -2,8 +2,8 @@
 
 #include "ai.h"
 
-#include <bitboards\bitboard.h>
-#include <utils\board_strings.h>
+#include <bitboards/bitboard.h>
+#include <utils/board_strings.h>
 
 using namespace utils;
 

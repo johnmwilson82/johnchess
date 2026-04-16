@@ -5,18 +5,27 @@
 #include "search_tree_node.h"
 
 #include "utils/board_strings.h"
+#include <unordered_map>
+
+
+struct TTEntry {
+    enum class Flag : uint8_t { EXACT, LOWER_BOUND, UPPER_BOUND };
+    float score;
+    uint8_t depth;
+    Flag flag;
+};
 
 
 class SearchTree
 {
 private:
     std::unique_ptr<ZobristHash> hasher;
+    std::unordered_map<uint64_t, TTEntry> m_tt;
 
     BitBoard& m_board;
     float m_mult;
 
-    float alpha_beta_max(float alpha, float beta, uint8_t depth_left, PieceColour ai_colour);
-    float alpha_beta_min(float alpha, float beta, uint8_t depth_left, PieceColour ai_colour);
+    float negamax(float alpha, float beta, uint8_t depth_left);
 
     float maxi(int depth, PieceColour ai_colour);
     float mini(int depth, PieceColour ai_colour);

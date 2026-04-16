@@ -136,6 +136,7 @@ void JohnchessApp::main_loop()
 
             case XBoardInterface::CommandReceived::NEW:
                 m_board->set_to_start_position();
+                m_force_mode = false;
                 break;
 
             case XBoardInterface::CommandReceived::MEMORY:

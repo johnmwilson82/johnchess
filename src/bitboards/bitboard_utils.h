@@ -1,6 +1,45 @@
 #pragma once
 #include <cstdint>
 #include <cassert>
+#ifdef _MSC_VER
+
+#include <stdlib.h>
+#define bswap_64(x) _byteswap_uint64(x)
+#define popcnt64(x) __popcnt64(x)
+#elif defined(__APPLE__)
+
+// Mac OS X / Darwin features
+#include <libkern/OSByteOrder.h>
+#define bswap_64(x) OSSwapInt64(x)
+
+#elif defined(__sun) || defined(sun)
+
+#include <sys/byteorder.h>
+#define bswap_64(x) BSWAP_64(x)
+
+#elif defined(__FreeBSD__)
+
+#include <sys/endian.h>
+#define bswap_64(x) bswap64(x)
+
+#elif defined(__OpenBSD__)
+
+#include <sys/types.h>
+#define bswap_64(x) swap64(x)
+
+#elif defined(__NetBSD__)
+
+#include <sys/types.h>
+#include <machine/bswap.h>
+#if defined(__BSWAP_RENAME) && !defined(__bswap_32)
+#define bswap_64(x) bswap64(x)
+#endif
+
+#else
+
+#include <byteswap.h>
+#define popcnt64(x) __builtin_popcountll(x)
+#endif
 
 namespace bitboard_utils
 {
@@ -38,10 +77,10 @@ namespace bitboard_utils
     }
 
     static inline uint64_t mirror_vertical(uint64_t bb) {
-        return _byteswap_uint64(bb);
+        return bswap_64(bb);
     }
 
     static inline uint64_t pop_count(uint64_t bb) {
-        return __popcnt64(bb);
+        return popcnt64(bb);
     }
 }

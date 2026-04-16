@@ -2,7 +2,7 @@
 
 #define private public
 #include <zobrist_hash.h>
-#include <utils\board_strings.h>
+#include <utils/board_strings.h>
 
 using namespace utils;
 

@@ -1,5 +1,6 @@
 #include "search_tree.h"
 #include <vector>
+#include <limits>
 
 float SearchTree::maxi(int depth, PieceColour ai_colour) {
     if (depth == 0) 
@@ -59,11 +60,22 @@ float SearchTree::mini(int depth, PieceColour ai_colour) {
     return min;
 }
 
-float SearchTree::alpha_beta_max(float alpha, float beta, uint8_t depth_left, PieceColour ai_colour)
+float SearchTree::negamax(float alpha, float beta, uint8_t depth_left)
 {
+    uint64_t hash = hasher->get_hash(m_board);
+
+    auto it = m_tt.find(hash);
+    if (it != m_tt.end() && it->second.depth >= depth_left) {
+        const auto& e = it->second;
+        if (e.flag == TTEntry::Flag::EXACT)                          return e.score;
+        if (e.flag == TTEntry::Flag::LOWER_BOUND && e.score > alpha) alpha = e.score;
+        if (e.flag == TTEntry::Flag::UPPER_BOUND && e.score < beta)  beta  = e.score;
+        if (alpha >= beta) return e.score;
+    }
+
     if (depth_left == 0)
     {
-        ShannonHeuristic eval(m_board, ai_colour);
+        ShannonHeuristic eval(m_board, m_board.get_colour_to_move());
         return eval.get();
     }
 
@@ -71,65 +83,35 @@ float SearchTree::alpha_beta_max(float alpha, float beta, uint8_t depth_left, Pi
 
     if (move_list.empty())
     {
-        return (m_board.get_in_check(m_board.get_colour_to_move()) ? (m_board.get_colour_to_move() == ai_colour ? -200.f : 200.f) : 0);
+        return m_board.get_in_check(m_board.get_colour_to_move()) ? -200.f : 0.f;
     }
+
+    float original_alpha = alpha;
 
     for (const auto& move : move_list)
     {
         m_board.make_move(move);
-        float score = alpha_beta_min(alpha, beta, depth_left - 1, ai_colour);
+        float score = -negamax(-beta, -alpha, depth_left - 1);
         m_board.unmake_move(move);
 
         if (score >= beta)
         {
+            m_tt[hash] = { beta, depth_left, TTEntry::Flag::LOWER_BOUND };
             return beta;
         }
         if (score > alpha)
-        {
             alpha = score;
-        }
     }
+
+    TTEntry::Flag flag = (alpha <= original_alpha) ? TTEntry::Flag::UPPER_BOUND : TTEntry::Flag::EXACT;
+    m_tt[hash] = { alpha, depth_left, flag };
 
     return alpha;
 }
 
-float SearchTree::alpha_beta_min(float alpha, float beta, uint8_t depth_left, PieceColour ai_colour)
-{
-    if (depth_left == 0)
-    {
-        ShannonHeuristic eval(m_board, ai_colour);
-        return eval.get();
-    }
-
-    BitBoard::MoveList move_list = m_board.get_all_legal_moves(m_board.get_colour_to_move());
-
-    if (move_list.empty())
-    {
-        return (m_board.get_in_check(m_board.get_colour_to_move()) ? (m_board.get_colour_to_move() == ai_colour ? -200.f : 200.f) : 0);
-    }
-
-    for (const auto& move : move_list)
-    {
-        m_board.make_move(move);
-        float score = alpha_beta_max(alpha, beta, depth_left - 1, ai_colour);
-        m_board.unmake_move(move);
-
-        if (score <= alpha)
-        {
-            return alpha;
-        }
-        if (score < beta)
-        {
-            beta = score;
-        }
-    }
-
-    return beta;
-}
-
 Move SearchTree::search(uint8_t search_depth, PieceColour ai_colour)
 {
-    m_mult = ai_colour == PieceColour::WHITE ? 1.0f : -1.0f;
+    m_tt.clear();
 
     std::unique_ptr<Move> best_move;
 
@@ -141,8 +123,7 @@ Move SearchTree::search(uint8_t search_depth, PieceColour ai_colour)
     for (const auto& move : move_list)
     {
         m_board.make_move(move);
-        //float score = mini(search_depth, ai_colour);
-        float score = alpha_beta_min(alpha, beta, search_depth, ai_colour);
+        float score = -negamax(-beta, -alpha, search_depth);
         m_board.unmake_move(move);
 
         if (score > alpha)
