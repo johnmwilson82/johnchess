@@ -31,6 +31,8 @@ public:
             FORCE,
             GO,
             RESULT,
+            UNDO,
+            REMOVE,
             NONE
         } type_t;
 

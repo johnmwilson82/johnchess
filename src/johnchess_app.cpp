@@ -33,9 +33,11 @@ void JohnchessApp::make_ai_move()
 {
     auto moving_colour = m_board->get_colour_to_move();
 
-    std::string move_string = m_ai->make_move(*m_board).to_string();
+    Move move = m_ai->make_move(*m_board);
+    std::string move_string = move.to_string();
 
     m_board->make_move(move_string);
+    m_move_history.push_back(move);
 
     m_board->get_all_legal_moves(m_board->get_colour_to_move()); // TODO: this is just to load the state for get_in_check
     if(m_board->get_in_check(moving_colour))
@@ -109,6 +111,8 @@ void JohnchessApp::main_loop()
                     break;
                 }
 
+                m_move_history.push_back(Move(rcvd_move));
+
                 // Check whether received move has caused game end
                 if(check_game_end()) break;
 
@@ -136,7 +140,23 @@ void JohnchessApp::main_loop()
 
             case XBoardInterface::CommandReceived::NEW:
                 m_board->set_to_start_position();
+                m_move_history.clear();
                 m_force_mode = false;
+                break;
+
+            case XBoardInterface::CommandReceived::UNDO:
+                if (!m_move_history.empty()) {
+                    m_board->unmake_move(m_move_history.back());
+                    m_move_history.pop_back();
+                }
+                break;
+
+            case XBoardInterface::CommandReceived::REMOVE:
+                // Take back two half-moves (opponent's + engine's).
+                for (int i = 0; i < 2 && !m_move_history.empty(); ++i) {
+                    m_board->unmake_move(m_move_history.back());
+                    m_move_history.pop_back();
+                }
                 break;
 
             case XBoardInterface::CommandReceived::MEMORY:

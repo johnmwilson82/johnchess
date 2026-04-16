@@ -263,6 +263,16 @@ void XBoardInterface::CommandReceived::parse(const std::string& rcvd)
             m_params.push_back("playother");
             break;
         }
+        else if(!command.compare("undo"))
+        {
+            m_type = UNDO;
+            break;
+        }
+        else if(!command.compare("remove"))
+        {
+            m_type = REMOVE;
+            break;
+        }
         else if(!command.compare("edit"))
         {
             m_type = EDIT;

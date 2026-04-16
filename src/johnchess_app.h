@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 #include "xboard_interface.h"
 
 #include "bitboards/bitboard.h"
@@ -35,5 +36,6 @@ private:
     std::istream& get_input_stream();
     std::ostream& get_output_stream();
     bool m_force_mode;
+    std::vector<Move> m_move_history;
 
 };
