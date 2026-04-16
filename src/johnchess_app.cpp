@@ -36,7 +36,14 @@ void JohnchessApp::make_ai_move()
     auto budget = std::chrono::milliseconds(std::max(100, m_time_remaining_cs * 10 / 30));
     auto deadline = std::chrono::steady_clock::now() + budget;
 
-    Move move = m_ai->make_move(*m_board, deadline);
+    ThinkCallback think_cb;
+    if (m_post_mode) {
+        think_cb = [this](uint8_t depth, int score_cp, int elapsed_cs, uint64_t nodes, const Move& best) {
+            m_xboard_interface->send_thinking(depth, score_cp, elapsed_cs, nodes, best.to_string());
+        };
+    }
+
+    Move move = m_ai->make_move(*m_board, deadline, think_cb);
     std::string move_string = move.to_string();
 
     m_board->make_move(move_string);
@@ -167,9 +174,12 @@ void JohnchessApp::main_loop()
                     m_time_remaining_cs = rcvd.get_intparams().front();
                 break;
 
+            case XBoardInterface::CommandReceived::POST:
+                m_post_mode = true;
+                break;
+
             case XBoardInterface::CommandReceived::MEMORY:
             case XBoardInterface::CommandReceived::LEVEL:
-            case XBoardInterface::CommandReceived::POST:
             case XBoardInterface::CommandReceived::HARD:
             case XBoardInterface::CommandReceived::RANDOM:
             case XBoardInterface::CommandReceived::OTIM:

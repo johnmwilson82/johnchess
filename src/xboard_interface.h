@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <vector>
 #include <cstdlib>
+#include <cstdint>
 #include <deque>
 
 class XBoardInterface
@@ -100,6 +101,7 @@ public:
 
 public:
     void tell_info(const std::string& infostring);
+    void send_thinking(uint8_t depth, int score_cp, int elapsed_cs, uint64_t nodes, const std::string& move);
     CommandReceived wait_for_command();
     void reply_invalid(CommandReceived rcvd);
     void reply_illegal_move(CommandReceived rcvd);

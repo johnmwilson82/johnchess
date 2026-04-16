@@ -37,6 +37,7 @@ private:
     std::istream& get_input_stream();
     std::ostream& get_output_stream();
     bool m_force_mode;
+    bool m_post_mode = false;
     std::vector<Move> m_move_history;
     int m_time_remaining_cs = 30000; // centiseconds, updated by TIME command
 

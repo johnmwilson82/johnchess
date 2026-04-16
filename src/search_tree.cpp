@@ -104,6 +104,7 @@ float SearchTree::mini(int depth, PieceColour ai_colour) {
 
 float SearchTree::negamax(float alpha, float beta, uint8_t depth_left)
 {
+    ++m_nodes;
     uint64_t hash = hasher->get_hash(m_board);
 
     auto it = m_tt.find(hash);
@@ -155,9 +156,12 @@ float SearchTree::negamax(float alpha, float beta, uint8_t depth_left)
     return alpha;
 }
 
-Move SearchTree::search(std::chrono::steady_clock::time_point deadline, PieceColour ai_colour)
+Move SearchTree::search(std::chrono::steady_clock::time_point deadline, PieceColour ai_colour,
+                        ThinkCallback think_cb)
 {
     m_tt.clear();
+    m_nodes = 0;
+    auto search_start = std::chrono::steady_clock::now();
 
     BitBoard::MoveList root_moves = m_board.get_all_legal_moves(m_board.get_colour_to_move());
 
@@ -196,6 +200,14 @@ Move SearchTree::search(std::chrono::steady_clock::time_point deadline, PieceCol
             bool same = best_move && (*iteration_best == *best_move);
             best_move = std::move(iteration_best);
             stable_count = same ? stable_count + 1 : 0;
+        }
+
+        if (think_cb && best_move) {
+            int score_cp = static_cast<int>(alpha * 100.0f);
+            int elapsed_cs = static_cast<int>(
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - search_start).count() / 10);
+            think_cb(depth, score_cp, elapsed_cs, m_nodes, *best_move);
         }
 
         // A forced mate was found — no deeper search can improve on this.

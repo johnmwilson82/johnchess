@@ -35,6 +35,11 @@ void XBoardInterface::tell_info(const std::string& infostring)
     write_command("tellics say", infostring);
 }
 
+void XBoardInterface::send_thinking(uint8_t depth, int score_cp, int elapsed_cs, uint64_t nodes, const std::string& move)
+{
+    m_outstr << depth << " " << score_cp << " " << elapsed_cs << " " << nodes << " " << move << "\n";
+}
+
 void XBoardInterface::write_command(const std::string& command, const std::string& content)
 {
     m_outstr << command << " " << content << std::endl;

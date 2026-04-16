@@ -14,7 +14,8 @@ public:
     AI(PieceColour colour) : m_colour(colour) {}
     virtual ~AI() {}
 
-    virtual Move make_move(BitBoard& board, std::chrono::steady_clock::time_point deadline) = 0;
+    virtual Move make_move(BitBoard& board, std::chrono::steady_clock::time_point deadline,
+                           ThinkCallback think_cb = nullptr) = 0;
 
     void set_colour(PieceColour colour) { m_colour = colour; }
 
@@ -30,11 +31,12 @@ private:
 public:
     BasicAI(PieceColour colour) : AI(colour) {}
 
-    Move make_move(BitBoard& board, std::chrono::steady_clock::time_point deadline) override
+    Move make_move(BitBoard& board, std::chrono::steady_clock::time_point deadline,
+                   ThinkCallback think_cb = nullptr) override
     {
         if (!m_board_tree)
             m_board_tree = std::make_unique<SearchTree>(board);
 
-        return m_board_tree->search(deadline, m_colour);
+        return m_board_tree->search(deadline, m_colour, think_cb);
     }
 };
