@@ -54,8 +54,11 @@ public:
     };
 
     //Move(const BoardLocation& from_loc, const DynMove& dm);
+    Move() : m_data(0) {}
     Move(const std::string& move_str);
     Move(const BoardLocation& from_loc, const BoardLocation& to_loc);
+
+    bool is_valid() const { return get_from_loc() != get_to_loc(); }
 
     bool operator== (const Move& m) const;
     

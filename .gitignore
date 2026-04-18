@@ -1,4 +1,8 @@
 build/
+build_cov/
+*.gcov
+*.gcno
+*.gcda
 .settings
 *.fen
 *.pgn

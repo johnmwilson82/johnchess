@@ -16,15 +16,15 @@ void XBoardInterface::reply_result(Result result){
     switch(result)
     {
         case Result::WHITE_WIN:
-            std::cout << "1-0 {White wins}" << std::endl;
+            m_outstr << "1-0 {White wins}" << std::endl;
             break;
 
         case Result::BLACK_WIN:
-            std::cout << "0-1 {Black wins}" << std::endl;
+            m_outstr << "0-1 {Black wins}" << std::endl;
             break;
 
         case Result::DRAW:
-            std::cout << "1/2-1/2 {Draw}" << std::endl;
+            m_outstr << "1/2-1/2 {Draw}" << std::endl;
             break;
     }
 
@@ -37,7 +37,7 @@ void XBoardInterface::tell_info(const std::string& infostring)
 
 void XBoardInterface::send_thinking(uint8_t depth, int score_cp, int elapsed_cs, uint64_t nodes, const std::string& move)
 {
-    m_outstr << depth << " " << score_cp << " " << elapsed_cs << " " << nodes << " " << move << "\n";
+    m_outstr << static_cast<int>(depth) << " " << score_cp << " " << elapsed_cs << " " << nodes << " " << move << "\n";
 }
 
 void XBoardInterface::write_command(const std::string& command, const std::string& content)

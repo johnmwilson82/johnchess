@@ -13,6 +13,7 @@ add_executable(johnchess_tests
     test_ai.cpp
     test_zobrist_hash.cpp
     test_read_write_board.cpp
+    test_xboard_interface.cpp
     perft.cpp
 )
 

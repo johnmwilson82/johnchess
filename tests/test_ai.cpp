@@ -140,6 +140,41 @@ TEST_F(AiTests, CheckWillForkWhite)
     EXPECT_EQ(move.to_string(), std::string("g6e7"));
 }
 
+TEST_F(AiTests, ThinkCallbackIncludesPrincipalVariation)
+{
+    // Knight on g6 forks queen on c8 and king on g8 via Nge7+.
+    // After the fork the king must move, then the knight takes the queen —
+    // so the principal variation should contain at least two moves.
+    std::string board_str(
+        " _ _ q _ _ _ k _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ N _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ K _\n"
+    );
+
+    auto board = board_from_string_repr<BitBoard>(board_str);
+    board.set_colour_to_move(PieceColour::WHITE);
+
+    BasicAI ai(PieceColour::WHITE);
+
+    std::string final_variation;
+    ThinkCallback cb = [&](uint8_t, int, int, uint64_t, const std::string& principal_variation) {
+        final_variation = principal_variation;
+    };
+
+    auto move = ai.make_move(board, deadline(), cb);
+
+    EXPECT_EQ(move.to_string(), "g6e7");
+
+    // PV must be non-empty and start with the chosen move.
+    EXPECT_FALSE(final_variation.empty());
+    EXPECT_EQ(final_variation.substr(0, 4), "g6e7");
+}
+
 TEST_F(AiTests, CheckWillForkBlack)
 {
     std::string board_str(
@@ -161,4 +196,28 @@ TEST_F(AiTests, CheckWillForkBlack)
     auto move = ai.make_move(board, deadline());
 
     EXPECT_EQ(move.to_string(), std::string("d4e2"));
+}
+
+TEST_F(AiTests, SingleLegalMoveIsReturnedImmediately)
+{
+    // White king on h1, in check from black queen on f1.
+    // Rook on g8 covers g1 and g2, so the only escape is h1-h2.
+    std::string board_str(
+        " _ _ _ _ _ _ r _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ _ _ _\n"
+        " _ _ _ _ _ q _ K\n"
+    );
+
+    auto board = board_from_string_repr<BitBoard>(board_str);
+    board.set_colour_to_move(PieceColour::WHITE);
+
+    BasicAI ai(PieceColour::WHITE);
+    auto move = ai.make_move(board, deadline());
+
+    EXPECT_EQ(move.to_string(), "h1h2");
 }

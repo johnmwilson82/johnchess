@@ -1099,3 +1099,48 @@ TEST_F(BitboardTests, CheckPosition4KingCaptureDefended)
     ASSERT_FALSE(find_fn(moves, "e8f7"));
 
 }
+
+// --- Move::to_string() promotion suffixes ---
+
+TEST(MoveTests, PromotionToStringQueen)
+{
+    Move m("e7e8q");
+    EXPECT_EQ(m.to_string(), "e7e8q");
+}
+
+TEST(MoveTests, PromotionToStringRook)
+{
+    Move m("e7e8r");
+    EXPECT_EQ(m.to_string(), "e7e8r");
+}
+
+TEST(MoveTests, PromotionToStringBishop)
+{
+    Move m("e7e8b");
+    EXPECT_EQ(m.to_string(), "e7e8b");
+}
+
+TEST(MoveTests, PromotionToStringKnight)
+{
+    Move m("e7e8n");
+    EXPECT_EQ(m.to_string(), "e7e8n");
+}
+
+// --- BoardLocation invalid input ---
+
+TEST(BoardLocationTests, ThrowsOnWrongLength)
+{
+    EXPECT_THROW(BoardLocation("e"), std::runtime_error);
+    EXPECT_THROW(BoardLocation("e11"), std::runtime_error);
+}
+
+TEST(BoardLocationTests, ThrowsOnInvalidRow)
+{
+    EXPECT_THROW(BoardLocation("e0"), std::runtime_error);
+    EXPECT_THROW(BoardLocation("e9"), std::runtime_error);
+}
+
+TEST(BoardLocationTests, ThrowsOnInvalidCol)
+{
+    EXPECT_THROW(BoardLocation("i1"), std::runtime_error);
+}

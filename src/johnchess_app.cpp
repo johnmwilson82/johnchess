@@ -38,8 +38,8 @@ void JohnchessApp::make_ai_move()
 
     ThinkCallback think_cb;
     if (m_post_mode) {
-        think_cb = [this](uint8_t depth, int score_cp, int elapsed_cs, uint64_t nodes, const Move& best) {
-            m_xboard_interface->send_thinking(depth, score_cp, elapsed_cs, nodes, best.to_string());
+        think_cb = [this](uint8_t depth, int score_cp, int elapsed_cs, uint64_t nodes, const std::string& principal_variation) {
+            m_xboard_interface->send_thinking(depth, score_cp, elapsed_cs, nodes, principal_variation);
         };
     }
 

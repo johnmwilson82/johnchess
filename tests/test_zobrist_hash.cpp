@@ -145,3 +145,27 @@ TEST_F(ZobristHashTests, CheckMoveHash)
     EXPECT_EQ(expected_hash, test_hash);
 
 }
+
+TEST_F(ZobristHashTests, WhiteCastlingRightsAffectHash)
+{
+    BitBoard board;
+    board.set_to_start_position();
+    board.set_castling_rights({
+        BitBoard::CastlingRights::WHITE_KINGSIDE,
+        BitBoard::CastlingRights::WHITE_QUEENSIDE,
+        BitBoard::CastlingRights::BLACK_KINGSIDE,
+        BitBoard::CastlingRights::BLACK_QUEENSIDE
+    });
+
+    BitBoard board_no_white_rights;
+    board_no_white_rights.set_to_start_position();
+    board_no_white_rights.set_castling_rights({
+        BitBoard::CastlingRights::BLACK_KINGSIDE,
+        BitBoard::CastlingRights::BLACK_QUEENSIDE
+    });
+
+    auto hash_all      = hasher->get_hash(board);
+    auto hash_no_white = hasher->get_hash(board_no_white_rights);
+
+    EXPECT_NE(hash_all, hash_no_white);
+}
