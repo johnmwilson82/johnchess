@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <thread>
 
+static constexpr float ASPIRATION_WINDOW = 0.5f;
+
 static int piece_value(PieceType pt)
 {
     switch (pt) {
@@ -203,18 +205,47 @@ void SearchTree::run_worker(std::chrono::steady_clock::time_point deadline)
         return move_score(m_board, a) > move_score(m_board, b);
     });
 
+    float prev_score = 0.0f;
+    const float INF  = std::numeric_limits<float>::infinity();
+
     for (uint8_t depth = 1; depth <= MAX_DEPTH; ++depth)
     {
-        float alpha = -std::numeric_limits<float>::infinity();
-        float beta  =  std::numeric_limits<float>::infinity();
+        float delta = (depth <= 2) ? INF : ASPIRATION_WINDOW;
+        float alpha = (depth <= 2) ? -INF : prev_score - delta;
+        float beta  = (depth <= 2) ?  INF : prev_score + delta;
 
-        for (const auto& move : root_moves)
+        while (true)
         {
-            if (std::chrono::steady_clock::now() >= deadline) return;
-            m_board.make_move(move);
-            float score = -negamax(-beta, -alpha, depth, true, 1);
-            m_board.unmake_move(move);
-            if (score > alpha) alpha = score;
+            float cur_alpha  = alpha;
+            float best_score = -INF;
+
+            for (const auto& move : root_moves)
+            {
+                if (std::chrono::steady_clock::now() >= deadline) return;
+                m_board.make_move(move);
+                float score = -negamax(-beta, -cur_alpha, depth, true, 1);
+                m_board.unmake_move(move);
+                if (score > best_score) best_score = score;
+                if (score > cur_alpha)  cur_alpha   = score;
+            }
+
+            if (best_score <= alpha)
+            {
+                delta = (delta >= INF) ? INF : delta * 2;
+                alpha = (delta >= INF) ? -INF : best_score - delta;
+            }
+            else if (best_score >= beta)
+            {
+                delta = (delta >= INF) ? INF : delta * 2;
+                beta  = (delta >= INF) ?  INF : best_score + delta;
+            }
+            else
+            {
+                prev_score = best_score;
+                break;
+            }
+
+            if (delta > 4.0f) { alpha = -INF; beta = INF; delta = INF; }
         }
 
         if (std::chrono::steady_clock::now() >= deadline) return;
@@ -250,25 +281,73 @@ Move SearchTree::search(std::chrono::steady_clock::time_point deadline, PieceCol
 
     std::unique_ptr<Move> best_move;
     int stable_count = 0;
+    float prev_score = 0.0f;
+
+
+    const float INF = std::numeric_limits<float>::infinity();
 
     for (uint8_t depth = 1; depth <= MAX_DEPTH; ++depth)
     {
-        float alpha = -std::numeric_limits<float>::infinity();
-        float beta = std::numeric_limits<float>::infinity();
+        // Use full window for the first two depths to seed prev_score reliably.
+        float delta = (depth <= 2) ? INF : ASPIRATION_WINDOW;
+        float alpha = (depth <= 2) ? -INF : prev_score - delta;
+        float beta  = (depth <= 2) ?  INF : prev_score + delta;
+
         std::unique_ptr<Move> iteration_best;
+        float best_score = -INF;
+        bool timed_out = false;
 
-        for (const auto& move : root_moves)
+        while (true)
         {
-            m_board.make_move(move);
-            float score = -negamax(-beta, -alpha, depth, true, 1);
-            m_board.unmake_move(move);
+            float cur_alpha = alpha;
+            float window_score = -INF;
+            std::unique_ptr<Move> window_best;
 
-            if (score > alpha)
+            for (const auto& move : root_moves)
             {
-                alpha = score;
-                iteration_best = std::make_unique<Move>(move);
+                if (std::chrono::steady_clock::now() >= deadline) { timed_out = true; break; }
+                m_board.make_move(move);
+                float score = -negamax(-beta, -cur_alpha, depth, true, 1);
+                m_board.unmake_move(move);
+
+                if (score > window_score)
+                {
+                    window_score = score;
+                    window_best  = std::make_unique<Move>(move);
+                }
+                if (score > cur_alpha) cur_alpha = score;
             }
+
+            if (timed_out) break;
+
+            if (window_score <= alpha)
+            {
+                // Fail low: widen downward.
+                delta = (delta >= INF) ? INF : delta * 2;
+                alpha = (delta >= INF) ? -INF : window_score - delta;
+                beta  = (delta >= INF) ?  INF : beta;
+            }
+            else if (window_score >= beta)
+            {
+                // Fail high: widen upward.
+                delta = (delta >= INF) ? INF : delta * 2;
+                beta  = (delta >= INF) ?  INF : window_score + delta;
+            }
+            else
+            {
+                // Score is within the window — accept.
+                iteration_best = std::move(window_best);
+                best_score     = window_score;
+                break;
+            }
+
+            // After a few doublings fall back to a full-window re-search.
+            if (delta > 4.0f) { alpha = -INF; beta = INF; delta = INF; }
         }
+
+        if (timed_out) break;
+
+        prev_score = best_score;
 
         // Track whether the best move changed this iteration.
         if (iteration_best) {
@@ -278,7 +357,7 @@ Move SearchTree::search(std::chrono::steady_clock::time_point deadline, PieceCol
         }
 
         if (think_cb && best_move) {
-            int score_cp = static_cast<int>(alpha * 100.0f);
+            int score_cp = static_cast<int>(best_score * 100.0f);
             int elapsed_cs = static_cast<int>(
                 std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::steady_clock::now() - search_start).count() / 10);
@@ -286,7 +365,7 @@ Move SearchTree::search(std::chrono::steady_clock::time_point deadline, PieceCol
         }
 
         // A forced mate was found — no deeper search can improve on this.
-        if (alpha >= 150.0f)
+        if (best_score >= 150.0f)
             break;
 
         // Best move has been stable for 3 consecutive depths — confident enough to stop.

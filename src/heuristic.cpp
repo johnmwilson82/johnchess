@@ -7,6 +7,54 @@ using namespace bitboard_utils;
 static constexpr uint64_t FILE_A = 0x0101010101010101ULL;
 static constexpr uint64_t FILE_H = 0x8080808080808080ULL;
 
+static constexpr uint64_t north_fill(uint64_t bb) {
+    bb |= bb << 8; bb |= bb << 16; bb |= bb << 32; return bb;
+}
+static constexpr uint64_t south_fill(uint64_t bb) {
+    bb |= bb >> 8; bb |= bb >> 16; bb |= bb >> 32; return bb;
+}
+
+// Bonus by advancement rank (0=start, 6=one step from promotion).
+static constexpr float passed_pawn_bonus[8] = {
+    0.00f, 0.10f, 0.15f, 0.20f, 0.30f, 0.45f, 0.70f, 0.00f
+};
+
+static float score_passed_pawns(uint64_t our_pawns, uint64_t their_pawns, bool we_are_white)
+{
+    float score = 0.0f;
+    uint64_t pawns = our_pawns;
+    while (pawns) {
+        uint8_t sq = bit_scan_forward(pawns);
+        pawns &= pawns - 1;
+        uint64_t bit = 1ULL << sq;
+        // All squares strictly ahead on the same and adjacent files.
+        uint64_t ahead = we_are_white ? north_fill(bit << 8) : south_fill(bit >> 8);
+        uint64_t mask  = ahead | ((ahead & ~FILE_A) >> 1) | ((ahead & ~FILE_H) << 1);
+        if (!(their_pawns & mask)) {
+            int rank        = sq >> 3;
+            int advancement = we_are_white ? rank : (7 - rank);
+            score += passed_pawn_bonus[advancement];
+        }
+    }
+    return score;
+}
+
+static float score_rooks_on_files(uint64_t our_rooks, uint64_t our_pawns, uint64_t all_pawns)
+{
+    float score = 0.0f;
+    uint64_t rooks = our_rooks;
+    while (rooks) {
+        uint8_t sq = bit_scan_forward(rooks);
+        rooks &= rooks - 1;
+        uint64_t file_mask = FILE_A << (sq & 7);
+        if (!(all_pawns & file_mask))
+            score += 0.25f;  // open file
+        else if (!(our_pawns & file_mask))
+            score += 0.10f;  // semi-open file
+    }
+    return score;
+}
+
 // PSTs defined from White's perspective, index 0=a1 through 63=h8.
 // Rows written rank-8 first for visual readability.
 
@@ -258,4 +306,13 @@ ShannonHeuristic::ShannonHeuristic(const BitBoard& board, PieceColour ai_colour)
     int opp_I = count_isolated_pawns(opp_pawns);
 
     accum -= 0.5f * ((ai_D - opp_D) + (ai_S - opp_S) + (ai_I - opp_I));
+
+    // Passed pawns: bonus scales with advancement rank, slightly amplified in the endgame.
+    float passed_scale = 1.0f + 0.5f * (1.0f - phase);
+    accum += passed_scale * score_passed_pawns(ai_pawns,  opp_pawns, ai_is_white);
+    accum -= passed_scale * score_passed_pawns(opp_pawns, ai_pawns, !ai_is_white);
+
+    // Rooks on open and semi-open files.
+    accum += score_rooks_on_files(ai_rooks,  ai_pawns,  board.get_pawns());
+    accum -= score_rooks_on_files(opp_rooks, opp_pawns, board.get_pawns());
 }
